@@ -1,0 +1,25 @@
+{
+  "name": "@denkitsu-ai/backend",
+  "version": "1.0.0",
+  "main": "src/app.js",
+  "author": "Denkitsu",
+  "license": "MIT",
+  "scripts": {
+    "start": "node .",
+    "dev": "nodemon ."
+  },
+  "dependencies": {
+    "axios": "^1.8.4",
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.13.2",
+    "nodemailer": "^6.10.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}
