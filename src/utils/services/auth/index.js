@@ -11,7 +11,7 @@ module.exports.authConfig = {
 }
 
 module.exports.generateToken = (data = {}) => {
-  return jwtSign(data, process.env.JWT_SECRET_SHA512, {
+  return jwtSign(data, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRATION,
     algorithm: "HS512"
   })

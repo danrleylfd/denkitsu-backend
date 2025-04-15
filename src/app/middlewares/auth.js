@@ -12,7 +12,7 @@ module.exports = (req, res, next) => {
     const [scheme, token] = parts
     if (!/^Bearer$/i.test(scheme)) return res.status(401).json({ error: "Token malformatted" })
 
-    verify(token, process.env.JWT_SECRET_SHA512, { algorithms: ["HS512"] }, (err, decoded) => {
+    verify(token, process.env.JWT_SECRET, { algorithms: ["HS512"] }, (err, decoded) => {
       if (err) return res.status(401).json({ error: "Token invalid" })
       req.query.id = decoded.id
       return next()
