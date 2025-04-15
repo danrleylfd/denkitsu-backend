@@ -4,6 +4,7 @@ const app = express()
 const cors = require("cors")
 
 const allowedOrigins = [
+  process.env.HOST0,
   process.env.HOST1,
   process.env.HOST2,
   process.env.HOST3,
