@@ -1,8 +1,8 @@
 const axios = require("axios")
 
-const tiktokToken = "0e8abe969d4211cf8d94047860d2f324771a901ccf7f9bdc345362754352241b"
+const kwaiToken = "0e8abe969d4211cf8d94047860d2f324771a901ccf7f9bdc345362754352241b"
 
-const tiktokAPI = axios.create({
+const kwaiAPI = axios.create({
   baseURL: "https://magicdown.net/wp-json/aio-dl/video-data/",
   headers: {
     origin: "https://magicdown.net",
@@ -11,4 +11,4 @@ const tiktokAPI = axios.create({
   }
 })
 
-module.exports = { tiktokToken, tiktokAPI }
+module.exports = { kwaiToken, kwaiAPI }
