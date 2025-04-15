@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+const mongoose = require("mongoose")
 const Video = require("../../../models/video")
 
 module.exports = async (req, res) => {
@@ -6,7 +6,7 @@ module.exports = async (req, res) => {
     const { video: videoID } = req.params
     const video = await Video.aggregate([
       { $match: { _id: new mongoose.Types.ObjectId(videoID) } },
-      { $project: { likesCount: { $size: '$likes' } } }
+      { $project: { likesCount: { $size: "$likes" } } }
     ])
     if (video.length === 0) return res.status(404).json({ error: "video not found" })
     return res.status(200).json({ likes: video[0].likesCount })

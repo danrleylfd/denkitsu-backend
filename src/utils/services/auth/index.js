@@ -2,9 +2,6 @@ const { sign: jwtSign } = require("jsonwebtoken")
 const { randomBytes } = require("crypto")
 
 module.exports.authConfig = {
-  unhashed: "Backend Core",
-  secret: "8f170f6540d4a39c6347b9c254640bd1",
-  type: "hash-md5",
   otp: {
     digits: true,
     lowerCaseAlphabets: true,
@@ -14,8 +11,9 @@ module.exports.authConfig = {
 }
 
 module.exports.generateToken = (data = {}) => {
-  return jwtSign(data, this.authConfig.secret, {
-    expiresIn: 86400 // segundos = 1 dia
+  return jwtSign(data, process.env.JWT_SECRET_SHA512, {
+    expiresIn: process.env.JWT_EXPIRATION,
+    algorithm: "HS512"
   })
 }
 
@@ -24,12 +22,17 @@ module.exports.generateOTPToken = (counter = 20) => {
   return otpToken
 }
 
-module.exports.generateOTPCode = (counter = 6, options = this.authConfig.otp) => {
+module.exports.generateOTPCode = (
+  counter = 6,
+  options = this.authConfig.otp
+) => {
   let characters = ""
-  const { digits, lowerCaseAlphabets, upperCaseAlphabets } = options
+  const { digits, lowerCaseAlphabets, upperCaseAlphabets, specialChars } =
+    options
   if (digits) characters += "0123456789"
   if (lowerCaseAlphabets) characters += "abcdefghijklmnopqrstuvwxyz"
   if (upperCaseAlphabets) characters += "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+  if (specialChars) characters += "!@#$%^&*()_+-=[]{}|;:,.<>?"
   let otp = ""
   for (let i = 0; i < counter; i++) {
     otp += characters[Math.floor(Math.random() * characters.length)]

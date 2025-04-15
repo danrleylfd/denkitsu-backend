@@ -11,19 +11,19 @@ const deleteAccount = require("../views/auth/deleteAccount")
 
 console.log("NONE /auth...")
 
-console.log("POST /auth/signUp")
+console.log("POST /auth/signup")
 routes.post("/signup", signUp)
 
-console.log("POST /auth/signIn")
+console.log("POST /auth/signin")
 routes.post("/signin", signIn)
 
-console.log("POST /auth/forgotPassword")
+console.log("POST /auth/forgot_password")
 routes.post("/forgot_password", forgotPassword)
 
-console.log("POST /auth/resetPassword")
+console.log("POST /auth/reset_password")
 routes.post("/reset_password", resetPassword)
 
-console.log("GET /auth/getUser")
+console.log("GET /auth/")
 routes.get("/", getUser)
 
 console.log("GET /auth/getUser/:id")

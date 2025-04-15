@@ -15,17 +15,17 @@ module.exports = async (req, res) => {
         $addFields: {
           popularity: {
             $sum: [
-              { $multiply: [{ $size: '$likes' }, 2] },
-              { $multiply: [{ $size: '$comments' }, 3] },
-              { $multiply: [{ $size: '$shares' }, 5] },
+              { $multiply: [{ $size: "$likes" }, 2] },
+              { $multiply: [{ $size: "$comments" }, 3] },
+              { $multiply: [{ $size: "$shares" }, 5] }
             ]
           }
         }
       },
-      { $sort: { popularity: -1, updatedAt: -1, createdAt: -1, } },
+      { $sort: { popularity: -1, updatedAt: -1, createdAt: -1 } },
       { $limit: 16 }
     ]).exec()
-    if (!videos) return res.status(404).json({ error: "videos not found." })
+    if (!videos) return res.status(404).json({ error: "videos not found" })
     const videosWithUsers = []
     for (let pos = 0; pos < videos.length; pos++) {
       const video = videos[pos]

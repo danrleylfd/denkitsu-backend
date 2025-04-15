@@ -32,4 +32,4 @@ console.log("DEL /videos/:video")
 routes.delete("/:video", deleteOne)
 
 console.log("\nroutes /videos loaded.\n")
-module.exports = app => app.use("/videos", routes)
+module.exports = (app) => app.use("/videos", routes)

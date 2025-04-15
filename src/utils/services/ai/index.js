@@ -21,5 +21,4 @@ const ask = async (prompts, options = {}) => {
   }
 }
 
-
 module.exports = ask

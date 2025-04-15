@@ -2,13 +2,14 @@ const ask = require("../../../utils/services/ai")
 
 const sysPrompt = {
   role: "system",
-  content: "O assistant deve sempre responder em pt-BR, mesmo que o usuário escreva em outro idioma."
+  content:
+    "O assistant deve sempre responder em pt-BR, mesmo que o usuário escreva em outro idioma."
 }
 
 module.exports = async (req, res) => {
   try {
     const { model, prompts } = req.body
-    if(!model || !prompts) return res.status(400).json({ error: "Bad Request." })
+    if (!model || !prompts) return res.status(400).json({ error: "Bad Request" })
     console.log(`MODEL ${model}`)
     console.log(`USER ${prompts[0].content}`)
     const { status, data } = await ask([sysPrompt, ...prompts], { model })

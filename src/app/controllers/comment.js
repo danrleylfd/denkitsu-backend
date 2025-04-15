@@ -22,4 +22,4 @@ console.log("DEL /:video/:comment")
 routes.delete("/:video/:comment", delComment)
 
 console.log("routes /comments loaded.")
-module.exports = app => app.use("/comments", routes)
+module.exports = (app) => app.use("/comments", routes)

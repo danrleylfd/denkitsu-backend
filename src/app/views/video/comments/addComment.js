@@ -7,10 +7,11 @@ module.exports = async (req, res) => {
     const { video: videoID } = req.params
     const { content } = req.body
     // Retorna se o usuário não houver enviado o content do video:
-    if (!content || content.trim().length === 0) return res.status(422).json({ error: "content missing." })
+    if (!content || content.trim().length === 0)
+      return res.status(422).json({ error: "content missing" })
     // Retorna se o video não for encontrado:
     const video = await Video.findById(videoID)
-    if (!video) return res.status(404).json({ error: "video not found." })
+    if (!video) return res.status(404).json({ error: "video not found" })
     // Publica o comentário:
     const comment = await Comment.create({
       content,

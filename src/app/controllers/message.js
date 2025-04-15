@@ -12,4 +12,4 @@ console.log("POST /message")
 routes.post("/", sendMessage)
 
 console.log("\nroutes /message loaded.\n")
-module.exports = (app) => app.use("/message", routes)
+module.exports = (app) => app.use("/messages", routes)

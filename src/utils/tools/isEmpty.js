@@ -1,3 +1,3 @@
 module.exports = (objectString) => {
-  return (!objectString || objectString.trim().length === 0)
+  return !objectString || objectString.trim().length === 0
 }

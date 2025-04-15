@@ -18,4 +18,4 @@ console.log("GET /shares/:video")
 routes.get("/:video", countShares)
 
 console.log("\nroutes /shares loaded.\n")
-module.exports = app => app.use("/shares", routes)
+module.exports = (app) => app.use("/shares", routes)

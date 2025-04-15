@@ -22,4 +22,4 @@ console.log("DEL /likes/:video")
 routes.delete("/:video", delLike)
 
 console.log("\nroutes /likes loaded.\n")
-module.exports = app => app.use("/likes", routes)
+module.exports = (app) => app.use("/likes", routes)

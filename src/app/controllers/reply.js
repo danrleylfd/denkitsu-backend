@@ -18,4 +18,4 @@ console.log("DELETE /replys/:video/:comment")
 routes.delete("/:video/:comment", delReply)
 
 console.log("\nroutes /replys loaded.\n")
-module.exports = app => app.use("/replys", routes)
+module.exports = (app) => app.use("/replys", routes)

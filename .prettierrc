@@ -8,5 +8,5 @@
   "bracketSpacing": true,
   "arrowParens": "always",
   "bracketSameLine": true,
-  "printWidth": 100
+  "printWidth": 160
 }
