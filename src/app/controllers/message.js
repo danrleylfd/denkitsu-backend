@@ -6,9 +6,9 @@ const routes = Router()
 
 const sendMessage = require("../views/message/sendMessage")
 
-console.log("NONE /message...")
+console.log("NONE /messages...")
 
-console.log("POST /message")
+console.log("POST /")
 routes.post("/", sendMessage)
 
 console.log("\nroutes /message loaded.\n")

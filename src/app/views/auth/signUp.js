@@ -1,5 +1,5 @@
 const User = require("../../models/auth")
-const { generateToken, generateRefreshToken } = require("../../../utils/services/auth")
+const { generateToken } = require("../../../utils/services/auth")
 
 module.exports = async (req, res) => {
   try {
@@ -26,7 +26,6 @@ module.exports = async (req, res) => {
     user.password = undefined
     return res.status(201).json({
       token: generateToken({ id: user._id }),
-      refreshToken: generateRefreshToken({ id: user._id }),
       user,
       message: "Success to Sign Up."
     })

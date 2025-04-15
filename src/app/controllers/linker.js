@@ -20,7 +20,7 @@ routes.get("/by-user", readMany)
 routes.get("/:label", readMany)
 routes.put("/:oldLabel", updateOne)
 
-console.log("DELETE /linkers/:label")
+console.log("DEL /linkers/:label")
 routes.delete("/:label", deleteOne)
 
 console.log("\nlinkers routes loaded.\n")

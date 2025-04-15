@@ -14,7 +14,7 @@ console.log("NONE /replys...")
 console.log("POST /replys/:video/:comment")
 routes.post("/:video/:comment", replyComment)
 
-console.log("DELETE /replys/:video/:comment")
+console.log("DEL /replys/:video/:comment")
 routes.delete("/:video/:comment", delReply)
 
 console.log("\nroutes /replys loaded.\n")

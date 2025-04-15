@@ -4,7 +4,7 @@ const isEmpty = (value) => !value || value.trim().length === 0
 
 module.exports = async (req, res) => {
   try {
-    const { user: userID } = req.query
+    const { id: userID } = req.query
     const { content, coverUrl, fileUrl } = req.body
     // Retorna se o usuário não houver enviado o body do video:
     if ([content, coverUrl, fileUrl].some(isEmpty))
