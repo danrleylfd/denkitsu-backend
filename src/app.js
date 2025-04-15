@@ -3,23 +3,25 @@ const express = require("express")
 const app = express()
 const cors = require("cors")
 
-const allowedOrigins = [
-  process.env.HOST0,
-  process.env.HOST1,
-  process.env.HOST2,
-  process.env.HOST3,
-  process.env.HOST4,
-  process.env.HOST5,
-  process.env.HOST6
-]
+const isDev = process.env.HOST0 === "localhost"
 
-app.use(cors({ origin: (origin, callback) => {
-  if(!origin || allowedOrigins.includes(origin)) {
-    callback(null, true)
-  } else {
-    callback(new Error("Not allowed by CORS"))
+app.use(cors({
+  origin: isDev ? true : (origin, callback) => {
+    const allowedOrigins = [
+      process.env.HOST1,
+      process.env.HOST2,
+      process.env.HOST3,
+      process.env.HOST4,
+      process.env.HOST5,
+      process.env.HOST6
+    ]
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true)
+    } else {
+      callback(new Error("Not allowed by CORS"))
+    }
   }
-} }))
+}))
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
