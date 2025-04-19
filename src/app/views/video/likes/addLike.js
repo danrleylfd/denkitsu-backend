@@ -2,7 +2,7 @@ const Video = require("../../../models/video")
 
 module.exports = async (req, res) => {
   try {
-    const { id: userID } = req
+    const { userID } = req
     const { video: videoID } = req.params
     const video = await Video.findById(videoID).populate("user")
     if (!video || video.likes.includes(userID))

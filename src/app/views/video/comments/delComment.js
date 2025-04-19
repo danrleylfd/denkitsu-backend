@@ -3,7 +3,7 @@ const Comment = require("../../../models/comment")
 
 module.exports = async (req, res) => {
   try {
-    const { id: userID } = req
+    const { userID } = req
     const { comment: commentID, video: videoID } = req.params
     // Retorna se o usuário não houver enviado o id do comentário:
     if (!commentID || commentID.trim().length === 0)

@@ -2,7 +2,7 @@ const Linker = require("../../models/linker")
 
 module.exports = async (req, res) => {
   try {
-    const { id: user } = req
+    const { userID } = req
     const { label, link } = req.body
     if (!label || label.trim().length === 0)
       return res.status(422).json({ error: "label missing" })
@@ -10,7 +10,7 @@ module.exports = async (req, res) => {
     const _linker = await Linker.findOne({ label })
     if (_linker) return res.status(401).json({ error: "Label already exists" })
     const linker = await Linker.create({
-      user,
+      user: userID,
       label: label.trim(),
       link: link.trim()
     })

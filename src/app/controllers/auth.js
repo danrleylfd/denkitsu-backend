@@ -19,7 +19,7 @@ routes.post("/reset_password", resetPassword)
 
 routes.get("/", getUser)
 
-routes.get("/:id", getUser)
+routes.get("/:userID", getUser)
 
 routes.put("/", editAccount)
 

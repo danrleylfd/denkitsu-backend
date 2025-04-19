@@ -14,10 +14,16 @@ console.log("NONE /linkers...")
 console.log("GET /linkers/")
 routes.post("/", createOne)
 
+console.log("GET /linkers/")
 routes.get("/", readMany)
+
+console.log("GET /linkers/by-user")
 routes.get("/by-user", readMany)
 
+console.log("GET /linkers/:label")
 routes.get("/:label", readMany)
+
+console.log("PUT /linkers/:oldLabel")
 routes.put("/:oldLabel", updateOne)
 
 console.log("DEL /linkers/:label")

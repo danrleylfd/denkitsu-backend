@@ -2,7 +2,6 @@ const { verify } = require("jsonwebtoken")
 
 module.exports = (req, res, next) => {
   try {
-    // if (req.method === "GET") return next()
     const authHeader = req.headers.authorization
     if (!authHeader) return res.status(401).json({ error: "No token provided." })
 
@@ -14,7 +13,7 @@ module.exports = (req, res, next) => {
 
     verify(token, process.env.JWT_SECRET, (err, decoded) => {
       if (err) return res.status(401).json({ error: "Token invalid." })
-      req.id = decoded.id
+      req.userID = decoded.id
       return next()
     })
   } catch ({ error }) {

@@ -3,7 +3,7 @@ const Comment = require("../../../models/comment")
 
 module.exports = async (req, res) => {
   try {
-    const { id: userID } = req.query
+    const { userID } = req.query
     const { video: videoID, comment: commentID } = req.params
     const { content } = req.body
     // Retorna se o usuário não houver enviado o content do video:
