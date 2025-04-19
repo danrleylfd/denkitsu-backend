@@ -3,7 +3,6 @@ const { verify } = require("jsonwebtoken")
 module.exports = (req, res, next) => {
   try {
     // if (req.method === "GET") return next()
-    req.query.id = undefined
     const authHeader = req.headers.authorization
     if (!authHeader) return res.status(401).json({ error: "No token provided." })
 
