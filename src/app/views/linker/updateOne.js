@@ -3,7 +3,7 @@ const Linker = require("../../models/linker")
 
 module.exports = async (req, res) => {
   try {
-    const { id } = req.query
+    const { id } = req
     const { oldLabel } = req.params
     const { newLabel, newLink } = req.body
     if (!oldLabel || oldLabel.trim().length === 0)

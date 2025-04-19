@@ -3,7 +3,7 @@ const Linker = require("../../models/linker")
 
 module.exports = async (req, res) => {
   try {
-    const { id } = req.query
+    const { id } = req
     console.log(`Id do usuário: ${id}`)
     const user = await User.findById(id)
     if (!user) return res.status(404).json({ error: "User not found/exist" })
