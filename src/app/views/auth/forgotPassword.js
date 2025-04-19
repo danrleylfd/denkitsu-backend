@@ -8,10 +8,9 @@ const { generateOTPToken, generateOTPCode } = require("../../../utils/services/a
 module.exports = async (req, res) => {
   try {
     const { email } = req.body
-    if (!email || email.trim().length === 0)
-      return res.status(422).json({ error: "email missing" })
+    if (!email || email.trim().length === 0) return res.status(422).json({ error: "email missing." })
     let user = await User.findOne({ email })
-    if (!user) return res.status(404).json({ error: "User not found/exist" })
+    if (!user) return res.status(404).json({ error: "User not found/exist." })
     const token = generateOTPCode() || generateOTPToken()
     const now = new Date()
     now.setMinutes(now.getMinutes() + 3)
@@ -20,15 +19,13 @@ module.exports = async (req, res) => {
     await user.save()
     user = await User.findById(user._id)
     const html = await renderFile(`${__dirname}/../../../utils/templates/forgotPassword.ejs`, {
-      username: user.name,
-      token
+      username: user.name, token
     })
     mailer.sendMail({ to: email, subject: "Token de recuperação", html }, (err) => {
-      if (err) return res.status(500).json({ error: "Cannot send forgot password email" })
+      if (err) return res.status(500).json({ error: "Cannot send forgot password email." })
     })
-    return res.status(200).json({ message: "Email successfully sent" })
-  } catch (error) {
-    console.error(error.message)
-    return res.status(500).json({ error: "Internal server error" })
+    return res.status(200).json({ message: "Email successfully sent." })
+  } catch ({ error }) {
+    return res.status(400).json({ error })
   }
 }
