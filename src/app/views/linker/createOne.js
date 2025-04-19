@@ -1,9 +1,11 @@
+const mongoose = require("../../../utils/database")
 const Linker = require("../../models/linker")
 
 module.exports = async (req, res) => {
   try {
-    const { id: user } = req.query
+    const { id: userID } = req.query
     const { label, link } = req.body
+    const user = new mongoose.Types.ObjectId(userID)
     if (!label || label.trim().length === 0)
       return res.status(422).json({ error: "label missing" })
     if (!link || link.trim().length === 0) return res.status(422).json({ error: "link missing" })
