@@ -2,7 +2,7 @@ const Video = require("../../../models/video")
 
 module.exports = async (req, res) => {
   try {
-    const { user: userID } = req.query
+    const { id: userID } = req.query
     const { video: videoID } = req.params
     const video = await Video.findById(videoID).populate("user")
     if (!video) return res.status(404).json({ error: "video not found" })

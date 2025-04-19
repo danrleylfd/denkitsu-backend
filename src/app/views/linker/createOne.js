@@ -2,7 +2,7 @@ const Linker = require("../../models/linker")
 
 module.exports = async (req, res) => {
   try {
-    const { id: user } = req.query
+    const { id: user } = req
     const { label, link } = req.body
     if (!label || label.trim().length === 0)
       return res.status(422).json({ error: "label missing" })

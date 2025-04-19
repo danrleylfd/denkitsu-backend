@@ -2,7 +2,7 @@ const Video = require("../../../models/video")
 
 module.exports = async (req, res) => {
   try {
-    const { user: userID } = req.query
+    const { id: userID } = req
     const { video: videoID } = req.params
     const video = await Video.findById(videoID).populate("user")
     // Retorna se o usuário não houver curtido o video:
