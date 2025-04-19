@@ -15,7 +15,7 @@ module.exports = (req, res, next) => {
 
     verify(token, process.env.JWT_SECRET, (err, decoded) => {
       if (err) return res.status(401).json({ error: "Token invalid." })
-      req.query.user = decoded.id
+      req.query.id = decoded.id
       return next()
     })
   } catch ({ error }) {
