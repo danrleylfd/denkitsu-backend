@@ -1,5 +1,4 @@
 const { verify } = require("jsonwebtoken")
-const { authConfig: { secret } } = require("../../utils/services/auth")
 
 module.exports = (req, res, next) => {
   try {
@@ -14,7 +13,7 @@ module.exports = (req, res, next) => {
     const [scheme, token] = parts
     if (!/^Bearer$/i.test(scheme)) return res.status(401).json({ error: "Token malformatted." })
 
-    verify(token, secret, (err, decoded) => {
+    verify(token, process.env.JWT_SECRET, (err, decoded) => {
       if (err) return res.status(401).json({ error: "Token invalid." })
       req.query.user = decoded.id
       return next()

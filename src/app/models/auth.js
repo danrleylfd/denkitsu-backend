@@ -32,7 +32,7 @@ const UserSchema = new mongoose.Schema({
 }, { timestamps: true })
 
 UserSchema.pre("save", async function (next) {
-  const encriptedPassword = await hash(this.password, 10)
+  const encriptedPassword = await hash(this.password, 14)
   this.password = encriptedPassword
   next()
 })
