@@ -16,6 +16,12 @@ module.exports.generateToken = (data = {}) => {
   })
 }
 
+module.exports.generateRefreshToken = (data = {}) => {
+  return jwtSign(data, process.env.JWT_REFRESH_SECRET, {
+    expiresIn: process.env.JWT_REFRESH_EXPIRATION
+  })
+}
+
 module.exports.generateOTPToken = (counter = 20) => {
   const otpToken = randomBytes(counter).toString("hex")
   return otpToken

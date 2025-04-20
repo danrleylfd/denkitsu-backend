@@ -1,5 +1,5 @@
 const User = require("../../models/auth")
-const { generateToken } = require("../../../utils/services/auth")
+const { generateRefreshToken, generateToken } = require("../../../utils/services/auth")
 
 module.exports = async (req, res) => {
   try {
@@ -20,11 +20,13 @@ module.exports = async (req, res) => {
     })
     user.password = undefined
     return res.status(201).json({
+      refreshToken: generateRefreshToken({ id: user._id }),
       token: generateToken({ id: user._id }),
       user,
       message: "Success to Sign Up."
     })
-  } catch ({ error }) {
-    return res.status(400).json({ error })//500
+  } catch (error) {
+    console.error(error.message)
+    return res.status(500).json({ error: "Internal server error" })
   }
 }

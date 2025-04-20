@@ -16,7 +16,8 @@ module.exports = (req, res, next) => {
       req.userID = decoded.id
       return next()
     })
-  } catch ({ error }) {
-    return res.status(500).json({ error })
+  } catch (error) {
+    console.error(error.message)
+    return res.status(500).json({ error: "Internal server error" })
   }
 }

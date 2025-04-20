@@ -15,7 +15,8 @@ module.exports = async (req, res) => {
     user.passwordResetExpires = now
     await user.save()
     return res.status(206).json({ message: "Password changed successfully." })
-  } catch ({ error }) {
-    return res.status(400).json({ error })
+  } catch (error) {
+    console.error(error.message)
+    return res.status(500).json({ error: "Internal server error" })
   }
 }

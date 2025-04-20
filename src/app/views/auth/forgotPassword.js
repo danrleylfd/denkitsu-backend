@@ -25,7 +25,8 @@ module.exports = async (req, res) => {
       if (err) return res.status(500).json({ error: "Cannot send forgot password email." })
     })
     return res.status(200).json({ message: "Email successfully sent." })
-  } catch ({ error }) {
-    return res.status(400).json({ error })
+  } catch (error) {
+    console.error(error.message)
+    return res.status(500).json({ error: "Internal server error" })
   }
 }

@@ -27,7 +27,8 @@ module.exports = async (req, res) => {
       user,
       message: "Account successfully edited."
     })
-  } catch ({ error }) {
-    return res.status(400).json({ error })
+  } catch (error) {
+    console.error(error.message)
+    return res.status(500).json({ error: "Internal server error" })
   }
 }

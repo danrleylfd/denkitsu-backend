@@ -7,7 +7,8 @@ module.exports = async (req, res) => {
     const user = await User.findById(userID)
     if (!user) return res.status(404).json({ error: "User not found/exist." })
     return res.status(200).json({ user, message: "Success to get user." })
-  } catch ({ error }) {
-    return res.status(400).json({ error })
+  } catch (error) {
+    console.error(error.message)
+    return res.status(500).json({ error: "Internal server error" })
   }
 }

@@ -1,7 +1,7 @@
 const { compare } = require("bcryptjs")
 
 const User = require("../../models/auth")
-const { generateToken } = require("../../../utils/services/auth")
+const { generateRefreshToken, generateToken } = require("../../../utils/services/auth")
 
 module.exports = async (req, res) => {
   try {
@@ -14,11 +14,13 @@ module.exports = async (req, res) => {
     if (!_password) return res.status(401).json({ error: "Invalid password." })
     user.password = undefined
     return res.status(200).json({
+      refreshToken: generateRefreshToken({ id: user._id }),
       token: generateToken({ id: user._id }),
       user,
       message: "Success to Sign In."
     })
-  } catch ({ error }) {
-    return res.status(400).json({ error })
+  } catch (error) {
+    console.error(error.message)
+    return res.status(500).json({ error: "Internal server error" })
   }
 }
