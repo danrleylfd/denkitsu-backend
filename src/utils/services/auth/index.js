@@ -27,13 +27,9 @@ module.exports.generateOTPToken = (counter = 20) => {
   return otpToken
 }
 
-module.exports.generateOTPCode = (
-  counter = 6,
-  options = this.authConfig.otp
-) => {
+module.exports.generateOTPCode = (counter = 6, options = this.authConfig.otp) => {
   let characters = ""
-  const { digits, lowerCaseAlphabets, upperCaseAlphabets, specialChars } =
-    options
+  const { digits, lowerCaseAlphabets, upperCaseAlphabets, specialChars } = options
   if (digits) characters += "0123456789"
   if (lowerCaseAlphabets) characters += "abcdefghijklmnopqrstuvwxyz"
   if (upperCaseAlphabets) characters += "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
