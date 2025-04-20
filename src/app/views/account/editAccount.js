@@ -12,7 +12,8 @@ module.exports = async (req, res) => {
     if (!password || password.trim().length < 8) return res.status(422).json({ error: "password missing or too short." })
     let user = await User.findOne({ email: email.trim() }).select("+password")
     if (!user) return res.status(404).json({ error: "User not found/exist." })
-    if (user._id !== userID) return res.status(401).json({ error: "Invalid user." })
+    console.log("user._id, userID", user._id, userID)
+    if (user._id != userID) return res.status(401).json({ error: "Invalid user." })
     let avatarUrl
     if (!_avatarUrl || _avatarUrl.trim().length === 0) avatarUrl = user.avatarUrl
     const _password = await compare(password, user.password)
