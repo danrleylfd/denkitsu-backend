@@ -25,6 +25,6 @@ app.use(express.urlencoded({ extended: true }))
 
 require("./app/controllers/index")(app)
 
-app.listen(process.env.PORT).then(() => {
-  console.log(`Servidor iniciado.`)
-})
+app.listen(process.env.PORT)
+
+console.log("Servidor inicializado.")
