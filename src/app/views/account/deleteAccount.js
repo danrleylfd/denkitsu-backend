@@ -12,7 +12,7 @@ module.exports = async (req, res) => {
     if (!password || password.length < 8) return res.status(422).json({ error: "password missing or too short." })
     const user = await User.findOne({ email }).select("+password")
     if (!user) return res.status(404).json({ error: "user not found." })
-    if (user._id !== userID) return res.status(401).json({ error: "invalid user." })
+    if (user._id != userID) return res.status(401).json({ error: "invalid user." })
     const _password = await compare(password, user.password)
     if (!_password) return res.status(401).json({ error: "invalid password." })
     await User.deleteOne({ _id: user._id })
