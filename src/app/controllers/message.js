@@ -6,10 +6,6 @@ const routes = Router()
 
 const sendMessage = require("../views/message/sendMessage")
 
-console.log("NONE /messages...")
-
-console.log("POST /")
 routes.post("/", sendMessage)
 
-console.log("\nroutes /message loaded.\n")
 module.exports = (app) => app.use("/messages", routes)

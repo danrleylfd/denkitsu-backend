@@ -1,11 +1,11 @@
 const { compare } = require("bcryptjs")
 
 const User = require("../../models/auth")
-const { generateToken } = require("../../../utils/services/auth")
+const { generateRefreshToken, generateToken } = require("../../../utils/services/auth")
 
 module.exports = async (req, res) => {
   try {
-    const { userID } = req.query
+    const { userID } = req
     const { name, email, password, avatarUrl: _avatarUrl } = req.body
     if (!name || name.trim().length === 0) return res.status(422).json({ error: "name missing." })
     if (!email || email.trim().length === 0) return res.status(422).json({ error: "email missing." })
@@ -23,6 +23,7 @@ module.exports = async (req, res) => {
     await user.save()
     user = await User.findById(user._id)
     return res.status(206).json({
+      refreshToken: generateRefreshToken({ id: user._id }),
       token: generateToken({ id: user._id }),
       user,
       message: "Account successfully edited."
