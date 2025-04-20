@@ -7,8 +7,7 @@ module.exports = async (req, res) => {
     const { video: videoID, comment: commentID } = req.params
     const { content } = req.body
     // Retorna se o usuário não houver enviado o content do video:
-    if (!content || content.trim().length === 0)
-      return res.status(422).json({ error: "content missing" })
+    if (!content || content.trim().length === 0) return res.status(422).json({ error: "content missing" })
     // Retorna se o video não for encontrado:
     const video = await Video.findById(videoID)
     if (!video) return res.status(404).json({ error: "video not found" })
@@ -25,9 +24,7 @@ module.exports = async (req, res) => {
       await comment.save()
       return res.status(201).json(comment)
     }
-    return res
-      .status(400)
-      .json({ error: "It is not possible to respond to a reply from another comment" })
+    return res.status(400).json({ error: "It is not possible to respond to a reply from another comment" })
   } catch (error) {
     console.error(error.message)
     return res.status(500).json({ error: "Internal server error" })

@@ -10,8 +10,7 @@ module.exports = async (req, res) => {
     // Retorna se o usuário não houver enviado os params/body do video:
     if ([key, newValue].some(isEmpty))
       return res.status(422).json({
-        message:
-          "one or more of the variables is missing: videoID, key and newValue.",
+        message: "one or more of the variables is missing: videoID, key and newValue.",
         note: "key is any attribute of a video."
       })
     let video = await Video.findOne({ _id: videoID, user: userID })

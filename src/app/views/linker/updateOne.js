@@ -6,18 +6,14 @@ module.exports = async (req, res) => {
     const { userID } = req
     const { oldLabel } = req.params
     const { newLabel, newLink } = req.body
-    if (!oldLabel || oldLabel.trim().length === 0)
-      return res.status(422).json({ error: "oldLabel missing" })
-    if (!newLabel || newLabel.trim().length === 0)
-      return res.status(422).json({ error: "newLabel missing" })
-    if (!newLink || newLink.trim().length === 0)
-      return res.status(422).json({ error: "newLink missing" })
+    if (!oldLabel || oldLabel.trim().length === 0) return res.status(422).json({ error: "oldLabel missing" })
+    if (!newLabel || newLabel.trim().length === 0) return res.status(422).json({ error: "newLabel missing" })
+    if (!newLink || newLink.trim().length === 0) return res.status(422).json({ error: "newLink missing" })
     const user = await User.findById(userID)
     if (!user) return res.status(404).json({ error: "User not found/exist" })
     let linker = await Linker.findOne({ label: oldLabel })
     if (!linker) return res.status(404).json({ error: "Label not found" })
-    if (linker.user.toString() !== userID)
-      return res.status(401).json({ error: "You are not the owner of this label" })
+    if (linker.user.toString() !== userID) return res.status(401).json({ error: "You are not the owner of this label" })
     linker.label = newLabel
     linker.link = newLink
     await linker.save()

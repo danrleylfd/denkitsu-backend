@@ -19,7 +19,8 @@ module.exports = async (req, res) => {
     await user.save()
     user = await User.findById(user._id)
     const html = await renderFile(`${__dirname}/../../../utils/templates/forgotPassword.ejs`, {
-      username: user.name, token
+      username: user.name,
+      token
     })
     mailer.sendMail({ to: email, subject: "Token de recuperação", html }, (err) => {
       if (err) return res.status(500).json({ error: "Cannot send forgot password email." })

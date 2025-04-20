@@ -28,4 +28,4 @@ routes.put("/", editAccount)
 
 routes.delete("/", deleteAccount)
 
-module.exports = app => app.use("/auth", routes)
+module.exports = (app) => app.use("/auth", routes)

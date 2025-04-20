@@ -14,11 +14,7 @@ module.exports = async (req, res) => {
       {
         $addFields: {
           popularity: {
-            $sum: [
-              { $multiply: [{ $size: "$likes" }, 2] },
-              { $multiply: [{ $size: "$comments" }, 3] },
-              { $multiply: [{ $size: "$shares" }, 5] }
-            ]
+            $sum: [{ $multiply: [{ $size: "$likes" }, 2] }, { $multiply: [{ $size: "$comments" }, 3] }, { $multiply: [{ $size: "$shares" }, 5] }]
           }
         }
       },

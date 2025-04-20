@@ -2,8 +2,7 @@ const ask = require("../../../utils/services/ai")
 
 const sysPrompt = {
   role: "system",
-  content:
-    "O assistant deve sempre responder em pt-BR, mesmo que o usuário escreva em outro idioma."
+  content: "O assistant deve sempre responder em pt-BR, mesmo que o usuário escreva em outro idioma."
 }
 
 module.exports = async (req, res) => {

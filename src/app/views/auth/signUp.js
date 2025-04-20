@@ -8,7 +8,8 @@ module.exports = async (req, res) => {
     if (!email || email.trim().length === 0) return res.status(422).json({ error: "email missing." })
     if (!password || password.trim().length < 8) return res.status(422).json({ error: "password missing or too short." })
     let avatarUrl
-    if (!_avatarUrl || _avatarUrl.trim().length === 0) avatarUrl = `https://ui-avatars.com/api/?name=${name.split(" ").join("+")}&background=random&size=512&rounded=true&format=png`
+    if (!_avatarUrl || _avatarUrl.trim().length === 0)
+      avatarUrl = `https://ui-avatars.com/api/?name=${name.split(" ").join("+")}&background=random&size=512&rounded=true&format=png`
     else avatarUrl = _avatarUrl.trim()
     const _user = await User.findOne({ email: email.trim() })
     if (_user) return res.status(401).json({ error: "User already exists." })

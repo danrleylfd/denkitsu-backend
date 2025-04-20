@@ -9,10 +9,8 @@ module.exports = async (req, res) => {
     // Retorna se o usuário não houver enviado o body do video:
     if ([content, coverUrl, fileUrl].some(isEmpty))
       return res.status(422).json({
-        message:
-          "one or more of the variables is missing: content, coverUrl and fileUrl."
+        message: "one or more of the variables is missing: content, coverUrl and fileUrl."
       })
-    // Publica o vídeo:
     const video = await Video.findOneOrCreate({
       user: userID,
       content: content.trim(),
