@@ -1,8 +1,9 @@
 require("dotenv").config({ path: __dirname + "/../.env" })
 const express = require("express")
-const app = express()
 const requestIp = require("request-ip")
 const cors = require("./app/middlewares/cors")
+
+const app = express()
 
 app.use(cors)
 app.use(express.json())
