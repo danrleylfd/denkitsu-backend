@@ -1,21 +1,9 @@
 require("dotenv").config({ path: __dirname + "/../.env" })
 const express = require("express")
 const app = express()
-const cors = require("cors")
+const cors = require("./app/middlewares/cors")
 
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      const allowedOrigins = [process.env.HOST0, process.env.HOST1, process.env.HOST2, process.env.HOST3, process.env.HOST4, process.env.HOST5, process.env.HOST6]
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true)
-      } else {
-        callback(new Error("Not allowed by CORS"))
-      }
-    }
-  })
-)
-
+app.use(cors)
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
