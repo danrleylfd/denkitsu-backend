@@ -2,11 +2,11 @@ const Log = require("../models/log")
 
 module.exports = async (req, res, next) => {
   try {
+    const user = req.userID || null
     const ip = req.ip || req.connection.remoteAddress
     const so = getOS(req.headers["user-agent"])
     const browser = getBrowser(req.headers["user-agent"])
     const route = req.originalUrl
-    const user = req.userID || null
     await Log.create({ ip, so, browser, route, user })
     next()
   } catch (error) {
