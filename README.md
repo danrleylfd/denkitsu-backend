@@ -48,8 +48,11 @@ Depois que o merge da sua pull request for feito, você pode deletar a sua branc
  - `PASSWORD="password"`
  - `AI_API_URL=""`
  - `AI_API_KEY=""`
+ - `OWNER=""`
  - `JWT_SECRET=""`
  - `JWT_EXPIRATION="24h"`
+ - `JWT_REFRESH_SECRET=""`
+ - `JWT_REFRESH_EXPIRATION="7d"`
 
 ## :memo: Licença
 

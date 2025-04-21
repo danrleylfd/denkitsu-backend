@@ -1,6 +1,8 @@
 const { Router } = require("express")
+const logMiddleware = require("../middlewares/log")
 
 const routes = Router()
+routes.use(logMiddleware)
 
 const signUp = require("../views/auth/signUp")
 const signIn = require("../views/auth/signIn")
