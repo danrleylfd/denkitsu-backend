@@ -2,11 +2,12 @@ const Log = require("../models/log")
 
 module.exports = async (req, res, next) => {
   try {
+    const route = req.originalUrl
+    if(route.includes("/dashboard/logs")) return next()
     const user = req.userID || null
     const ip = req.ip || req.connection.remoteAddress
     const so = getOS(req.headers["user-agent"])
     const browser = getBrowser(req.headers["user-agent"])
-    const route = req.originalUrl
     await Log.create({ ip, so, browser, route, user })
     next()
   } catch (error) {
