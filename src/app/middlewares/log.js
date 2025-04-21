@@ -5,7 +5,7 @@ module.exports = async (req, res, next) => {
     const route = req.originalUrl
     if(route.includes("/dashboard/logs")) return next()
     const user = req.userID || null
-    const ip = req.ip || req.connection.remoteAddress
+    const ip = req.clientIp
     const so = getOS(req.headers["user-agent"])
     const browser = getBrowser(req.headers["user-agent"])
     await Log.create({ ip, so, browser, route, user })
