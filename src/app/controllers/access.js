@@ -8,4 +8,4 @@ const readOne = require("../views/linker/readOne")
 
 routes.get("/:label", readOne)
 
-module.exports = (app) => app.use("/", routes)
+module.exports = (app) => app.use("/access", routes)
