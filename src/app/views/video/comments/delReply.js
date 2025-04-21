@@ -2,7 +2,7 @@ const Comment = require("../../../models/comment")
 
 module.exports = async (req, res) => {
   try {
-    const { userID } = req.query
+    const { userID } = req
     const { comment: commentID, reply: replyID } = req.params
     // Retorna se o usuário não houver enviado o id do comentário:
     if (!replyID || replyID.trim().length === 0) return res.status(422).json({ error: "reply id missing" })

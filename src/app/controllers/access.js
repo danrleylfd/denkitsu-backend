@@ -1,5 +1,8 @@
 const { Router } = require("express")
+const logMiddleware = require("../middlewares/log")
+
 const routes = Router()
+routes.use(logMiddleware)
 
 const readOne = require("../views/linker/readOne")
 
