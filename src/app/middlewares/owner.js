@@ -9,7 +9,7 @@ module.exports = (req, res, next) => {
     const [scheme, token] = parts
     if (!/^Bearer$/i.test(scheme)) return res.status(401).json({ error: "Token malformatted." })
 
-    if (token !== "Denkitsu") return res.status(401).json({ error: "Token invalid." })
+    if (token !== process.env.OWNER) return res.status(401).json({ error: "Token invalid." })
     next()
   } catch (error) {
     console.error(error.message)
