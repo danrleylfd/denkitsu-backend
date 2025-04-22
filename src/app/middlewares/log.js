@@ -7,11 +7,17 @@ module.exports = async (req, res, next) => {
     const browser = getBrowser(req.headers["user-agent"])
     const route = req.originalUrl
     const user = req.userID || null
-    await Log.create({ ip, so, browser, route, user })
+    const log = await Log.create({ ip, so, browser, route, user })
+    if (!log) throw new Error("LOG_NOT_CREATED")
     next()
   } catch (error) {
-    console.error(error.message)
-    return res.status(500).json({ error: "Internal server error" })
+    console.error(`[LOG_MIDDLEWARE] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
+    const defaultError = { status: 500, message: `[LOG_MIDDLEWARE] ${new Date().toISOString()} - Internal server error` }
+    const errorMessages = {
+      LOG_NOT_CREATED: { status: 422, message: "Log not created" }
+    }
+    const { status, message } = errorMessages[error.message] || defaultError
+    return res.status(status).json({ code: error.message, error: message })
   }
 }
 

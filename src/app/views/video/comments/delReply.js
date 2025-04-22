@@ -5,16 +5,25 @@ module.exports = async (req, res) => {
     const { userID } = req
     const { reply: replyID } = req.params
     const reply = await Comment.findById(replyID).populate("parent")
-    if (!reply) return res.status(404).json({ error: "Reply not found" })
-    if (reply.user != userID) return res.status(401).json({ error: "You are not the author of this reply" })
+    if (!reply) throw new Error("REPLY_NOT_FOUND")
+    if (reply.user != userID) throw new Error("UNAUTHORIZED")
     const comment = reply.parent
-    if (!comment) return res.status(404).json({ error: "Comment not exists" })
+    if (!comment) throw new Error("COMMENT_NOT_EXISTS")
     comment.replies = comment.replies.filter((replyId) => replyId != replyID)
-    await comment.save()
-    await reply.delete()
+    await promise.all([
+      comment.save(),
+      reply.delete()
+    ])
     return res.status(204).send()
   } catch (error) {
-    console.error(error.message)
-    return res.status(500).json({ error: "Internal server error" })
+    console.error(`[DEL_REPLY] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
+    const defaultError = { status: 500, message: `[DEL_REPLY] ${new Date().toISOString()} - Internal server error` }
+    const errorMessages = {
+      INVALID_COMMENT: { status: 422, message: "comment missing or invalid." },
+      UNNAUTHORIZED: { status: 401, message: "You are not the author of this reply" },
+      COMMENT_NOT_EXISTS: { status: 404, message: "Comment not exists" }
+    }
+    const { status, message } = errorMessages[error.message] || defaultError
+    return res.status(status).json({ code: error.message, error: message })
   }
 }

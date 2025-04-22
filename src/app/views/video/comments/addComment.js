@@ -6,23 +6,25 @@ module.exports = async (req, res) => {
     const { userID } = req
     const { video: videoID } = req.params
     const { content } = req.body
-    // Retorna se o usuário não houver enviado o content do video:
-    if (!content || content.trim().length === 0) return res.status(422).json({ error: "content missing" })
-    // Retorna se o video não for encontrado:
+    if (!content || content.trim().length === 0) throw new Error("INVALID_COMMENT")
     const video = await Video.findById(videoID)
-    if (!video) return res.status(404).json({ error: "video not found" })
-    // Publica o comentário:
+    if (!video) throw new Error("VIDEO_NOT_FOUND")
     const comment = await Comment.create({
       content,
       user: userID,
       video: videoID
     })
-    // Adiciona o comentário ao vídeo:
     video.comments.push(comment._id)
     await video.save()
     return res.status(201).json(comment)
   } catch (error) {
-    console.error(error.message)
-    return res.status(500).json({ error: "Internal server error" })
+    console.error(`[POST_COMMENT] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
+    const defaultError = { status: 500, message: `[POST_COMMENT] ${new Date().toISOString()} - Internal server error` }
+    const errorMessages = {
+      INVALID_COMMENT: { status: 422, message: "comment missing or invalid." },
+      VIDEO_NOT_FOUND: { status: 404, message: "video not found" }
+    }
+    const { status, message } = errorMessages[error.message] || defaultError
+    return res.status(status).json({ code: error.message, error: message })
   }
 }
