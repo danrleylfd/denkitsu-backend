@@ -6,7 +6,7 @@ module.exports = async (req, res) => {
     const { reply: replyID } = req.params
     const reply = await Comment.findById(replyID).populate("parent")
     if (!reply) throw new Error("REPLY_NOT_FOUND")
-    if (reply.user != userID) throw new Error("UNAUTHORIZED")
+    if (reply.user.toString() !== userID) throw new Error("UNAUTHORIZED")
     const comment = reply.parent
     if (!comment) throw new Error("COMMENT_NOT_EXISTS")
     comment.replies = comment.replies.filter((replyId) => replyId != replyID)

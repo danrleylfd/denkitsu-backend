@@ -1,4 +1,4 @@
-const { compare } = require("bcryptjs")
+// const { compare } = require("bcryptjs")
 
 const User = require("../../models/auth")
 const { generateRefreshToken, generateToken } = require("../../../utils/services/auth")
@@ -6,20 +6,18 @@ const { generateRefreshToken, generateToken } = require("../../../utils/services
 module.exports = async (req, res) => {
   try {
     const { userID } = req
-    const { name, email, password, avatarUrl: _avatarUrl } = req.body
-    if (!name || name.trim().length === 0) return res.status(422).json({ error: "name missing." })
-    if (!email || email.trim().length === 0) return res.status(422).json({ error: "email missing." })
-    if (!password || password.trim().length < 8) return res.status(422).json({ error: "password missing or too short." })
-    let user = await User.findOne({ email: email.trim() }).select("+password")
-    if (!user) return res.status(404).json({ error: "User not found/exist." })
-    if (user._id.toString() !== userID) return res.status(401).json({ error: "Invalid user." })
-    let avatarUrl
-    if (!_avatarUrl || _avatarUrl.trim().length === 0) avatarUrl = user.avatarUrl
-    const _password = await compare(password, user.password)
-    if (!_password) return res.status(401).json({ error: "Invalid password." })
-    user.password = password
-    user.name = name.trim()
-    user.avatarUrl = avatarUrl.trim()
+    const { name, avatarUrl, email, password } = req.body
+    if (!name?.trim() && !avatarUrl?.trim()) throw new Error("NAME_OR_AVATAR_MISSING")
+    // if (!email?.trim()) throw new Error("EMAIL_MISSING")
+    // if (!password?.trim() || password.trim().length < 8) throw new Error("PASSWORD_MISSING")
+    // const user = await User.findOne({ email: email.trim() }).select("+password")
+    const user = await User.findById(userID)
+    if (!user) throw new Error("USER_NOT_FOUND")
+    if (user._id.toString() !== userID) throw new Error("UNAUTHORIZED_USER")
+    // const isValidPassword = await compare(password.trim(), user.password)
+    // if (!isValidPassword) throw new Error("INVALID_PASSWORD")
+    user.name = name?.trim() || user.name
+    user.avatarUrl = avatarUrl?.trim() || user.avatarUrl
     await user.save()
     user = await User.findById(user._id)
     return res.status(206).json({
@@ -29,7 +27,17 @@ module.exports = async (req, res) => {
       message: "Account successfully edited."
     })
   } catch (error) {
-    console.error(error.message)
-    return res.status(500).json({ error: "Internal server error" })
+    console.error(`[EDIT_ACCOUNT] ${new Date().toISOString()} - `, { error: error.message, stack: error.stack })
+    const defaultError = { status: 500, message: "Internal Server Error" }
+    const errorMessages = {
+      // EMAIL_MISSING: { status: 422, message: "Email is missing." },
+      // PASSWORD_MISSING: { status: 422, message: "Password must be at least 8 characters long." },
+      // INVALID_PASSWORD: { status: 401, message: "Invalid password." },
+      USER_NOT_FOUND: { status: 404, message: "User not found/exists." },
+      UNAUTHORIZED_USER: { status: 401, message: "Unauthorized user." },
+      NAME_OR_AVATAR_MISSING: { status: 422, message: "name or avatarUrl is missing" },
+    }
+    const { status, message } = errorMessages[error.message] || defaultError
+    return res.status(status).json({ code: error.message, error: message })
   }
 }

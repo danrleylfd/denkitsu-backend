@@ -8,12 +8,12 @@ module.exports = async (req, res) => {
   try {
     const { userID } = req
     const { email, password } = req.body
-    if (!email || email.length === 0) throw new Error("EMAIL_MISSING")
-    if (!password || password.length < 8) throw new Error("PASSWORD_INVALID")
-    const user = await User.findOne({ email }).select("+password")
+    if (!email?.trim()) throw new Error("EMAIL_MISSING")
+    if (!password?.trim() || password.trim().length < 8) throw new Error("PASSWORD_INVALID")
+    const user = await User.findOne({ email: email.trim() }).select("+password")
     if (!user) throw new Error("USER_NOT_FOUND")
     if (user._id.toString() !== userID) throw new Error("UNAUTHORIZED_USER")
-    const isValidPassword = await compare(password, user.password)
+    const isValidPassword = await compare(password.trim(), user.password)
     if (!isValidPassword) throw new Error("INVALID_PASSWORD")
     await Promise.all([
       User.deleteOne({ _id: user._id }),

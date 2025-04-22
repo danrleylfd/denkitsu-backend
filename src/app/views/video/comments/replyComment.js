@@ -1,12 +1,12 @@
-const Video = require("../../../models/video")
 const Comment = require("../../../models/comment")
 
 module.exports = async (req, res) => {
   try {
     const { userID } = req
     const { comment: commentID } = req.params
+    if (commentID?.length < 24) throw new Error("COMMENT_MISSING")
     const { content } = req.body
-    if (!content || content.trim().length === 0) throw new Error("INVALID_COMMENT")
+    if (!content?.trim()) throw new Error("CONTENT_MISSING")
     const comment = await Comment.findById(commentID)
     if (comment.parent) throw new Error("IMPOSSIBLE_REPLY")
     const reply = await Comment.create({
@@ -21,7 +21,8 @@ module.exports = async (req, res) => {
     console.error(`[POST_REPLY] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
     const defaultError = { status: 500, message: `[POST_REPLY] ${new Date().toISOString()} - Internal server error` }
     const errorMessages = {
-      INVALID_COMMENT: { status: 422, message: "comment missing or invalid." },
+      COMMENT_MISSING: { status: 422, message: "comment missing or invalid" },
+      CONTENT_MISSING: { status: 422, message: "reply content missing" },
       IMPOSSIBLE_REPLY: { status: 400, message: "It is not possible to respond to a reply from another comment" }
     }
     const { status, message } = errorMessages[error.message] || defaultError
