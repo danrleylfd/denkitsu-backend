@@ -14,7 +14,6 @@ module.exports = async (req, res, next) => {
 
     const decoded = verify(token, process.env.JWT_SECRET)
     if (!decoded) throw new Error("TOKEN_INVALID")
-    console.log(decoded)
     const user = await User.findById(decoded.id)
     if (!user) throw new Error("USER_NOT_FOUND")
     req.userID = decoded.id
