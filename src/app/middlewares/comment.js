@@ -1,4 +1,4 @@
-const video = require("../models/video")
+const Video = require("../models/video")
 
 module.exports = (req, res, next) => {
   try {
