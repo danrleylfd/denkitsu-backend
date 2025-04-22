@@ -7,7 +7,7 @@ module.exports = (req, res, next) => {
     console.error(`[SHARE_MIDDLEWARE] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
     const defaultError = { status: 500, message: `[SHARE_MIDDLEWARE] ${new Date().toISOString()} - Internal server error` }
     const errorMessages = {
-      VIDEO_INVALID: { status: 422, message: "Video ID is missing or invalid" }
+      VIDEO_INVALID: { status: 422, message: "video is missing or invalid" }
     }
     const { status, message } = errorMessages[error.message] || defaultError
     return res.status(status).json({ code: error.message, error: message })

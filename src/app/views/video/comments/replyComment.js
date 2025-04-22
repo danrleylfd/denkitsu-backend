@@ -18,12 +18,12 @@ module.exports = async (req, res) => {
     await comment.save()
     return res.status(201).json(comment)
   } catch (error) {
-    console.error(`[POST_REPLY] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
-    const defaultError = { status: 500, message: `[POST_REPLY] ${new Date().toISOString()} - Internal server error` }
+    console.error(`[REPLY_COMMENT] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
+    const defaultError = { status: 500, message: `[REPLY_COMMENT] ${new Date().toISOString()} - Internal server error` }
     const errorMessages = {
       COMMENT_MISSING: { status: 422, message: "comment missing or invalid" },
-      CONTENT_MISSING: { status: 422, message: "reply content missing" },
-      IMPOSSIBLE_REPLY: { status: 400, message: "It is not possible to respond to a reply from another comment" }
+      CONTENT_MISSING: { status: 422, message: "content is required" },
+      IMPOSSIBLE_REPLY: { status: 400, message: "it is not possible to respond to a reply from another comment" }
     }
     const { status, message } = errorMessages[error.message] || defaultError
     return res.status(status).json({ code: error.message, error: message })

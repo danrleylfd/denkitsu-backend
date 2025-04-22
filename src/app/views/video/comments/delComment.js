@@ -13,13 +13,13 @@ module.exports = async (req, res) => {
     await video.save()
     await Comment.deleteMany({ parent: commentID })
     await Comment.findByIdAndDelete(commentID)
-    return res.status(204).json({ message: "Successfully deleted" })
+    return res.status(204).send()
   } catch (error) {
     console.error(`[DEL_COMMENT] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
     const defaultError = { status: 500, message: `[DEL_COMMENT] ${new Date().toISOString()} - Internal server error` }
     const errorMessages = {
-      INVALID_COMMENT: { status: 422, message: "comment missing or invalid." },
-      UNAUTHORIZED: { status: 401, message: "You are not the author of this comment." }
+      INVALID_COMMENT: { status: 422, message: "comment missing or invalid" },
+      UNAUTHORIZED: { status: 401, message: "you are not the author of this comment" }
     }
     const { status, message } = errorMessages[error.message] || defaultError
     return res.status(status).json({ code: error.message, error: message })

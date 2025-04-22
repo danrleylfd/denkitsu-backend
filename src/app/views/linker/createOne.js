@@ -4,10 +4,10 @@ module.exports = async (req, res) => {
   try {
     const { userID } = req
     const { label, link } = req.body
-    if (!label || label.trim().length === 0) return res.status(422).json({ error: "label missing" })
-    if (!link || link.trim().length === 0) return res.status(422).json({ error: "link missing" })
+    if (!label?.trim()) throw new Error("LABEL_MISSING")
+    if (!link?.trim()) throw new Error("LINK_MISSING")
     const _linker = await Linker.findOne({ label })
-    if (_linker) return res.status(401).json({ error: "Label already exists" })
+    if (_linker) throw new Error("LABEL_ALREADY_EXISTS")
     const linker = await Linker.create({
       user: userID,
       label: label.trim(),
@@ -15,7 +15,14 @@ module.exports = async (req, res) => {
     })
     return res.status(201).json(linker)
   } catch (error) {
-    console.error(error.message)
-    return res.status(500).json({ error: "Internal server error" })
+    console.error(`[CREATE_LABEL] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
+    const defaultError = { status: 500, message: `[CREATE_LABEL] ${new Date().toISOString()} - Internal server error` }
+    const errorMessages = {
+      LABEL_MISSING: { status: 422, message: "label is required" },
+      LINK_MISSING: { status: 422, message: "link is required" },
+      LABEL_ALREADY_EXISTS: { status: 409, message: "label already exists" },
+    }
+    const { status, message } = errorMessages[error.message] || defaultError
+    return res.status(status).json({ code: error.message, message })
   }
 }

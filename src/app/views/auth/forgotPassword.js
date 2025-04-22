@@ -8,26 +8,35 @@ const { generateOTPToken, generateOTPCode } = require("../../../utils/services/a
 module.exports = async (req, res) => {
   try {
     const { email } = req.body
-    if (!email || email.trim().length === 0) return res.status(422).json({ error: "email missing." })
-    let user = await User.findOne({ email })
-    if (!user) return res.status(404).json({ error: "User not found/exist." })
+    if (!email?.trim()) throw new Error("EMAIL_MISSING")
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) throw new Error("EMAIL_INVALID")
+    const user = await User.findOne({ email })
+    if (!user) throw new Error("USER_NOT_FOUND")
     const token = generateOTPCode() || generateOTPToken()
     const now = new Date()
     now.setMinutes(now.getMinutes() + 3)
     user.passwordResetToken = token
     user.passwordResetExpires = now
     await user.save()
-    user = await User.findById(user._id)
     const html = await renderFile(`${__dirname}/../../../utils/templates/forgotPassword.ejs`, {
       username: user.name,
       token
     })
     mailer.sendMail({ to: email, subject: "Token de recuperação", html }, (err) => {
-      if (err) return res.status(500).json({ error: "Cannot send forgot password email." })
+      if (err) throw new Error("MAIL_ERROR")
     })
-    return res.status(200).json({ message: "Email successfully sent." })
+    return res.status(200).json()
   } catch (error) {
-    console.error(error.message)
-    return res.status(500).json({ error: "Internal server error" })
+    console.error(`[FORGOT_PASSWORD] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
+    const defaultError = { status: 500, message: `[FORGOT_PASSWORD] ${new Date().toISOString()} - Internal server error` }
+    const errorMessages = {
+      EMAIL_MISSING: { status: 422, message: "email is required" },
+      EMAIL_INVALID: { status: 422, message: "email is invalid" },
+      USER_NOT_FOUND: { status: 404, message: "user not found/exists" },
+      MAIL_ERROR: { status: 500, message: "error sending email" }
+    }
+    const { status, message } = errorMessages[error.message] || defaultError
+    return res.status(status).json({ code: error.message, message })
   }
 }

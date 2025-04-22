@@ -21,7 +21,7 @@ module.exports = async (req, res) => {
       { $sort: { popularity: -1, updatedAt: -1, createdAt: -1 } },
       { $limit: 16 }
     ]).exec()
-    if (!videos) return res.status(404).json({ error: "videos not found" })
+    if (!videos) return res.status(404).json({ error: "videos not found/exists" })
     const videosWithUsers = []
     for (let pos = 0; pos < videos.length; pos++) {
       const video = videos[pos]

@@ -8,8 +8,8 @@ module.exports = (req, res, next) => {
     console.error(`[REPLY_MIDDLEWARE] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
     const defaultError = { status: 500, message: `[REPLY_MIDDLEWARE] ${new Date().toISOString()} - Internal server error` }
     const errorMessages = {
-      COMMENT_MISSING: { status: 422, message: "comment id missing." },
-      REPLY_MISSING: { status: 422, message: "reply id missing." }
+      COMMENT_MISSING: { status: 422, message: "comment is required." },
+      REPLY_MISSING: { status: 422, message: "reply is required" }
     }
     const { status, message } = errorMessages[error.message] || defaultError
     return res.status(status).json({ code: error.message, error: message })

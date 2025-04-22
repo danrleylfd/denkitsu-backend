@@ -18,11 +18,11 @@ module.exports = async (req, res) => {
     await video.save()
     return res.status(201).json(comment)
   } catch (error) {
-    console.error(`[POST_COMMENT] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
-    const defaultError = { status: 500, message: `[POST_COMMENT] ${new Date().toISOString()} - Internal server error` }
+    console.error(`[COMMENT] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
+    const defaultError = { status: 500, message: `[COMMENT] ${new Date().toISOString()} - Internal server error` }
     const errorMessages = {
-      INVALID_COMMENT: { status: 422, message: "comment missing or invalid." },
-      VIDEO_NOT_FOUND: { status: 404, message: "video not found" }
+      INVALID_COMMENT: { status: 422, message: "comment missing or invalid" },
+      VIDEO_NOT_FOUND: { status: 404, message: "video not found/exists" }
     }
     const { status, message } = errorMessages[error.message] || defaultError
     return res.status(status).json({ code: error.message, error: message })

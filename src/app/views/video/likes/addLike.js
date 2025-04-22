@@ -10,10 +10,10 @@ module.exports = async (req, res) => {
     const updatedVideo = await video.save()
     return res.status(201).json(updatedVideo)
   } catch (error) {
-    console.error(`[POST_LIKE] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
-    const defaultError = { status: 500, message: `[POST_LIKE] ${new Date().toISOString()} - Internal server error` }
+    console.error(`[LIKE] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
+    const defaultError = { status: 500, message: `[LIKE] ${new Date().toISOString()} - Internal server error` }
     const errorMessages = {
-      VIDEO_NOT_FOUND: { status: 404, message: "video not found" }
+      VIDEO_NOT_FOUND: { status: 404, message: "video not found/exists" }
     }
     const { status, message } = errorMessages[error.message] || defaultError
     return res.status(status).json({ code: error.message, error: message })

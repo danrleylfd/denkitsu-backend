@@ -3,12 +3,16 @@ const User = require("../../models/auth")
 module.exports = async (req, res) => {
   try {
     const { userID } = req.params || req
-    if (!userID || userID.length === 0) return res.status(422).json({ error: "userID missing." })
     const user = await User.findById(userID)
-    if (!user) return res.status(404).json({ error: "User not found/exist." })
-    return res.status(200).json({ user, message: "Success to get user." })
+    if (!user) throw new Error("USER_NOT_FOUND")
+    return res.status(200).json({ user })
   } catch (error) {
-    console.error(error.message)
-    return res.status(500).json({ error: "Internal server error" })
+    console.error(`[GET_USER] ${new Date().toISOString()} - `, { error: error.message, stack: error.stack })
+    const defaultError = { status: 500, message: `[GET_USER] ${new Date().toISOString()} - Internal server error` }
+    const errorMessages = {
+      USER_NOT_FOUND: { status: 404, message: "user not found/exists" },
+    }
+    const { status, message } = errorMessages[error.message] || defaultError
+    return res.status(status).json({ code: error.message, error: message })
   }
 }

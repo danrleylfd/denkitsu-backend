@@ -14,8 +14,8 @@ module.exports = async (req, res) => {
     console.error(`[UNLIKE] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
     const defaultError = { status: 500, message: `[UNLIKE] ${new Date().toISOString()} - Internal server error` }
     const errorMessages = {
-      VIDEO_NOT_FOUND: { status: 404, message: "video not found" },
-      VIDEO_NOT_LIKED: { status: 422, message: "You didn't like this video" }
+      VIDEO_NOT_FOUND: { status: 404, message: "video not found/exists" },
+      VIDEO_NOT_LIKED: { status: 422, message: "you didn't like this video" }
     }
     const { status, message } = errorMessages[error.message] || defaultError
     return res.status(status).json({ code: error.message, error: message })
