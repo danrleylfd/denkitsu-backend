@@ -1,5 +1,5 @@
 const { verify } = require("jsonwebtoken")
-const User = require("../../models/auth")
+const User = require("../models/auth")
 
 module.exports = (req, res, next) => {
   try {
