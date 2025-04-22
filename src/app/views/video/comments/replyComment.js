@@ -6,12 +6,9 @@ module.exports = async (req, res) => {
     const { userID } = req
     const { video: videoID, comment: commentID } = req.params
     const { content } = req.body
-    // Retorna se o usuário não houver enviado o content do video:
     if (!content || content.trim().length === 0) return res.status(422).json({ error: "content missing" })
-    // Retorna se o video não for encontrado:
     const video = await Video.findById(videoID)
     if (!video) return res.status(404).json({ error: "video not found" })
-    // Publica a resposta do comentário:
     const comment = await Comment.findById(commentID)
     if (!comment.parent) {
       const reply = await Comment.create({
@@ -19,7 +16,6 @@ module.exports = async (req, res) => {
         user: userID,
         parent: commentID
       })
-      // Adiciona a resposta ao comentário:
       comment.replies.push(reply._id)
       await comment.save()
       return res.status(201).json(comment)

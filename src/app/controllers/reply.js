@@ -11,8 +11,8 @@ routes.use(replyMiddleware)
 const replyComment = require("../views/video/comments/replyComment")
 const delReply = require("../views/video/comments/delReply")
 
-routes.post("/:video/:comment", replyComment)
+routes.post("/:video/:comment/:reply", replyComment)
 
-routes.delete("/:video/:comment", delReply)
+routes.delete("/:video/:comment/:reply", delReply)
 
 module.exports = (app) => app.use("/replys", routes)

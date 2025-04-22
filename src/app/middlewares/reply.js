@@ -1,6 +1,7 @@
 module.exports = (req, res, next) => {
-  let { comment: commentID } = req.params
-  commentID = commentID.trim()
-  if (!commentID || commentID.length === 0) return next()
-  return res.status(422).json({ error: "comment id missing" })
+  const { video: videoID, comment: commentID, reply: replyID } = req.params
+  if (videoID.length < 24) return res.status(422).json({ error: "video id missing" })
+  if (commentID.length < 24) return res.status(422).json({ error: "comment id missing" })
+  if (replyID.length < 24) return res.status(422).json({ error: "reply id missing" })
+  next()
 }

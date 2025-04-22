@@ -1,11 +1,10 @@
 const Video = require("../../models/video")
 
-const isEmpty = (value) => !value || value.trim().length === 0
-
 module.exports = async (req, res) => {
   try {
     const { userID } = req
     const { video: videoID } = req.params
+    if (!videoID || videoID.length < 24) return res.status(422).json({ error: "video id missing" })
     await Video.findOneAndDelete({ _id: videoID, user: userID })
     return res.status(204).json({ message: "Successfully deleted" })
   } catch (error) {

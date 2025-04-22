@@ -8,19 +8,30 @@ module.exports = async (req, res) => {
   try {
     const { userID } = req
     const { email, password } = req.body
-    if (!email || email.length === 0) return res.status(422).json({ error: "email missing." })
-    if (!password || password.length < 8) return res.status(422).json({ error: "password missing or too short." })
+    if (!email || email.length === 0) throw new Error("EMAIL_MISSING")
+    if (!password || password.length < 8) throw new Error("PASSWORD_INVALID")
     const user = await User.findOne({ email }).select("+password")
-    if (!user) return res.status(404).json({ error: "user not found." })
-    if (user._id != userID) return res.status(401).json({ error: "invalid user." })
-    const _password = await compare(password, user.password)
-    if (!_password) return res.status(401).json({ error: "invalid password." })
-    await User.deleteOne({ _id: user._id })
-    await Video.deleteMany({ user: user._id })
-    await Comment.deleteMany({ user: user._id })
+    if (!user) throw new Error("USER_NOT_FOUND")
+    if (user._id != userID) throw new Error("UNAUTHORIZED_USER")
+    const isValidPassword = await compare(password, user.password)
+    if (!isValidPassword) throw new Error("INVALID_PASSWORD")
+    await Promise.all([
+      User.deleteOne({ _id: user._id }),
+      Video.deleteMany({ user: user._id }),
+      Comment.deleteMany({ user: user._id })
+    ])
     return res.status(204).send()
   } catch (error) {
-    console.error(error.message)
-    return res.status(500).json({ error: "Internal server error" })
+    console.error(`[DELETE_ACCOUNT] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
+    const defaultError = { status: 500, message: `[DELETE_ACCOUNT] ${new Date().toISOString()} - Internal server error` }
+    const errorMessages = {
+      EMAIL_MISSING: { status: 422, message: "Email is required" },
+      PASSWORD_INVALID: { status: 422, message: "Password must be at least 8 characters" },
+      USER_NOT_FOUND: { status: 404, message: "User not found" },
+      UNAUTHORIZED_USER: { status: 401, message: "Unauthorized access" },
+      INVALID_PASSWORD: { status: 401, message: "Invalid password" }
+    }
+    const { status, message } = errorMessages[error.message] || defaultError
+    return res.status(status).json({ code: error.message, error: message })
   }
 }
