@@ -2,7 +2,6 @@ module.exports = (req, res, next) => {
   try {
     let { video: videoID } = req.params
     if (!videoID || videoID.length < 24) throw new Error("VIDEO_MISSING")
-    req.params.video = req.params.video.trim()
     next()
   } catch (error) {
     console.error(`[SHARE_MIDDLEWARE] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })

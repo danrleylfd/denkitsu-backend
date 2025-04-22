@@ -3,7 +3,6 @@ const Video = require("../../../models/video")
 module.exports = async (req, res) => {
   try {
     const { video: videoID } = req.params
-    if (!videoID || videoID.length < 24) return res.status(422).json({ error: "invalid video ID" })
     const video = await Video.aggregate([{ $match: { _id: mongoose.Types.ObjectId(videoID) } }, { $project: { sharesCount: { $size: "$shares" } } }])
     if (video.length === 0) return res.status(404).json({ error: "video id missing" })
     return res.status(200).json({
