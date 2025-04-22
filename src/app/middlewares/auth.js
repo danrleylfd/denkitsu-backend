@@ -1,7 +1,7 @@
 const { verify } = require("jsonwebtoken")
 const User = require("../models/auth")
 
-module.exports = (req, res, next) => {
+module.exports = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization
     if (!authHeader) throw new Error("TOKEN_MISSING")
@@ -12,13 +12,13 @@ module.exports = (req, res, next) => {
     const [scheme, token] = parts
     if (!/^Bearer$/i.test(scheme)) throw new Error("TOKEN_SCHEMA_ERROR")
 
-    verify(token, process.env.JWT_SECRET, async (err, decoded) => {
-      if (err) throw new Error("TOKEN_INVALID")
-      const user = await User.findById(decoded.id)
-      if (!user) throw new Error("USER_NOT_FOUND")
-      req.userID = decoded.id
-      return next()
-    })
+    const decoded = verify(token, process.env.JWT_SECRET)
+    if (!decoded) throw new Error("TOKEN_INVALID")
+    console.log(decoded)
+    const user = await User.findById(decoded.id)
+    if (!user) throw new Error("USER_NOT_FOUND")
+    req.userID = decoded.id
+    return next()
   } catch (error) {
     console.error(`[AUTH_MIDDLEWARE] ${new Date().toISOString()} - `, { error: error.message, stack: error.stack })
     const defaultError = { status: 500, message: `[AUTH_MIDDLEWARE] ${new Date().toISOString()} - Internal server error` }
