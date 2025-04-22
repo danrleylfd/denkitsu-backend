@@ -1,26 +1,32 @@
 const Video = require("../../models/video")
 
-const isEmpty = (value) => !value || value.trim().length === 0
-
 module.exports = async (req, res) => {
   try {
     const { userID } = req
     const { video: videoID } = req.params
-    if (!videoID || videoID.length < 24) return res.status(422).json({ error: "video is required" })
-    const { key, newValue } = req.body
-    // Retorna se o usuário não houver enviado os params/body do video:
-    if ([key, newValue].some(isEmpty))
-      return res.status(422).json({
-        message: "one or more of the variables is missing: videoID, key and newValue.",
-        note: "key is any attribute of a video."
-      })
-    let video = await Video.findOne({ _id: videoID, user: userID })
-    video[key] = newValue
+    if (!videoID || videoID.length !== 24) throw new Error("VIDEO_MISSING")
+    const { content, coverUrl, fileUrl } = req.body
+    if (!content?.trim()) throw new Error("CONTENT_MISSING")
+    if (!coverUrl?.trim()) throw new Error("COVER_URL_MISSING")
+    if (!fileUrl?.trim()) throw new Error("FILE_URL_MISSING")
+    const video = await Video.findOne({ _id: videoID, user: userID })
+    if (!video) throw new Error("VIDEO_NOT_FOUND")
+    video.content = content
+    video.coverUrl = coverUrl
+    video.fileUrl = fileUrl
     await video.save()
-    // video = await Video.findById(videoID)
     return res.status(201).json(video)
   } catch (error) {
-    console.error(error.message)
-    return res.status(500).json({ error: "Internal server error" })
+    console.error(`[UPDATE_VIDEO] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
+    const defaultError = { status: 500, message: `[UPDATE_VIDEO] ${new Date().toISOString()} - Internal server error` }
+    const errorMessages = {
+      VIDEO_MISSING: { status: 422, message: "video is required" },
+      CONTENT_MISSING: { status: 422, message: "content is required" },
+      COVER_URL_MISSING: { status: 422, message: "coverUrl is required" },
+      FILE_URL_MISSING: { status: 422, message: "fileUrl is required" },
+      VIDEO_NOT_FOUND: { status: 404, message: "video not found/exists" }
+    }
+    const { status, message } = errorMessages[error.message] || defaultError
+    return res.status(status).json({ code: error.message, error: message })
   }
 }

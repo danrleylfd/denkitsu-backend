@@ -1,4 +1,5 @@
 const { verify } = require("jsonwebtoken")
+const User = require("../../models/auth")
 
 module.exports = (req, res, next) => {
   try {
@@ -11,8 +12,10 @@ module.exports = (req, res, next) => {
     const [scheme, token] = parts
     if (!/^Bearer$/i.test(scheme)) throw new Error("TOKEN_SCHEMA_ERROR")
 
-    verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    verify(token, process.env.JWT_SECRET, async (err, decoded) => {
       if (err) throw new Error("TOKEN_INVALID")
+      const user = await User.findById(decoded.id)
+      if (!user) throw new Error("USER_NOT_FOUND")
       req.userID = decoded.id
       return next()
     })
@@ -23,7 +26,8 @@ module.exports = (req, res, next) => {
       TOKEN_MISSING: { status: 401, message: "No token provided" },
       TOKEN_PARTS_ERROR: { status: 401, message: "Invalid token format" },
       TOKEN_SCHEMA_ERROR: { status: 401, message: "Token must use Bearer scheme" },
-      TOKEN_INVALID: { status: 401, message: "Invalid or expired token" }
+      TOKEN_INVALID: { status: 401, message: "Invalid or expired token" },
+      USER_NOT_FOUND: { status: 404, message: "user not found/exists" },
     }
     const { status, message } = errorMessages[error.message] || defaultError
     return res.status(status).json({ code: error.message, error: message })

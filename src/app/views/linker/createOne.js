@@ -15,8 +15,8 @@ module.exports = async (req, res) => {
     })
     return res.status(201).json(linker)
   } catch (error) {
-    console.error(`[CREATE_LABEL] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
-    const defaultError = { status: 500, message: `[CREATE_LABEL] ${new Date().toISOString()} - Internal server error` }
+    console.error(`[CREATE_LINKER] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
+    const defaultError = { status: 500, message: `[CREATE_LINKER] ${new Date().toISOString()} - Internal server error` }
     const errorMessages = {
       LABEL_MISSING: { status: 422, message: "label is required" },
       LINK_MISSING: { status: 422, message: "link is required" },

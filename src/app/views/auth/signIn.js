@@ -28,7 +28,7 @@ module.exports = async (req, res) => {
       EMAIL_INVALID: { status: 422, message: "email is invalid" },
       PASSWORD_INVALID: { status: 422, message: "password must be at least 8 characters" },
       USER_NOT_FOUND: { status: 404, message: "user not found/exists" },
-      INVALID_PASSWORD: { status: 401, message: "Invalid credentials" }
+      INVALID_PASSWORD: { status: 401, message: "invalid credentials" }
     }
     const { status, message } = errorMessages[error.message] || defaultError
     return res.status(status).json({ code: error.message, message })

@@ -8,14 +8,21 @@ const sysPrompt = {
 module.exports = async (req, res) => {
   try {
     const { model, prompts } = req.body
-    if (!model || !prompts) return res.status(400).json({ error: "Bad Request" })
+    if (!model || model.trim().length < 3) throw new Error("MODEL_MISSING")
+    if (!prompts || prompts.length < 1) throw new Error("PROMPTS_MISSING")
     console.log(`MODEL ${model}`)
     console.log(`USER ${prompts[0].content}`)
     const { status, data } = await ask([sysPrompt, ...prompts], { model })
     console.log(`ASSISTANT ${data.choices[0].message.content.split("\n")[0]}...`)
     return res.status(status).json(data)
   } catch (error) {
-    console.error(error.message)
-    return res.status(500).json({ error: "Internal server error" })
+    console.error(`[SEND_MESSAGE] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
+    const defaultError = { status: 500, message: `[SEND_MESSAGE] ${new Date().toISOString()} - Internal server error` }
+    const errorMessages = {
+      MODEL_MISSING: { status: 422, message: "model is required" },
+      PROMPTS_MISSING: { status: 422, message: "prompts is required" }
+    }
+    const { status, message } = errorMessages[error.message] || defaultError
+    return res.status(status).json({ code: error.message, message })
   }
 }

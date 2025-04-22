@@ -7,7 +7,6 @@ module.exports = async (req, res) => {
     const { name, avatarUrl } = req.body
     if (!name?.trim() && !avatarUrl?.trim()) throw new Error("NAME_OR_AVATAR_MISSING")
     const user = await User.findById(userID)
-    if (!user) throw new Error("USER_NOT_FOUND")
     user.name = name?.trim() || user.name
     user.avatarUrl = avatarUrl?.trim() || user.avatarUrl
     await user.save()
@@ -21,7 +20,6 @@ module.exports = async (req, res) => {
     console.error(`[EDIT_ACCOUNT] ${new Date().toISOString()} - `, { error: error.message, stack: error.stack })
     const defaultError = { status: 500, message: `[EDIT_ACCOUNT] ${new Date().toISOString()} - Internal server error` }
     const errorMessages = {
-      USER_NOT_FOUND: { status: 404, message: "user not found/exists" },
       NAME_OR_AVATAR_MISSING: { status: 422, message: "name or avatarUrl is required" },
     }
     const { status, message } = errorMessages[error.message] || defaultError

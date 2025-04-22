@@ -21,7 +21,7 @@ module.exports = async (req, res) => {
       { $sort: { popularity: -1, updatedAt: -1, createdAt: -1 } },
       { $limit: 16 }
     ]).exec()
-    if (!videos) return res.status(404).json({ error: "videos not found/exists" })
+    if (!videos || videos.length === 0) throw new Error("VIDEOS_NOT_FOUND")
     const videosWithUsers = []
     for (let pos = 0; pos < videos.length; pos++) {
       const video = videos[pos]
@@ -30,7 +30,12 @@ module.exports = async (req, res) => {
     }
     return res.status(200).json(videosWithUsers)
   } catch (error) {
-    console.error(error.message)
-    return res.status(500).json({ error: "Internal server error" })
+    console.error(`[POPULAR_VIDEOS] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
+    const defaultError = { status: 500, message: `[POPULAR_VIDEOS] ${new Date().toISOString()} - Internal server error` }
+    const errorMessages = {
+      VIDEOS_NOT_FOUND: { status: 404, message: "videos not found/exists" },
+    }
+    const { status, message } = errorMessages[error.message] || defaultError
+    return res.status(status).json({ code: error.message, error: message })
   }
 }

@@ -34,7 +34,7 @@ module.exports = async (req, res) => {
       EMAIL_INVALID: { status: 422, message: "email is invalid" },
       PASSWORD_MISSING: { status: 422, message: "password missing or must be at least 8 characters" },
       USER_NOT_FOUND: { status: 404, message: "user not found/exists" },
-      TOKEN_INVALID: { status: 401, message: "Invalid or expired token" }
+      TOKEN_INVALID: { status: 401, message: "invalid or expired token" }
     }
     const { status, message } = errorMessages[error.message] || defaultError
     return res.status(status).json({ code: error.message, message })

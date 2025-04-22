@@ -8,7 +8,6 @@ module.exports = async (req, res) => {
   try {
     const { userID } = req
     const user = await User.findById(userID)
-    if (!user) throw new Error("USER_NOT_FOUND")
     const videos = await Video.find({ user: user._id }).select("_id")
     const videoIds = videos.map(video => video._id)
     await Promise.all([
@@ -20,11 +19,9 @@ module.exports = async (req, res) => {
     ])
     return res.status(204).send()
   } catch (error) {
-    console.error(`[DELETE_ACCOUNT] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
-    const defaultError = { status: 500, message: `[DELETE_ACCOUNT] ${new Date().toISOString()} - Internal server error` }
-    const errorMessages = {
-      USER_NOT_FOUND: { status: 404, message: "user not found/exists" },
-    }
+    console.error(`[DEL_ACCOUNT] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
+    const defaultError = { status: 500, message: `[DEL_ACCOUNT] ${new Date().toISOString()} - Internal server error` }
+    const errorMessages = {}
     const { status, message } = errorMessages[error.message] || defaultError
     return res.status(status).json({ code: error.message, error: message })
   }

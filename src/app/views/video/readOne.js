@@ -3,12 +3,18 @@ const Video = require("../../models/video")
 module.exports = async (req, res) => {
   try {
     const { video: videoID } = req.params
-    if (!videoID || videoID.length < 24) return res.status(422).json({ error: "video is required" })
+    if (!videoID || videoID.trim().length !== 24) throw new Error("VIDEO_MISSING")
     const video = await Video.findById(videoID).populate("user").exec()
-    if (!video) return res.status(404).json({ error: "video not found/exists" })
+    if (!video) throw new Error("VIDEO_NOT_FOUND")
     return res.status(200).json(video)
   } catch (error) {
-    console.error(error.message)
-    return res.status(500).json({ error: "Internal server error" })
+    console.error(`[VIEW_VIDEO] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
+    const defaultError = { status: 500, message: `[VIEW_VIDEO] ${new Date().toISOString()} - Internal server error` }
+    const errorMessages = {
+      VIDEO_MISSING: { status: 422, message: "video is required" },
+      VIDEO_NOT_FOUND: { status: 404, message: "video not found/exists" },
+    }
+    const { status, message } = errorMessages[error.message] || defaultError
+    return res.status(status).json({ code: error.message, error: message })
   }
 }
