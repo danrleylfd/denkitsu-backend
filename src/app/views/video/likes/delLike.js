@@ -5,7 +5,6 @@ module.exports = async (req, res) => {
     const { userID } = req
     const { video: videoID } = req.params
     const video = await Video.findById(videoID).populate("user")
-    if (!video) throw new Error("VIDEO_NOT_FOUND")
     if (!video.likes.includes(userID)) throw new Error("VIDEO_NOT_LIKED")
     await Video.updateOne({ _id: videoID }, { $pull: { likes: userID } }, { new: true })
     const updatedVideo = await Video.findById(videoID).populate("user")
@@ -14,7 +13,6 @@ module.exports = async (req, res) => {
     console.error(`[UNLIKE] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
     const defaultError = { status: 500, message: `[UNLIKE] ${new Date().toISOString()} - Internal server error` }
     const errorMessages = {
-      VIDEO_NOT_FOUND: { status: 404, message: "video not found/exists" },
       VIDEO_NOT_LIKED: { status: 422, message: "you didn't like this video" }
     }
     const { status, message } = errorMessages[error.message] || defaultError

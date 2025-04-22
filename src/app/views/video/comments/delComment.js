@@ -5,11 +5,11 @@ module.exports = async (req, res) => {
   try {
     const { userID } = req
     const { video: videoID, comment: commentID } = req.params
-    if (!commentID || commentID.length < 24) throw new Error("INVALID_COMMENT")
+    if (!commentID || commentID.length !== 24) throw new Error("INVALID_COMMENT")
     const comment = await Comment.findById(commentID)
     if (comment.user !== userID) throw new Error("UNAUTHORIZED")
     const video = await Video.findById(videoID)
-    video.comments = video.comments.filter((commentId) => commentId !== commentID)
+    video.comments = video.comments.filter((commentId) => commentId.toString() !== commentID)
     await video.save()
     await Comment.deleteMany({ parent: commentID })
     await Comment.findByIdAndDelete(commentID)

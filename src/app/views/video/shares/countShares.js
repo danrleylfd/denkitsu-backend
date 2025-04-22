@@ -1,13 +1,14 @@
+const { Types: { ObjectId } } = require("../../../../utils/database")
 const Video = require("../../../models/video")
 
 module.exports = async (req, res) => {
   try {
     const { video: videoID } = req.params
-    const video = await Video.aggregate([{ $match: { _id: mongoose.Types.ObjectId(videoID) } }, { $project: { sharesCount: { $size: "$shares" } } }])
-    if (video.length === 0) throw new Error("VIDEO_NOT_FOUND")
+    const [ video ] = await Video.aggregate([{ $match: { _id: ObjectId(videoID) } }, { $project: { sharesCount: { $size: "$shares" } } }])
+    if (!video) throw new Error("VIDEO_NOT_FOUND")
     return res.status(200).json({
-      shares: video[0].sharesCount,
-      sharesExtras: video[0].sharesExtras
+      shares: video.sharesCount,
+      sharesExtras: video.sharesExtras
     })
   } catch (error) {
     console.error(`[COUNT_SHARES] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
