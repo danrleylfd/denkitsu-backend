@@ -4,7 +4,7 @@ module.exports = (req, res, next) => {
   try {
     const { video: videoID } = req.params
     if (!videoID || videoID.trim().length !== 24) throw new Error("VIDEO_MISSING")
-    const video = Video.findById(videoID)
+    const video = await Video.findById(videoID)
     if (!video) throw new Error("VIDEO_NOT_FOUND")
     next()
   } catch (error) {
