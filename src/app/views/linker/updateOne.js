@@ -1,4 +1,3 @@
-const User = require("../../models/auth")
 const Linker = require("../../models/linker")
 
 module.exports = async (req, res) => {
@@ -6,21 +5,25 @@ module.exports = async (req, res) => {
     const { userID } = req
     const { oldLabel } = req.params
     const { newLabel, newLink } = req.body
-    if (!oldLabel || oldLabel.trim().length === 0) return res.status(422).json({ error: "oldLabel missing" })
-    if (!newLabel || newLabel.trim().length === 0) return res.status(422).json({ error: "newLabel missing" })
-    if (!newLink || newLink.trim().length === 0) return res.status(422).json({ error: "newLink missing" })
-    const user = await User.findById(userID)
-    if (!user) return res.status(404).json({ error: "User not found/exist" })
-    let linker = await Linker.findOne({ label: oldLabel })
-    if (!linker) return res.status(404).json({ error: "Label not found" })
-    if (linker.user.toString() !== userID) return res.status(401).json({ error: "You are not the owner of this label" })
+    if (!oldLabel?.trim()) throw new Error("OLD_LABEL_MISSING")
+    if (!newLabel?.trim()) throw new Error("NEW_LABEL_MISSING")
+    if (!newLink?.trim()) throw new Error("NEW_LINK_MISSING")
+    const linker = await Linker.findOne({ label: oldLabel, user: userID })
+    if (!linker) throw new Error("LABEL_NOT_FOUND")
     linker.label = newLabel
     linker.link = newLink
     await linker.save()
-    linker = await Linker.findOne({ user: userID })
     return res.status(201).json(linker)
   } catch (error) {
-    console.error(error.message)
-    return res.status(500).json({ error: "Internal server error" })
+    console.error(`[UPDATE_LINKER] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
+    const defaultError = { status: 500, message: `[UPDATE_LINKER] ${new Date().toISOString()} - Internal server error` }
+    const errorMessages = {
+      OLD_LABEL_MISSING: { status: 422, message: "old label is missing" },
+      NEW_LABEL_MISSING: { status: 422, message: "new label is missing" },
+      NEW_LINK_MISSING: { status: 422, message: "new link is missing" },
+      LABEL_NOT_FOUND: { status: 404, message: "label not found" }
+    }
+    const { status, message } = errorMessages[error.message] || defaultError
+    return res.status(status).json({ code: error.message, error: message })
   }
 }

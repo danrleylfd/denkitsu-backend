@@ -12,7 +12,7 @@ module.exports = async (req, res) => {
     if (!password || password.length < 8) throw new Error("PASSWORD_INVALID")
     const user = await User.findOne({ email }).select("+password")
     if (!user) throw new Error("USER_NOT_FOUND")
-    if (user._id != userID) throw new Error("UNAUTHORIZED_USER")
+    if (user._id.toString() !== userID) throw new Error("UNAUTHORIZED_USER")
     const isValidPassword = await compare(password, user.password)
     if (!isValidPassword) throw new Error("INVALID_PASSWORD")
     await Promise.all([

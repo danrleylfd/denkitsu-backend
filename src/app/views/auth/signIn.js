@@ -6,12 +6,12 @@ const { generateRefreshToken, generateToken } = require("../../../utils/services
 module.exports = async (req, res) => {
   try {
     const { email, password } = req.body
-    if (!email || email.length === 0) return res.status(422).json({ error: "email missing." })
-    if (!password || password.length < 8) return res.status(422).json({ error: "password missing or too short." })
-    const user = await User.findOne({ email }).select("+password")
-    if (!user) return res.status(404).json({ error: "User not found/exist." })
-    const _password = await compare(password, user.password)
-    if (!_password) return res.status(401).json({ error: "Invalid password." })
+    if (!email?.trim()) throw new Error("EMAIL_MISSING")
+    if (!password?.trim() || password.length < 8) throw new Error("PASSWORD_INVALID")
+    const user = await User.findOne({ email: email.trim() }).select("+password")
+    if (!user) throw new Error("USER_NOT_FOUND")
+    const isValidPassword = await compare(password, user.password)
+    if (!isValidPassword) throw new Error("INVALID_PASSWORD")
     user.password = undefined
     return res.status(200).json({
       refreshToken: generateRefreshToken({ id: user._id }),
@@ -20,7 +20,15 @@ module.exports = async (req, res) => {
       message: "Success to Sign In."
     })
   } catch (error) {
-    console.error(error.message)
-    return res.status(500).json({ error: "Internal server error" })
+    console.error(`[SIGNIN] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
+    const defaultError = { status: 500, message: "Internal server error" }
+    const errorMessages = {
+      EMAIL_MISSING: { status: 422, message: "Email is required" },
+      PASSWORD_INVALID: { status: 422, message: "Password must be at least 8 characters" },
+      USER_NOT_FOUND: { status: 404, message: "User not found" },
+      INVALID_PASSWORD: { status: 401, message: "Invalid credentials" }
+    }
+    const { status, message } = errorMessages[error.message] || defaultError
+    return res.status(status).json({ code: error.message, message })
   }
 }

@@ -8,7 +8,7 @@ module.exports = async (req, res) => {
     if (!password || password.trim().length < 8) return res.status(422).json({ error: "password missing or too short." })
     const user = await User.findOne({ email }).select("+passwordResetToken passwordResetExpires")
     if (!user) return res.status(404).json({ error: "User not found/exist." })
-    if (token != user.passwordResetToken) return res.status(401).json({ error: "Invalid token." })
+    if (user.passwordResetToken.toString() !== token) return res.status(401).json({ error: "Invalid token." })
     const now = new Date()
     if (now > user.passwordResetExpires) return res.status(401).json({ error: "Token expired, generate a new one." })
     user.password = password
