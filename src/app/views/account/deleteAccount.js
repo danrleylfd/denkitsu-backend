@@ -15,7 +15,7 @@ module.exports = async (req, res) => {
       Comment.deleteMany({ video: { $in: videoIds } }),
       Video.deleteMany({ user: user._id }),
       Log.deleteMany({ user: user._id }),
-      user.delete()
+      User.findByIdAndDelete(user._id)
     ])
     return res.status(204).send()
   } catch (error) {

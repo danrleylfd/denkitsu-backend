@@ -13,8 +13,7 @@ module.exports = async (req, res) => {
     return res.status(200).json({
       refreshToken: generateRefreshToken({ id: user._id }),
       token: generateToken({ id: user._id }),
-      user,
-      message: "Account successfully edited."
+      user
     })
   } catch (error) {
     console.error(`[EDIT_ACCOUNT] ${new Date().toISOString()} - `, { error: error.message, stack: error.stack })
