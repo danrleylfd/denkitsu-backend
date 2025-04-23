@@ -4,7 +4,7 @@ const Video = require("../../../models/video")
 module.exports = async (req, res) => {
   try {
     const { video: videoID } = req.params
-    const [ video ] = await Video.aggregate([{ $match: { _id: ObjectId(videoID) } }, { $project: { likesCount: { $size: "$likes" } } }])
+    const [ video ] = await Video.aggregate([{ $match: { _id: videoID } }, { $project: { likesCount: { $size: "$likes" } } }])
     if (!video) throw new Error("VIDEO_NOT_FOUND")
     return res.status(200).json({ likes: video.likesCount })
   } catch (error) {
