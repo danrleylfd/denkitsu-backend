@@ -6,17 +6,17 @@ const videoMiddleware = require("../middlewares/video")
 const routes = Router()
 routes.use(authMiddleware)
 routes.use(logMiddleware)
-routes.use(videoMiddleware)
+// routes.use(videoMiddleware)
 
 const addLike = require("../views/video/likes/addLike")
 const countLikes = require("../views/video/likes/countLikes")
 const delLike = require("../views/video/likes/delLike")
 
-routes.post("/:video", addLike)
+routes.post("/:video", videoMiddleware, addLike)
 
-routes.get("/:video", countLikes)
+routes.get("/:video", videoMiddleware, countLikes)
 
-routes.delete("/:video", delLike)
+routes.delete("/:video", videoMiddleware, delLike)
 
 const loadLikeRoutes = (app) => app.use("/likes", routes)
 
