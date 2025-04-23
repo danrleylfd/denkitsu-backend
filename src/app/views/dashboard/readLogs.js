@@ -1,6 +1,6 @@
 const Log = require("../../models/log")
 
-module.exports = async (req, res) => {
+const readLogs = async (req, res) => {
   try {
     const logs = await Log.find().sort({ createdAt: -1 }).populate("user", "_id name email")
     if (!logs) throw new Error("LOGS_NOT_FOUND")
@@ -15,3 +15,5 @@ module.exports = async (req, res) => {
     return res.status(status).json({ code: error.message, message })
   }
 }
+
+module.exports = readLogs

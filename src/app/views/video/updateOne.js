@@ -1,6 +1,6 @@
 const Video = require("../../models/video")
 
-module.exports = async (req, res) => {
+const updateOne = async (req, res) => {
   try {
     const { userID } = req
     const { video: videoID } = req.params
@@ -30,3 +30,5 @@ module.exports = async (req, res) => {
     return res.status(status).json({ code: error.message, error: message })
   }
 }
+
+module.exports = updateOne

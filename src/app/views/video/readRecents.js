@@ -1,6 +1,6 @@
 const Video = require("../../models/video")
 
-module.exports = async (req, res) => {
+const readRecents = async (req, res) => {
   try {
     const videos = await Video.find().sort("-createdAt").populate("user").exec()
     if (!videos || videos.length === 0) throw new Error("VIDEOS_NOT_FOUND")
@@ -15,3 +15,5 @@ module.exports = async (req, res) => {
     return res.status(status).json({ code: error.message, error: message })
   }
 }
+
+module.exports = readRecents

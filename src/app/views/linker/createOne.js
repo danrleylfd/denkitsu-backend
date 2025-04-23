@@ -1,6 +1,6 @@
 const Linker = require("../../models/linker")
 
-module.exports = async (req, res) => {
+const createOne = async (req, res) => {
   try {
     const { userID } = req
     const { label, link } = req.body
@@ -26,3 +26,5 @@ module.exports = async (req, res) => {
     return res.status(status).json({ code: error.message, message })
   }
 }
+
+module.exports = createOne

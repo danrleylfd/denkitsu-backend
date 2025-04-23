@@ -4,7 +4,7 @@ const Video = require("../../models/video")
 const Comment = require("../../models/comment")
 const Log = require("../../models/log")
 
-module.exports = async (req, res) => {
+const deleteAccount = async (req, res) => {
   try {
     const { userID } = req
     const user = await User.findById(userID)
@@ -26,3 +26,5 @@ module.exports = async (req, res) => {
     return res.status(status).json({ code: error.message, error: message })
   }
 }
+
+module.exports = deleteAccount

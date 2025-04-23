@@ -5,7 +5,7 @@ const mailer = require("../../../utils/services/mail")
 
 const { generateOTPToken, generateOTPCode } = require("../../../utils/services/auth")
 
-module.exports = async (req, res) => {
+const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body
     if (!email?.trim()) throw new Error("EMAIL_MISSING")
@@ -40,3 +40,5 @@ module.exports = async (req, res) => {
     return res.status(status).json({ code: error.message, message })
   }
 }
+
+module.exports = forgotPassword

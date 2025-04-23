@@ -1,6 +1,6 @@
 const Video = require("../../models/video")
 
-module.exports = async (req, res) => {
+const readOne = async (req, res) => {
   try {
     const { video: videoID } = req.params
     if (!videoID || videoID.trim().length !== 24) throw new Error("VIDEO_MISSING")
@@ -18,3 +18,5 @@ module.exports = async (req, res) => {
     return res.status(status).json({ code: error.message, error: message })
   }
 }
+
+module.exports = readOne

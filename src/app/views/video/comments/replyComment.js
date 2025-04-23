@@ -1,6 +1,6 @@
 const Comment = require("../../../models/comment")
 
-module.exports = async (req, res) => {
+const replyComment = async (req, res) => {
   try {
     const { userID } = req
     const { comment: commentID } = req.params
@@ -29,3 +29,5 @@ module.exports = async (req, res) => {
     return res.status(status).json({ code: error.message, error: message })
   }
 }
+
+module.exports = replyComment

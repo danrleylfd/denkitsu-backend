@@ -1,4 +1,4 @@
-module.exports = async (req, res) => {
+const external = async (req, res) => {
   try {
     const data = {
       baseURL: "https://vidburner.com/wp-json/aio-dl/video-data",
@@ -14,3 +14,5 @@ module.exports = async (req, res) => {
     return res.status(status).json({ code: error.message, message })
   }
 }
+
+module.exports = external

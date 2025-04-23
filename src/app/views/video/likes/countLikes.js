@@ -1,7 +1,7 @@
 const { Types: { ObjectId } } = require("../../../../utils/database")
 const Video = require("../../../models/video")
 
-module.exports = async (req, res) => {
+const countLikes = async (req, res) => {
   try {
     const { video: videoID } = req.params
     const [ video ] = await Video.aggregate([{ $match: { _id: new ObjectId(videoID) } }, { $project: { likesCount: { $size: "$likes" } } }])
@@ -17,3 +17,5 @@ module.exports = async (req, res) => {
     return res.status(status).json({ code: error.message, error: message })
   }
 }
+
+module.exports = countLikes

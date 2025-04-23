@@ -1,7 +1,7 @@
 const User = require("../../models/auth")
 const Linker = require("../../models/linker")
 
-module.exports = async (req, res) => {
+const readMany = async (req, res) => {
   try {
     const { userID } = req
     const user = await User.findById(userID)
@@ -18,3 +18,5 @@ module.exports = async (req, res) => {
     return res.status(status).json({ code: error.message, message })
   }
 }
+
+module.exports = readMany

@@ -3,7 +3,7 @@ const { compare } = require("bcryptjs")
 const User = require("../../models/auth")
 const { generateRefreshToken, generateToken } = require("../../../utils/services/auth")
 
-module.exports = async (req, res) => {
+const signIn = async (req, res) => {
   try {
     const { email, password } = req.body
     if (!email?.trim()) throw new Error("EMAIL_MISSING")
@@ -34,3 +34,5 @@ module.exports = async (req, res) => {
     return res.status(status).json({ code: error.message, message })
   }
 }
+
+module.exports = signIn

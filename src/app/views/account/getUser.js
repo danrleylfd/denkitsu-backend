@@ -1,6 +1,6 @@
 const User = require("../../models/auth")
 
-module.exports = async (req, res) => {
+const getUser = async (req, res) => {
   try {
     const userID = req.params.userID || req.userID
     const user = await User.findById(userID)
@@ -16,3 +16,5 @@ module.exports = async (req, res) => {
     return res.status(status).json({ code: error.message, error: message })
   }
 }
+
+module.exports = getUser

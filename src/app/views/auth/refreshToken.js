@@ -2,7 +2,7 @@ const { verify } = require("jsonwebtoken")
 
 const { generateToken, generateRefreshToken } = require("../../../utils/services/auth")
 
-module.exports = async (req, res) => {
+const refreshToken = async (req, res) => {
   try {
     const { refreshToken } = req.body
     if (!refreshToken) throw new Error("REFRESH_TOKEN_MISSING")
@@ -32,3 +32,5 @@ module.exports = async (req, res) => {
     return res.status(status).json({ code: error.message, message })
   }
 }
+
+module.exports = refreshToken

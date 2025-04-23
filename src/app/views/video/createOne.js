@@ -1,6 +1,6 @@
 const Video = require("../../models/video")
 
-module.exports = async (req, res) => {
+const createOne = async (req, res) => {
   try {
     const { userID } = req
     const { content, coverUrl, fileUrl } = req.body
@@ -26,3 +26,5 @@ module.exports = async (req, res) => {
     return res.status(status).json({ code: error.message, error: message })
   }
 }
+
+module.exports = createOne

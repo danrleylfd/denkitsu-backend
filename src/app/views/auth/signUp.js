@@ -1,7 +1,7 @@
 const User = require("../../models/auth")
 const { generateRefreshToken, generateToken } = require("../../../utils/services/auth")
 
-module.exports = async (req, res) => {
+const signUp = async (req, res) => {
   try {
     const { name, email, password, avatarUrl: _avatarUrl } = req.body
     if (!name?.trim()) throw new Error("NAME_MISSING")
@@ -38,3 +38,5 @@ module.exports = async (req, res) => {
     return res.status(status).json({ code: error.message, error: message })
   }
 }
+
+module.exports = signUp

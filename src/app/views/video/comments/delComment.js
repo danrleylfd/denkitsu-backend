@@ -1,7 +1,7 @@
 const Video = require("../../../models/video")
 const Comment = require("../../../models/comment")
 
-module.exports = async (req, res) => {
+const delComment = async (req, res) => {
   try {
     const { userID } = req
     const { video: videoID, comment: commentID } = req.params
@@ -25,3 +25,5 @@ module.exports = async (req, res) => {
     return res.status(status).json({ code: error.message, error: message })
   }
 }
+
+module.exports = delComment

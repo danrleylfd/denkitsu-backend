@@ -1,7 +1,7 @@
 const User = require("../../models/auth")
 const Video = require("../../models/video")
 
-module.exports = async (req, res) => {
+const readPopular = async (req, res) => {
   try {
     const dateLimit = new Date()
     dateLimit.setDate(dateLimit.getDate() - 10000) // 1 = 1 Dia = Últimas 24 horas
@@ -58,3 +58,5 @@ module.exports = async (req, res) => {
     return res.status(status).json({ code: error.message, error: message })
   }
 }
+
+module.exports = readPopular

@@ -5,7 +5,7 @@ const sysPrompt = {
   content: "O assistant deve sempre responder em pt-BR, mesmo que o usuário escreva em outro idioma."
 }
 
-module.exports = async (req, res) => {
+const sendMessage = async (req, res) => {
   try {
     const { model, prompts } = req.body
     if (!model || model.trim().length < 3) throw new Error("MODEL_MISSING")
@@ -26,3 +26,5 @@ module.exports = async (req, res) => {
     return res.status(status).json({ code: error.message, message })
   }
 }
+
+module.exports = sendMessage

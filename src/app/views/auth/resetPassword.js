@@ -1,7 +1,7 @@
 const { generateRefreshToken, generateToken } = require("../../../utils/services/auth")
 const User = require("../../models/auth")
 
-module.exports = async (req, res) => {
+const resetPassword = async (req, res) => {
   try {
     const { token, email, password } = req.body
     if (!token?.trim()) throw new Error("TOKEN_MISSING")
@@ -40,3 +40,5 @@ module.exports = async (req, res) => {
     return res.status(status).json({ code: error.message, message })
   }
 }
+
+module.exports = resetPassword

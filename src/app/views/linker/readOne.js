@@ -1,6 +1,6 @@
 const Linker = require("../../models/linker")
 
-module.exports = async (req, res) => {
+const readOne = async (req, res) => {
   try {
     const { label } = req.params
     if (!label || label.trim().length === 0) throw new Error("LABEL_MISSING")
@@ -18,3 +18,5 @@ module.exports = async (req, res) => {
     return res.status(status).json({ code: error.message, message })
   }
 }
+
+module.exports = readOne

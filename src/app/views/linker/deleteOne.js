@@ -1,7 +1,7 @@
 const User = require("../../models/auth")
 const Linker = require("../../models/linker")
 
-module.exports = async (req, res) => {
+const deleteOne = async (req, res) => {
   try {
     const { userID } = req
     const { label } = req.params
@@ -24,3 +24,5 @@ module.exports = async (req, res) => {
     return res.status(status).json({ code: error.message, message })
   }
 }
+
+module.exports = deleteOne
