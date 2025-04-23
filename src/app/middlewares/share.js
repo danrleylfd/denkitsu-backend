@@ -1,6 +1,6 @@
 const Video = require("../models/video")
 
-module.exports = async (req, res, next) => {
+const shareMiddleware = async (req, res, next) => {
   try {
     let { video: videoID } = req.params
     if (!videoID || videoID.trim().length !== 24) throw new Error("VIDEO_INVALID")
@@ -18,3 +18,5 @@ module.exports = async (req, res, next) => {
     return res.status(status).json({ code: error.message, error: message })
   }
 }
+
+module.exports = shareMiddleware

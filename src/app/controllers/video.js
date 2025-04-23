@@ -25,4 +25,6 @@ routes.put("/:video", updateOne)
 
 routes.delete("/:video", deleteOne)
 
-module.exports = (app) => app.use("/videos", routes)
+const loadVideoRoutes = (app) => app.use("/videos", routes)
+
+module.exports = loadVideoRoutes

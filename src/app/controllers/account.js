@@ -18,4 +18,6 @@ routes.put("/", editAccount)
 
 routes.delete("/", deleteAccount)
 
-module.exports = (app) => app.use("/account", routes)
+const loadAccountRoutes = (app) => app.use("/account", routes)
+
+module.exports = loadAccountRoutes

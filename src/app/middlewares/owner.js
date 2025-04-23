@@ -1,4 +1,4 @@
-module.exports = (req, res, next) => {
+const ownerMiddleware = (req, res, next) => {
   try {
     const authHeader = req.headers.authorization
     if (!authHeader) throw new Error("TOKEN_MISSING")
@@ -24,3 +24,5 @@ module.exports = (req, res, next) => {
     return res.status(status).json({ error: message })
   }
 }
+
+module.exports = ownerMiddleware

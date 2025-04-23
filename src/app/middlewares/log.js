@@ -1,6 +1,21 @@
 const Log = require("../models/log")
 
-module.exports = async (req, res, next) => {
+const getOS = (userAgent) => {
+  if (/windows/i.test(userAgent)) return "Windows"
+  if (/macintosh|mac os x/i.test(userAgent)) return "Mac OS"
+  if (/linux/i.test(userAgent)) return "Linux"
+  return "Desconhecido"
+}
+
+const getBrowser = (userAgent) => {
+  if (/chrome|crios|crmo/i.test(userAgent)) return "Chrome"
+  if (/firefox|fxios/i.test(userAgent)) return "Firefox"
+  if (/safari/i.test(userAgent)) return "Safari"
+  if (/msie|trident/i.test(userAgent)) return "Internet Explorer"
+  return "Desconhecido"
+}
+
+const logMiddleware = async (req, res, next) => {
   try {
     const ip = req.clientIp
     const so = getOS(req.headers["user-agent"])
@@ -21,17 +36,4 @@ module.exports = async (req, res, next) => {
   }
 }
 
-function getOS(userAgent) {
-  if (/windows/i.test(userAgent)) return "Windows"
-  if (/macintosh|mac os x/i.test(userAgent)) return "Mac OS"
-  if (/linux/i.test(userAgent)) return "Linux"
-  return "Desconhecido"
-}
-
-function getBrowser(userAgent) {
-  if (/chrome|crios|crmo/i.test(userAgent)) return "Chrome"
-  if (/firefox|fxios/i.test(userAgent)) return "Firefox"
-  if (/safari/i.test(userAgent)) return "Safari"
-  if (/msie|trident/i.test(userAgent)) return "Internet Explorer"
-  return "Desconhecido"
-}
+module.exports = logMiddleware

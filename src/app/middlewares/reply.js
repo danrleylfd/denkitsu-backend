@@ -1,4 +1,4 @@
-module.exports = (req, res, next) => {
+const replyMiddleware = (req, res, next) => {
   try {
     const { comment: commentID, reply: replyID } = req.params
     if (!commentID || commentID.trim().length !== 24) throw new Error("COMMENT_MISSING")
@@ -15,3 +15,5 @@ module.exports = (req, res, next) => {
     return res.status(status).json({ code: error.message, error: message })
   }
 }
+
+module.exports = replyMiddleware

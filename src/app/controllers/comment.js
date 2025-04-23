@@ -1,12 +1,12 @@
 const { Router } = require("express")
 const authMiddleware = require("../middlewares/auth")
 const logMiddleware = require("../middlewares/log")
-const commentMiddleware = require("../middlewares/comment")
+const videoMiddleware = require("../middlewares/video")
 
 const routes = Router()
 routes.use(authMiddleware)
 routes.use(logMiddleware)
-routes.use(commentMiddleware)
+routes.use(videoMiddleware)
 
 const addComment = require("../views/video/comments/addComment")
 const countComments = require("../views/video/comments/countComments")
@@ -18,4 +18,6 @@ routes.get("/:video", countComments)
 
 routes.delete("/:video/:comment", delComment)
 
-module.exports = (app) => app.use("/comments", routes)
+const loadCommentRoutes = (app) => app.use("/comments", routes)
+
+module.exports = loadCommentRoutes

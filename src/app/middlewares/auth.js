@@ -1,7 +1,7 @@
 const { verify } = require("jsonwebtoken")
 const User = require("../models/auth")
 
-module.exports = async (req, res, next) => {
+const authMiddleware = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization
     if (!authHeader) throw new Error("TOKEN_MISSING")
@@ -32,3 +32,5 @@ module.exports = async (req, res, next) => {
     return res.status(status).json({ code: error.message, error: message })
   }
 }
+
+module.exports = authMiddleware

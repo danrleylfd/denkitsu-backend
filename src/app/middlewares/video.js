@@ -1,6 +1,6 @@
 const Video = require("../models/video")
 
-const likeMiddleware = async (req, res, next) => {
+const videoMiddleware = async (req, res, next) => {
   try {
     const { video: videoID } = req.params
     if (!videoID || videoID.trim().length !== 24) throw new Error("VIDEO_MISSING")
@@ -8,8 +8,8 @@ const likeMiddleware = async (req, res, next) => {
     if (!video) throw new Error("VIDEO_NOT_FOUND")
     next()
   } catch (error) {
-    console.error(`[LIKE_MIDDLEWARE] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
-    const defaultError = { status: 500, message: `[LIKE_MIDDLEWARE] ${new Date().toISOString()} - Internal server error` }
+    console.error(`[VIDEO_MIDDLEWARE] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
+    const defaultError = { status: 500, message: `[VIDEO_MIDDLEWARE] ${new Date().toISOString()} - Internal server error` }
     const errorMessages = {
       VIDEO_MISSING: { status: 422, message: "video is required" },
       VIDEO_NOT_FOUND: { status: 404, message: "video not found/exists" }
@@ -19,4 +19,4 @@ const likeMiddleware = async (req, res, next) => {
   }
 }
 
-module.exports = likeMiddleware
+module.exports = videoMiddleware

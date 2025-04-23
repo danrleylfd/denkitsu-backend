@@ -8,4 +8,6 @@ const readLogs = require("../views/dashboard/readLogs")
 
 routes.get("/logs", readLogs)
 
-module.exports = (app) => app.use("/dashboard", routes)
+const loadDashboardRoutes = (app) => app.use("/dashboard", routes)
+
+module.exports = loadDashboardRoutes

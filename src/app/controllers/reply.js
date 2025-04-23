@@ -15,4 +15,6 @@ routes.post("/:comment", replyComment)
 
 routes.delete("/:reply", delReply)
 
-module.exports = (app) => app.use("/replys", routes)
+const loadReplyRoutes = (app) => app.use("/replys", routes)
+
+module.exports = loadReplyRoutes

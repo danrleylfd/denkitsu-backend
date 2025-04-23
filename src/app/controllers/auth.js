@@ -20,4 +20,6 @@ routes.post("/forgot_password", forgotPassword)
 
 routes.post("/reset_password", resetPassword)
 
-module.exports = (app) => app.use("/auth", routes)
+const loadAuthRoutes = (app) => app.use("/auth", routes)
+
+module.exports = loadAuthRoutes

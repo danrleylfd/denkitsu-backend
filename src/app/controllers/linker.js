@@ -23,4 +23,6 @@ routes.put("/:oldLabel", updateOne)
 
 routes.delete("/:label", deleteOne)
 
-module.exports = (app) => app.use("/linkers", routes)
+const loadLinkerRoutes = (app) => app.use("/linkers", routes)
+
+module.exports = loadLinkerRoutes

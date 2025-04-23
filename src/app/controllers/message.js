@@ -8,4 +8,6 @@ const sendMessage = require("../views/message/sendMessage")
 
 routes.post("/", sendMessage)
 
-module.exports = (app) => app.use("/messages", routes)
+const loadMessageRoutes = (app) => app.use("/messages", routes)
+
+module.exports = loadMessageRoutes
