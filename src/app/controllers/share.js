@@ -6,14 +6,14 @@ const videoMiddleware = require("../middlewares/video")
 const routes = Router()
 routes.use(authMiddleware)
 routes.use(logMiddleware)
-routes.use(videoMiddleware)
+// routes.use(videoMiddleware)
 
 const share = require("../views/video/shares/share")
 const countShares = require("../views/video/shares/countShares")
 
-routes.post("/:video", share)
+routes.post("/:video", videoMiddleware, share)
 
-routes.get("/:video", countShares)
+routes.get("/:video", videoMiddleware, countShares)
 
 const loadShareRoutes = (app) => app.use("/shares", routes)
 

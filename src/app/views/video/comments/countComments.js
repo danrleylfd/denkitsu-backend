@@ -1,10 +1,11 @@
-const { ObjectId } = require("../../../../utils/database")
+const { Types: { ObjectId } } = require("../../../../utils/database")
 const Video = require("../../../models/video")
 
 module.exports = async (req, res) => {
   try {
     const { video: videoID } = req.params
     const [ video ] = await Video.aggregate([{ $match: { _id: new ObjectId(videoID) } }, { $project: { commentsCount: { $size: "$comments" } } }])
+    if (!video) throw new Error("VIDEO_NOT_FOUND")
     return res.status(200).json({ comments: video.commentsCount })
   } catch (error) {
     console.error(`[COUNT_COMMENTS] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
