@@ -4,7 +4,7 @@ const Video = require("../../models/video")
 module.exports = async (req, res) => {
   try {
     const dateLimit = new Date()
-    dateLimit.setDate(dateLimit.getDate() - 365) // 1 = 1 Dia = Últimas 24 horas
+    dateLimit.setDate(dateLimit.getDate() - 10000) // 1 = 1 Dia = Últimas 24 horas
     const videosWithUsers = await Video.aggregate([
       {
         $match: {
