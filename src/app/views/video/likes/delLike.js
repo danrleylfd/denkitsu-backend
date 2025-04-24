@@ -8,7 +8,7 @@ const delLike = async (req, res) => {
       { _id: videoID, likes: userID },
       { $pull: { likes: userID } },
       { new: true }
-    ).populate("user")
+    ).select("_id")
     if (!video) throw new Error("VIDEO_NOT_FOUND_OR_NOT_LIKED")
     return res.status(204).send()
   } catch (error) {
