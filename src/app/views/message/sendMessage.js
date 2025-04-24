@@ -16,6 +16,10 @@ const sendMessage = async (req, res) => {
     console.log(`ASSISTANT ${data.choices[0].message.content.split("\n")[0]}...`)
     return res.status(status).json(data)
   } catch (error) {
+    if (error.response) {
+      console.error(`[SEND_MESSAGE] ${new Date().toISOString()} -`, { status: error.response.status, data: error.response.data })
+      return res.status(error.response.status).json(error.response.data)
+    }
     console.error(`[SEND_MESSAGE] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
     const defaultError = { status: 500, message: `[SEND_MESSAGE] ${new Date().toISOString()} - Internal server error` }
     const errorMessages = {
