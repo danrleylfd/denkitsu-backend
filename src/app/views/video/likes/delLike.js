@@ -10,7 +10,7 @@ const delLike = async (req, res) => {
       { new: true }
     ).populate("user")
     if (!video) throw new Error("VIDEO_NOT_FOUND_OR_NOT_LIKED")
-    return res.status(200).json(video)
+    return res.status(204).send()
   } catch (error) {
     console.error(`[UNLIKE] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
     const defaultError = { status: 500, message: `[UNLIKE] ${new Date().toISOString()} - Internal server error` }
