@@ -4,7 +4,7 @@ const registerShare = async (req, res) => {
   try {
     const { userID } = req
     const { video: videoID } = req.params
-    const video = await Video.findById(videoID).populate("user")
+    const video = await Video.findById(videoID)
     if (!video.shares.includes(userID)) video.shares.push(userID)
     else video.sharesExtras += 1
     const updatedVideo = await video.save()
