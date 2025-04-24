@@ -6,7 +6,7 @@ const deleteOne = async (req, res) => {
     const { userID } = req
     const { video: videoID } = req.params
     if (!videoID || videoID.trim().length !== 24) return res.status(422).json({ error: "video is required" })
-    await promise.all([
+    await Promise.all([
       Comment.deleteMany({ video: videoID }),
       Video.findOneAndDelete({ _id: videoID, user: userID })
     ])
