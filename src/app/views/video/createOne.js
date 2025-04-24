@@ -12,7 +12,7 @@ const createOne = async (req, res) => {
       content: content.trim(),
       coverUrl: coverUrl.trim(),
       fileUrl: fileUrl.trim()
-    })
+    }).populate("user")
     return res.status(201).json(video)
   } catch (error) {
     console.error(`[POST_VIDEO] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })

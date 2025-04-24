@@ -7,12 +7,12 @@ const addComment = async (req, res) => {
     const { video: videoID } = req.params
     const { content } = req.body
     if (!content || content.trim().length === 0) throw new Error("INVALID_COMMENT")
-    const video = await Video.findById(videoID)
+    const video = await Video.findById(videoID).select("comments")
     const comment = await Comment.create({
-      content,
+      content: content.trim(),
       user: userID,
       video: videoID
-    })
+    }).populate("user")
     video.comments.push(comment._id)
     await video.save()
     return res.status(201).json(comment)

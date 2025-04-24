@@ -6,21 +6,22 @@ const createOne = async (req, res) => {
     const { label, link } = req.body
     if (!label?.trim()) throw new Error("LABEL_MISSING")
     if (!link?.trim()) throw new Error("LINK_MISSING")
-    const _linker = await Linker.findOne({ label })
-    if (_linker) throw new Error("LABEL_ALREADY_EXISTS")
-    const linker = await Linker.create({
+    await Linker.create({
       user: userID,
       label: label.trim(),
       link: link.trim()
     })
-    return res.status(201).json(linker)
+    return res.status(201).json({ success: true })
   } catch (error) {
+    if (error.code === 11000) { // Código de erro label duplicado do mongoose pois label é único
+      const { status, message } = { status: 409, message: "label already exists" }
+      return res.status(status).json({ code: "LABEL_ALREADY_EXISTS", message })
+    }
     console.error(`[CREATE_LINKER] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
     const defaultError = { status: 500, message: `[CREATE_LINKER] ${new Date().toISOString()} - Internal server error` }
     const errorMessages = {
       LABEL_MISSING: { status: 422, message: "label is required" },
-      LINK_MISSING: { status: 422, message: "link is required" },
-      LABEL_ALREADY_EXISTS: { status: 409, message: "label already exists" },
+      LINK_MISSING: { status: 422, message: "link is required" }
     }
     const { status, message } = errorMessages[error.message] || defaultError
     return res.status(status).json({ code: error.message, message })

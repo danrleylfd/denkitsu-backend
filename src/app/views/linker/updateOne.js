@@ -9,8 +9,8 @@ const updateOne = async (req, res) => {
     if (!newLabel?.trim()) throw new Error("NEW_LABEL_MISSING")
     if (!newLink?.trim()) throw new Error("NEW_LINK_MISSING")
     const linker = await Linker.findOneAndUpdate(
-      { label: oldLabel, user: userID },
-      { $set: { label: newLabel, link: newLink } },
+      { label: oldLabel.trim(), user: userID },
+      { $set: { label: newLabel.trim(), link: newLink.trim() } },
       { new: true }
     )
     if (!linker) throw new Error("LINKER_NOT_FOUND")

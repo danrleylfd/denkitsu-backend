@@ -14,9 +14,9 @@ const authMiddleware = async (req, res, next) => {
 
     const decoded = verify(token, process.env.JWT_SECRET)
     if (!decoded) throw new Error("TOKEN_INVALID")
-    const user = await User.findById(decoded.id)
+    const user = await User.findById(decoded.id).select("_id")
     if (!user) throw new Error("USER_NOT_FOUND")
-    req.userID = decoded.id
+    req.userID = user._id
     return next()
   } catch (error) {
     console.error(`[AUTH_MIDDLEWARE] ${new Date().toISOString()} - `, { error: error.message, stack: error.stack })

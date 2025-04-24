@@ -4,7 +4,7 @@ const readPopular = async (req, res) => {
   try {
     const dateLimit = new Date()
     dateLimit.setDate(dateLimit.getDate() - 10000) // 1 = 1 Dia = Últimas 24 horas
-    const videosWithUsers = await Video.aggregate([
+    const videos = await Video.aggregate([
       { $match: { createdAt: { $gte: dateLimit } } },
       {
         $addFields: {
@@ -31,8 +31,8 @@ const readPopular = async (req, res) => {
       { $addFields: { user: "$userData" } },
       { $project: { userData: 0 } }
     ]).exec()
-    if (!videosWithUsers || videosWithUsers.length === 0) throw new Error("VIDEOS_NOT_FOUND")
-    return res.status(200).json(videosWithUsers)
+    if (!videos || videos.length === 0) throw new Error("VIDEOS_NOT_FOUND")
+    return res.status(200).json(videos)
   } catch (error) {
     console.error(`[POPULAR_VIDEOS] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
     const defaultError = { status: 500, message: `[POPULAR_VIDEOS] ${new Date().toISOString()} - Internal server error` }

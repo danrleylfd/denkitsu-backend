@@ -4,7 +4,7 @@ const readOne = async (req, res) => {
   try {
     const { label } = req.params
     if (!label || label.trim().length === 0) throw new Error("LABEL_MISSING")
-    const linker = await Linker.findOne({ label }).populate("user").exec()
+    const linker = await Linker.findOne({ label: label.trim() }).select("link")
     if (!linker) throw new Error("LINKER_NOT_FOUND")
     return res.status(200).json({ link: linker.link })
   } catch (error) {

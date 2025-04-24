@@ -4,8 +4,7 @@ const Linker = require("../../models/linker")
 const readMany = async (req, res) => {
   try {
     const { userID } = req
-    const user = await User.findById(userID)
-    const linkers = await Linker.find({ user: user._id }).sort("-createdAt").populate("user").exec()
+    const linkers = await Linker.find({ user: userID }).sort("-createdAt")
     if (!linkers?.length === 0) throw new Error("LINKERS_NOT_FOUND")
     return res.status(200).json(linkers)
   } catch (error) {
