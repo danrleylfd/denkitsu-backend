@@ -7,7 +7,7 @@ const sysPrompt = {
 
 const sendMessage = async (req, res) => {
   try {
-    const { model, prompts } = req.body
+    const { model, messages: prompts } = req.body
     if (!model || model.trim().length < 3) throw new Error("MODEL_MISSING")
     if (!prompts || prompts.length < 1) throw new Error("PROMPTS_MISSING")
     console.log(`MODEL ${model}`)
