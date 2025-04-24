@@ -2,7 +2,7 @@ const Video = require("../../models/video")
 
 const readRecents = async (req, res) => {
   try {
-    const videos = await Video.find().sort("-createdAt").populate("user").exec()
+    const videos = await Video.find().sort("-createdAt").populate("user")
     if (!videos || videos.length === 0) throw new Error("VIDEOS_NOT_FOUND")
     return res.status(200).json(videos)
   } catch (error) {

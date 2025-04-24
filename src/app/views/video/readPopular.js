@@ -30,7 +30,7 @@ const readPopular = async (req, res) => {
       { $unwind: "$userData" },
       { $addFields: { user: "$userData" } },
       { $project: { userData: 0 } }
-    ]).exec()
+    ])
     if (!videos || videos.length === 0) throw new Error("VIDEOS_NOT_FOUND")
     return res.status(200).json(videos)
   } catch (error) {

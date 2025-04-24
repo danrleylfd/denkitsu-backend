@@ -4,7 +4,7 @@ const readOne = async (req, res) => {
   try {
     const { video: videoID } = req.params
     if (!videoID || videoID.trim().length !== 24) throw new Error("VIDEO_MISSING")
-    const video = await Video.findById(videoID).populate("user").exec()
+    const video = await Video.findById(videoID).populate("user")
     if (!video) throw new Error("VIDEO_NOT_FOUND")
     return res.status(200).json(video)
   } catch (error) {

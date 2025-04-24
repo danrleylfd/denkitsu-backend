@@ -2,7 +2,6 @@ const cors = require("cors")
 
 module.exports = cors({
   origin: (origin, callback) => {
-    console.log(`origin: ${origin}`)
     const allowedOrigins = [
       process.env.HOST0,
       process.env.HOST1,
