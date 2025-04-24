@@ -12,7 +12,7 @@ const addComment = async (req, res) => {
       content: content.trim(),
       user: userID,
       video: videoID
-    }).populate("user")
+    })
     video.comments.push(comment._id)
     await video.save()
     return res.status(201).json(comment)

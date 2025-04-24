@@ -10,7 +10,7 @@ const addLike = async (req, res) => {
       { new: true }
     ).select("_id")
     if (!video) throw new Error("VIDEO_NOT_FOUND_OR_ALREADY_LIKED")
-    return res.status(201).json({ success: true })
+    return res.status(201).send()
   } catch (error) {
     console.error(`[LIKE] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
     const defaultError = { status: 500, message: `[LIKE] ${new Date().toISOString()} - Internal server error` }

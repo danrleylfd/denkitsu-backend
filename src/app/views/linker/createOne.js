@@ -6,12 +6,12 @@ const createOne = async (req, res) => {
     const { label, link } = req.body
     if (!label?.trim()) throw new Error("LABEL_MISSING")
     if (!link?.trim()) throw new Error("LINK_MISSING")
-    await Linker.create({
+    const linker = await Linker.create({
       user: userID,
       label: label.trim(),
       link: link.trim()
     })
-    return res.status(201).json({ success: true })
+    return res.status(201).json(linker)
   } catch (error) {
     if (error.code === 11000) { // Código de erro label duplicado do mongoose pois label é único
       const { status, message } = { status: 409, message: "label already exists" }
