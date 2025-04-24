@@ -1,4 +1,3 @@
-const User = require("../../models/auth")
 const Video = require("../../models/video")
 
 const readPopular = async (req, res) => {
@@ -6,11 +5,7 @@ const readPopular = async (req, res) => {
     const dateLimit = new Date()
     dateLimit.setDate(dateLimit.getDate() - 10000) // 1 = 1 Dia = Últimas 24 horas
     const videosWithUsers = await Video.aggregate([
-      {
-        $match: {
-          createdAt: { $gte: dateLimit }
-        }
-      },
+      { $match: { createdAt: { $gte: dateLimit } } },
       {
         $addFields: {
           popularity: {
@@ -32,19 +27,9 @@ const readPopular = async (req, res) => {
           as: "userData"
         }
       },
-      {
-        $unwind: "$userData"
-      },
-      {
-        $addFields: {
-          user: "$userData"
-        }
-      },
-      {
-        $project: {
-          userData: 0
-        }
-      }
+      { $unwind: "$userData" },
+      { $addFields: { user: "$userData" } },
+      { $project: { userData: 0 } }
     ]).exec()
     if (!videosWithUsers || videosWithUsers.length === 0) throw new Error("VIDEOS_NOT_FOUND")
     return res.status(200).json(videosWithUsers)
