@@ -12,7 +12,7 @@ const delReply = async (req, res) => {
     comment.replies = comment.replies.filter((replyId) => replyId != replyID)
     await promise.all([
       comment.save(),
-      reply.delete()
+      Comment.findByIdAndDelete(replyID)
     ])
     return res.status(204).send()
   } catch (error) {
