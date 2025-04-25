@@ -17,8 +17,6 @@ routes.get("/", readMany)
 
 routes.get("/by-user", readMany)
 
-routes.get("/:label", readMany)
-
 routes.put("/:oldLabel", updateOne)
 
 routes.delete("/:label", deleteOne)

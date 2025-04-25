@@ -26,7 +26,7 @@ const forgotPassword = async (req, res) => {
     mailer.sendMail({ to: email, subject: "Token de recuperação", html }, (err) => {
       if (err) throw new Error("MAIL_ERROR")
     })
-    return res.status(200).json()
+    return res.status(200).send()
   } catch (error) {
     console.error(`[FORGOT_PASSWORD] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
     const defaultError = { status: 500, message: `[FORGOT_PASSWORD] ${new Date().toISOString()} - Internal server error` }
