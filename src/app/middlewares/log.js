@@ -18,11 +18,11 @@ const getBrowser = (userAgent) => {
 const logMiddleware = async (req, res, next) => {
   try {
     const ip = req.clientIp
-    const so = getOS(req.headers["user-agent"])
+    const os = getOS(req.headers["user-agent"])
     const browser = getBrowser(req.headers["user-agent"])
     const route = req.originalUrl
     const user = req.userID || null
-    const log = await Log.create({ ip, so, browser, route, user })
+    const log = await Log.create({ ip, os, browser, route, user })
     if (!log) throw new Error("LOG_NOT_CREATED")
     next()
   } catch (error) {

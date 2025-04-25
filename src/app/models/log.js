@@ -6,7 +6,7 @@ const LogSchema = new mongoose.Schema(
       type: String,
       required: true
     },
-    so: {
+    os: {
       type: String,
       required: true
     },
