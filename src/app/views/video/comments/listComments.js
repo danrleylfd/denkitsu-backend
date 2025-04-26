@@ -6,7 +6,7 @@ const countComments = async (req, res) => {
     const { video: videoID } = req.params
     const comments = await Comment.find({ video: videoID }).sort("-createdAt").populate("user")
     if (!comments) throw new Error("VIDEO_NOT_FOUND")
-    return res.status(200).json({ comments })
+    return res.status(200).json(comments)
   } catch (error) {
     console.error(`[COUNT_COMMENTS] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
     const defaultError = { status: 500, message: `[COUNT_COMMENTS] ${new Date().toISOString()} - Internal server error` }
