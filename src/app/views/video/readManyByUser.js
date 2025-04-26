@@ -2,7 +2,7 @@ const Video = require("../../models/video")
 
 const readManyByUser = async (req, res) => {
   try {
-    const { userID } = req.params || req
+    const userID = req.params.userID || req.userID
     const videos = await Video.find({ user: userID }).sort("-createdAt").populate("user")
     if (!videos || videos.length === 0) throw new Error("VIDEOS_NOT_FOUND")
     return res.status(200).json(videos)

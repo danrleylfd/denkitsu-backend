@@ -18,13 +18,13 @@ routes.post("/", createOne)
 
 routes.get("/", readManyByUser)
 
-routes.get("/:userID", readManyByUser)
-
 routes.get("/one/:video", readOne)
 
 routes.get("/popular", readPopular)
 
 routes.get("/recents", readRecents)
+
+routes.get("/:userID", readManyByUser)
 
 routes.put("/:video", updateOne)
 
