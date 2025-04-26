@@ -2,7 +2,7 @@ const User = require("../../models/auth")
 
 const getUser = async (req, res) => {
   try {
-    const userID = req.params.userID || req.userID
+    const { userID } = req.params || req
     const user = await User.findById(userID)
     if (!user) throw new Error("USER_NOT_FOUND")
     return res.status(200).json({ user })
