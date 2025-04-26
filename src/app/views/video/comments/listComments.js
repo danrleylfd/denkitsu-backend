@@ -1,4 +1,3 @@
-const { Types: { ObjectId } } = require("../../../../utils/database")
 const Comment = require("../../../models/comment")
 
 const countComments = async (req, res) => {

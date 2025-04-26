@@ -3,7 +3,6 @@ const Video = require("../models/video")
 const videoMiddleware = async (req, res, next) => {
   try {
     const { video: videoID } = req.params
-    console.log(videoID, req.params)
     if (!videoID || videoID.trim().length !== 24) throw new Error("VIDEO_MISSING")
     const video = await Video.findById(videoID)
     if (!video) throw new Error("VIDEO_NOT_FOUND")
