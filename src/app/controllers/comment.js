@@ -9,10 +9,13 @@ routes.use(logMiddleware)
 // routes.use(videoMiddleware)
 
 const addComment = require("../views/video/comments/addComment")
+const listComments = require("../views/video/comments/listComments")
 const countComments = require("../views/video/comments/countComments")
 const delComment = require("../views/video/comments/delComment")
 
 routes.post("/:video", videoMiddleware, addComment)
+
+routes.get("/list/:video", videoMiddleware, listComments)
 
 routes.get("/:video", videoMiddleware, countComments)
 
