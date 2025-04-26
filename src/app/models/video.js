@@ -6,7 +6,6 @@ const VideoSchema = new mongoose.Schema(
     coverUrl: { type: String, required: true },
     fileUrl: { type: String, required: true },
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }],
     shares: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
