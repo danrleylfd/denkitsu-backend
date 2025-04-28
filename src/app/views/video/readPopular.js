@@ -18,7 +18,7 @@ const readPopular = async (req, res) => {
         }
       },
       { $sort: { popularity: -1, updatedAt: -1, createdAt: -1 } },
-      { $limit: 16 },
+      { $limit: 33 },
       {
         $lookup: {
           from: "users",
