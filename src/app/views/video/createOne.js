@@ -7,7 +7,7 @@ const createOne = async (req, res) => {
     if (!content?.trim()) throw new Error("CONTENT_MISSING")
     if (!coverUrl?.trim()) throw new Error("COVER_URL_MISSING")
     if (!fileUrl?.trim()) throw new Error("FILE_URL_MISSING")
-    const video = await Video.findOneOrCreate({
+    const video = await Video.create({
       user: userID,
       content: content.trim(),
       coverUrl: coverUrl.trim(),
