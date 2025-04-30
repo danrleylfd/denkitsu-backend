@@ -7,10 +7,7 @@ const editAccount = async (req, res) => {
     if (name?.length > 16) throw new Error("NAME_TOO_LONG")
     if (avatarUrl?.trim()) {
       try {
-        const url = new URL(avatarUrl)
-        const imageTypes = ["jpg", "jpeg", "png", "webp"]
-        const isValidImageUrl = imageTypes.some(type => url.pathname.toLowerCase().includes(type))
-        if (!isValidImageUrl) throw new Error("INVALID_IMAGE_URL")
+        new URL(avatarUrl)
         if (avatarUrl.length > 255) throw new Error("AVATAR_URL_TOO_LONG")
       } catch {
         throw new Error("INVALID_URL")
