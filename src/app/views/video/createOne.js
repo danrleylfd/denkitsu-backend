@@ -12,8 +12,9 @@ const createOne = async (req, res) => {
       content: content.trim(),
       coverUrl: coverUrl.trim(),
       fileUrl: fileUrl.trim()
-    }).populate("user")
-    return res.status(201).json(video)
+    })
+    const populatedVideo = await video.populate("user")
+    return res.status(201).json(populatedVideo)
   } catch (error) {
     console.error(`[POST_VIDEO] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
     const defaultError = { status: 500, message: `[POST_VIDEO] ${new Date().toISOString()} - Internal server error` }
