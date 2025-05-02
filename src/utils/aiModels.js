@@ -1,244 +1,75 @@
 const aiModels = [
-  {
-    "id": "agentica-org/deepcoder-14b-preview:free",
-    "name": "Agentica: Deepcoder 14B Preview"
-  },
-  {
-    "id": "allenai/molmo-7b-d:free",
-    "name": "AllenAI: Molmo 7B D"
-  },
-  {
-    "id": "arliai/qwq-32b-arliai-rpr-v1:free",
-    "name": "ArliAI: QwQ 32B RpR v1"
-  },
-  {
-    "id": "bytedance-research/ui-tars-72b:free",
-    "name": "Bytedance: UI-TARS 72B"
-  },
-  {
-    "id": "cognitivecomputations/dolphin3.0-mistral-24b:free",
-    "name": "Dolphin3.0 Mistral 24B"
-  },
-  {
-    "id": "cognitivecomputations/dolphin3.0-r1-mistral-24b:free",
-    "name": "Dolphin3.0 R1 Mistral 24B"
-  },
-  {
-    "id": "deepseek/deepseek-chat:free",
-    "name": "DeepSeek: DeepSeek V3"
-  },
-  {
-    "id": "deepseek/deepseek-chat-v3-0324:free",
-    "name": "DeepSeek: DeepSeek V3 0324"
-  },
-  {
-    "id": "deepseek/deepseek-r1:free",
-    "name": "DeepSeek: R1"
-  },
-  {
-    "id": "deepseek/deepseek-r1-distill-llama-70b:free",
-    "name": "DeepSeek: R1 Distill Llama 70B"
-  },
-  {
-    "id": "deepseek/deepseek-r1-distill-qwen-14b:free",
-    "name": "DeepSeek: R1 Distill Qwen 14B"
-  },
-  {
-    "id": "deepseek/deepseek-r1-distill-qwen-32b:free",
-    "name": "DeepSeek: R1 Distill Qwen 32B"
-  },
-  {
-    "id": "deepseek/deepseek-r1-zero:free",
-    "name": "DeepSeek: R1 Zero"
-  },
-  {
-    "id": "deepseek/deepseek-v3-base:free",
-    "name": "DeepSeek: DeepSeek V3 Base"
-  },
-  {
-    "id": "featherless/qwerky-72b:free",
-    "name": "Qwerky 72B"
-  },
-  {
-    "id": "google/gemini-2.0-flash-exp:free",
-    "name": "Google: Gemini 2.0 Flash Experimental"
-  },
-  {
-    "id": "google/gemma-2-9b-it:free",
-    "name": "Google: Gemma 2 9B"
-  },
-  {
-    "id": "google/gemma-3-12b-it:free",
-    "name": "Google: Gemma 3 12B"
-  },
-  {
-    "id": "google/gemma-3-1b-it:free",
-    "name": "Google: Gemma 3 1B"
-  },
-  {
-    "id": "google/gemma-3-27b-it:free",
-    "name": "Google: Gemma 3 27B"
-  },
-  {
-    "id": "google/gemma-3-4b-it:free",
-    "name": "Google: Gemma 3 4B"
-  },
-  {
-    "id": "google/learnlm-1.5-pro-experimental:free",
-    "name": "Google: LearnLM 1.5 Pro Experimental"
-  },
-  {
-    "id": "huggingfaceh4/zephyr-7b-beta:free",
-    "name": "Hugging Face: Zephyr 7B"
-  },
-  {
-    "id": "meta-llama/llama-3.1-405b:free",
-    "name": "Meta: Llama 3.1 405B (base)"
-  },
-  {
-    "id": "meta-llama/llama-3.1-8b-instruct:free",
-    "name": "Meta: Llama 3.1 8B Instruct"
-  },
-  {
-    "id": "meta-llama/llama-3.2-11b-vision-instruct:free",
-    "name": "Meta: Llama 3.2 11B Vision Instruct"
-  },
-  {
-    "id": "meta-llama/llama-3.2-1b-instruct:free",
-    "name": "Meta: Llama 3.2 1B Instruct"
-  },
-  {
-    "id": "meta-llama/llama-3.2-3b-instruct:free",
-    "name": "Meta: Llama 3.2 3B Instruct"
-  },
-  {
-    "id": "meta-llama/llama-3.3-70b-instruct:free",
-    "name": "Meta: Llama 3.3 70B Instruct"
-  },
-  {
-    "id": "meta-llama/llama-4-maverick:free",
-    "name": "Meta: Llama 4 Maverick"
-  },
-  {
-    "id": "meta-llama/llama-4-scout:free",
-    "name": "Meta: Llama 4 Scout"
-  },
-  {
-    "id": "microsoft/mai-ds-r1:free",
-    "name": "Microsoft: MAI DS R1"
-  },
-  {
-    "id": "mistralai/mistral-7b-instruct:free",
-    "name": "Mistral: Mistral 7B Instruct"
-  },
-  {
-    "id": "mistralai/mistral-nemo:free",
-    "name": "Mistral: Mistral Nemo"
-  },
-  {
-    "id": "mistralai/mistral-small-24b-instruct-2501:free",
-    "name": "Mistral: Mistral Small 3"
-  },
-  {
-    "id": "mistralai/mistral-small-3.1-24b-instruct:free",
-    "name": "Mistral: Mistral Small 3.1 24B"
-  },
-  {
-    "id": "moonshotai/kimi-vl-a3b-thinking:free",
-    "name": "Moonshot AI: Kimi VL A3B Thinking"
-  },
-  {
-    "id": "moonshotai/moonlight-16b-a3b-instruct:free",
-    "name": "Moonshot AI: Moonlight 16B A3B Instruct"
-  },
-  {
-    "id": "nousresearch/deephermes-3-llama-3-8b-preview:free",
-    "name": "Nous: DeepHermes 3 Llama 3 8B Preview"
-  },
-  {
-    "id": "nvidia/llama-3.1-nemotron-70b-instruct:free",
-    "name": "NVIDIA: Llama 3.1 Nemotron 70B Instruct"
-  },
-  {
-    "id": "nvidia/llama-3.1-nemotron-nano-8b-v1:free",
-    "name": "NVIDIA: Llama 3.1 Nemotron Nano 8B v1"
-  },
-  {
-    "id": "nvidia/llama-3.1-nemotron-ultra-253b-v1:free",
-    "name": "NVIDIA: Llama 3.1 Nemotron Ultra 253B v1"
-  },
-  {
-    "id": "nvidia/llama-3.3-nemotron-super-49b-v1:free",
-    "name": "NVIDIA: Llama 3.3 Nemotron Super 49B v1"
-  },
-  {
-    "id": "open-r1/olympiccoder-32b:free",
-    "name": "OlympicCoder 32B"
-  },
-  {
-    "id": "qwen/qwen-2.5-72b-instruct:free",
-    "name": "Qwen2.5 72B Instruct"
-  },
-  {
-    "id": "qwen/qwen-2.5-7b-instruct:free",
-    "name": "Qwen2.5 7B Instruct"
-  },
-  {
-    "id": "qwen/qwen-2.5-coder-32b-instruct:free",
-    "name": "Qwen2.5 Coder 32B Instruct"
-  },
-  {
-    "id": "qwen/qwen2.5-vl-32b-instruct:free",
-    "name": "Qwen: Qwen2.5 VL 32B Instruct"
-  },
-  {
-    "id": "qwen/qwen2.5-vl-3b-instruct:free",
-    "name": "Qwen: Qwen2.5 VL 3B Instruct"
-  },
-  {
-    "id": "qwen/qwen2.5-vl-72b-instruct:free",
-    "name": "Qwen: Qwen2.5 VL 72B Instruct"
-  },
-  {
-    "id": "qwen/qwen2.5-vl-7b-instruct:free",
-    "name": "Qwen: Qwen2.5 VL 7B Instruct"
-  },
-  {
-    "id": "qwen/qwq-32b:free",
-    "name": "Qwen: QwQ 32B"
-  },
-  {
-    "id": "qwen/qwq-32b-preview:free",
-    "name": "Qwen: QwQ 32B Preview"
-  },
-  {
-    "id": "rekaai/reka-flash-3:free",
-    "name": "Reka: Flash 3"
-  },
-  {
-    "id": "shisa-ai/shisa-v2-llama3.3-70b:free",
-    "name": "Shisa AI: Shisa V2 Llama 3.3 70B"
-  },
-  {
-    "id": "sophosympatheia/rogue-rose-103b-v0.2:free",
-    "name": "Rogue Rose 103B v0.2"
-  },
-  {
-    "id": "thudm/glm-4-32b:free",
-    "name": "THUDM: GLM 4 32B"
-  },
-  {
-    "id": "thudm/glm-4-9b:free",
-    "name": "THUDM: GLM 4 9B"
-  },
-  {
-    "id": "thudm/glm-z1-32b:free",
-    "name": "THUDM: GLM Z1 32B"
-  },
-  {
-    "id": "thudm/glm-z1-9b:free",
-    "name": "THUDM: GLM Z1 9B"
-  }
+  { id: "agentica-org/deepcoder-14b-preview:free", name: "Agentica: Deepcoder 14B Preview (free)" },
+  { id: "allenai/molmo-7b-d:free", name: "AllenAI: Molmo 7B D (free)" },
+  { id: "arliai/qwq-32b-arliai-rpr-v1:free", name: "ArliAI: QwQ 32B RpR v1 (free)" },
+  { id: "bytedance-research/ui-tars-72b:free", name: "Bytedance: UI-TARS 72B  (free)" },
+  { id: "cognitivecomputations/dolphin3.0-mistral-24b:free", name: "Dolphin3.0 Mistral 24B (free)" },
+  { id: "cognitivecomputations/dolphin3.0-r1-mistral-24b:free", name: "Dolphin3.0 R1 Mistral 24B (free)" },
+  { id: "deepseek/deepseek-chat-v3-0324:free", name: "DeepSeek: DeepSeek V3 0324 (free)" },
+  { id: "deepseek/deepseek-chat:free", name: "DeepSeek: DeepSeek V3 (free)" },
+  { id: "deepseek/deepseek-prover-v2:free", name: "DeepSeek: DeepSeek Prover V2 (free)" },
+  { id: "deepseek/deepseek-r1-distill-llama-70b:free", name: "DeepSeek: R1 Distill Llama 70B (free)" },
+  { id: "deepseek/deepseek-r1-distill-qwen-14b:free", name: "DeepSeek: R1 Distill Qwen 14B (free)" },
+  { id: "deepseek/deepseek-r1-distill-qwen-32b:free", name: "DeepSeek: R1 Distill Qwen 32B (free)" },
+  { id: "deepseek/deepseek-r1-zero:free", name: "DeepSeek: DeepSeek R1 Zero (free)" },
+  { id: "deepseek/deepseek-r1:free", name: "DeepSeek: R1 (free)" },
+  { id: "deepseek/deepseek-v3-base:free", name: "DeepSeek: DeepSeek V3 Base (free)" },
+  { id: "featherless/qwerky-72b:free", name: "Qwerky 72B (free)" },
+  { id: "google/gemini-2.0-flash-exp:free", name: "Google: Gemini 2.0 Flash Experimental (free)" },
+  { id: "google/gemma-2-9b-it:free", name: "Google: Gemma 2 9B (free)" },
+  { id: "google/gemma-3-12b-it:free", name: "Google: Gemma 3 12B (free)" },
+  { id: "google/gemma-3-1b-it:free", name: "Google: Gemma 3 1B (free)" },
+  { id: "google/gemma-3-27b-it:free", name: "Google: Gemma 3 27B (free)" },
+  { id: "google/gemma-3-4b-it:free", name: "Google: Gemma 3 4B (free)" },
+  { id: "google/learnlm-1.5-pro-experimental:free", name: "Google: LearnLM 1.5 Pro Experimental (free)" },
+  { id: "huggingfaceh4/zephyr-7b-beta:free", name: "Hugging Face: Zephyr 7B (free)" },
+  { id: "meta-llama/llama-3.1-405b:free", name: "Meta: Llama 3.1 405B (base) (free)" },
+  { id: "meta-llama/llama-3.1-8b-instruct:free", name: "Meta: Llama 3.1 8B Instruct (free)" },
+  { id: "meta-llama/llama-3.2-11b-vision-instruct:free", name: "Meta: Llama 3.2 11B Vision Instruct (free)" },
+  { id: "meta-llama/llama-3.2-1b-instruct:free", name: "Meta: Llama 3.2 1B Instruct (free)" },
+  { id: "meta-llama/llama-3.2-3b-instruct:free", name: "Meta: Llama 3.2 3B Instruct (free)" },
+  { id: "meta-llama/llama-3.3-70b-instruct:free", name: "Meta: Llama 3.3 70B Instruct (free)" },
+  { id: "meta-llama/llama-4-maverick:free", name: "Meta: Llama 4 Maverick (free)" },
+  { id: "meta-llama/llama-4-scout:free", name: "Meta: Llama 4 Scout (free)" },
+  { id: "microsoft/mai-ds-r1:free", name: "Microsoft: MAI DS R1 (free)" },
+  { id: "microsoft/phi-4-reasoning-plus:free", name: "Microsoft: Phi 4 Reasoning Plus (free)" },
+  { id: "microsoft/phi-4-reasoning:free", name: "Microsoft: Phi 4 Reasoning (free)" },
+  { id: "mistralai/mistral-7b-instruct:free", name: "Mistral: Mistral 7B Instruct (free)" },
+  { id: "mistralai/mistral-nemo:free", name: "Mistral: Mistral Nemo (free)" },
+  { id: "mistralai/mistral-small-24b-instruct-2501:free", name: "Mistral: Mistral Small 3 (free)" },
+  { id: "mistralai/mistral-small-3.1-24b-instruct:free", name: "Mistral: Mistral Small 3.1 24B (free)" },
+  { id: "moonshotai/kimi-vl-a3b-thinking:free", name: "Moonshot AI: Kimi VL A3B Thinking (free)" },
+  { id: "moonshotai/moonlight-16b-a3b-instruct:free", name: "Moonshot AI: Moonlight 16B A3B Instruct (free)" },
+  { id: "nousresearch/deephermes-3-llama-3-8b-preview:free", name: "Nous: DeepHermes 3 Llama 3 8B Preview (free)" },
+  { id: "nvidia/llama-3.1-nemotron-ultra-253b-v1:free", name: "NVIDIA: Llama 3.1 Nemotron Ultra 253B v1 (free)" },
+  { id: "nvidia/llama-3.3-nemotron-super-49b-v1:free", name: "NVIDIA: Llama 3.3 Nemotron Super 49B v1 (free)" },
+  { id: "open-r1/olympiccoder-32b:free", name: "OlympicCoder 32B (free)" },
+  { id: "opengvlab/internvl3-14b:free", name: "OpenGVLab: InternVL3 14B (free)" },
+  { id: "opengvlab/internvl3-2b:free", name: "OpenGVLab: InternVL3 2B (free)" },
+  { id: "qwen/qwen-2.5-72b-instruct:free", name: "Qwen2.5 72B Instruct (free)" },
+  { id: "qwen/qwen-2.5-7b-instruct:free", name: "Qwen2.5 7B Instruct (free)" },
+  { id: "qwen/qwen-2.5-coder-32b-instruct:free", name: "Qwen2.5 Coder 32B Instruct (free)" },
+  { id: "qwen/qwen-2.5-vl-7b-instruct:free", name: "Qwen: Qwen2.5-VL 7B Instruct (free)" },
+  { id: "qwen/qwen2.5-vl-32b-instruct:free", name: "Qwen: Qwen2.5 VL 32B Instruct (free)" },
+  { id: "qwen/qwen2.5-vl-3b-instruct:free", name: "Qwen: Qwen2.5 VL 3B Instruct (free)" },
+  { id: "qwen/qwen2.5-vl-72b-instruct:free", name: "Qwen: Qwen2.5 VL 72B Instruct (free)" },
+  { id: "qwen/qwen3-0.6b-04-28:free", name: "Qwen: Qwen3 0.6B (free)" },
+  { id: "qwen/qwen3-1.7b:free", name: "Qwen: Qwen3 1.7B (free)" },
+  { id: "qwen/qwen3-14b:free", name: "Qwen: Qwen3 14B (free)" },
+  { id: "qwen/qwen3-235b-a22b:free", name: "Qwen: Qwen3 235B A22B (free)" },
+  { id: "qwen/qwen3-30b-a3b:free", name: "Qwen: Qwen3 30B A3B (free)" },
+  { id: "qwen/qwen3-32b:free", name: "Qwen: Qwen3 32B (free)" },
+  { id: "qwen/qwen3-4b:free", name: "Qwen: Qwen3 4B (free)" },
+  { id: "qwen/qwen3-8b:free", name: "Qwen: Qwen3 8B (free)" },
+  { id: "qwen/qwq-32b-preview:free", name: "Qwen: QwQ 32B Preview (free)" },
+  { id: "qwen/qwq-32b:free", name: "Qwen: QwQ 32B (free)" },
+  { id: "rekaai/reka-flash-3:free", name: "Reka: Flash 3 (free)" },
+  { id: "shisa-ai/shisa-v2-llama3.3-70b:free", name: "Shisa AI: Shisa V2 Llama 3.3 70B  (free)" },
+  { id: "thudm/glm-4-32b:free", name: "THUDM: GLM 4 32B (free)" },
+  { id: "thudm/glm-4-9b:free", name: "THUDM: GLM 4 9B (free)" },
+  { id: "thudm/glm-z1-32b:free", name: "THUDM: GLM Z1 32B (free)" },
+  { id: "thudm/glm-z1-9b:free", name: "THUDM: GLM Z1 9B (free)" },
+  { id: "tngtech/deepseek-r1t-chimera:free", name: "TNG: DeepSeek R1T Chimera (free)" }
 ]
 
 module.exports = aiModels
