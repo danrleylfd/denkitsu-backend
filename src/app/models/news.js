@@ -5,7 +5,7 @@ const NewsSchema = new mongoose.Schema(
     content: { type: String, required: true }
   },
   {
-    source: { type: String, required: true, unique: true }
+    sourceUrl: { type: String, required: true, unique: true }
   },
   { timestamps: true }
 )
