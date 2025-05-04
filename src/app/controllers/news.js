@@ -5,9 +5,12 @@ const routes = Router()
 routes.use(logMiddleware)
 
 const createOne = require("../views/news/createOne")
+const readOneBySource = require("../views/news/readOneBySource")
 const readMany = require("../views/news/readMany")
 
 routes.post("/", createOne)
+
+routes.get("/:source", readOneBySource)
 
 routes.get("/", readMany)
 
