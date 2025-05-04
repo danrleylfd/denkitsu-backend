@@ -5,7 +5,7 @@ const createOne = async (req, res) => {
     const { content, source } = req.body
     if (!content?.trim()) throw new Error("CONTENT_MISSING")
     if (!source?.trim()) throw new Error("SOURCE_MISSING")
-    const news = await News.create({ content: content.trim() })
+    const news = await News.create({ content: content.trim(), source: source.trim() })
     return res.status(201).json(news)
   } catch (error) {
     console.error(`[CREATE_NEWS] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
