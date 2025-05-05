@@ -10,7 +10,7 @@ const readManyPaginate = async (req, res) => {
     const total = await News.countDocuments()
     const totalPages = Math.ceil(total / limit)
     return res.status(200).json({
-      news: news.docs,
+      news,
       pagination: {
         totalItems: total,
         totalPages,
