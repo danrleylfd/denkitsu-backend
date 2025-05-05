@@ -1,11 +1,11 @@
 const { Router } = require("express")
 const authMiddleware = require("../middlewares/auth")
-const logMiddleware = require("../middlewares/log")
+// const logMiddleware = require("../middlewares/log")
 const videoMiddleware = require("../middlewares/video")
 
 const routes = Router()
 routes.use(authMiddleware)
-routes.use(logMiddleware)
+// routes.use(logMiddleware)
 // routes.use(videoMiddleware)
 
 const addLike = require("../views/video/likes/addLike")
