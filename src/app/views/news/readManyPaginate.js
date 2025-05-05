@@ -5,7 +5,7 @@ const readManyPaginate = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
-    const news = await News.find().sort({ createdAt: -1 }).skip(skip).limit(limit);
+    const { docs: news, ...pagination } = await News.find().sort({ createdAt: -1 }).skip(skip).limit(limit);
     if (!news || news.length === 0) throw new Error("NEWS_NOT_FOUND");
     const total = await News.countDocuments()
     const totalPages = Math.ceil(total / limit)
@@ -17,7 +17,8 @@ const readManyPaginate = async (req, res) => {
         currentPage: page,
         itemsPerPage: limit,
         hasNextPage: page < totalPages,
-        hasPreviousPage: page > 1
+        hasPreviousPage: page > 1,
+        pagination
       }
     })
   } catch (error) {
