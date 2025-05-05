@@ -11,11 +11,11 @@ const readManyPaginate = require("../views/news/readManyPaginate")
 
 routes.post("/", createOne)
 
-routes.get("/:source", readOneBySource)
-
 routes.get("/", readMany)
 
 routes.get("/pages", readManyPaginate)
+
+routes.get("/:source", readOneBySource)
 
 const loadNewsRoutes = (app) => app.use("/news", routes)
 
