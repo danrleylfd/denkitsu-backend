@@ -6,6 +6,7 @@ const readManyPaginate = async (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
     const { docs: news, ...pagination } = await News.find().sort({ createdAt: -1 }).skip(skip).limit(limit);
+    console.log(pagination)
     if (!news || news.length === 0) throw new Error("NEWS_NOT_FOUND");
     const total = await News.countDocuments()
     const totalPages = Math.ceil(total / limit)
