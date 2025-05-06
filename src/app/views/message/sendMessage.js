@@ -1,10 +1,5 @@
 const ask = require("../../../utils/services/ai")
 
-const sysPrompt = {
-  role: "system",
-  content: "O assistant deve sempre responder em pt-BR, mesmo que o usuário escreva em outro idioma."
-}
-
 const sendMessage = async (req, res) => {
   try {
     const { model, messages: prompts } = req.body
@@ -12,7 +7,7 @@ const sendMessage = async (req, res) => {
     if (!prompts || prompts.length < 1) throw new Error("PROMPTS_MISSING")
     // console.log(`MODEL ${model}`)
     // console.log(`USER ${prompts[0].content}`)
-    const { status, data } = await ask([sysPrompt, ...prompts], { model })
+    const { status, data } = await ask([...prompts], { model })
     // console.log(`ASSISTANT ${data.choices[0].message.content.split("\n")[0]}...`)
     return res.status(status).json(data)
   } catch (error) {
