@@ -347,7 +347,7 @@ Este módulo gerencia o CRUD (Create, Read, Update, Delete) de vídeos, além de
         ```json
         {
           "content": "string (required)",
-          "coverUrl": "string (required, valid URL)",
+          "thumbnail": "string (required, valid URL)",
           "fileUrl": "string (required, valid URL)"
         }
         ```
@@ -395,7 +395,7 @@ Este módulo gerencia o CRUD (Create, Read, Update, Delete) de vídeos, além de
         ```json
         {
           "content": "string (required)",
-          "coverUrl": "string (required, valid URL)",
+          "thumbnail": "string (required, valid URL)",
           "fileUrl": "string (required, valid URL)"
         }
         ```

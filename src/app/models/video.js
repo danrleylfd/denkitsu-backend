@@ -3,7 +3,7 @@ const mongoose = require("../../utils/database")
 const VideoSchema = new mongoose.Schema(
   {
     content: { type: String, required: true },
-    coverUrl: { type: String, required: true },
+    thumbnail: { type: String, required: true },
     fileUrl: { type: String, required: true },
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
@@ -15,7 +15,7 @@ const VideoSchema = new mongoose.Schema(
 )
 
 VideoSchema.pre("save", async function (next) {
-  // console.log(this.content, this.coverUrl)
+  // console.log(this.content, this.thumbnail)
   next()
 })
 
