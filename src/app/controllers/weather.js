@@ -4,9 +4,12 @@ const { Router } = require("express")
 const routes = Router()
 // routes.use(logMiddleware)
 
-const getWeather = require("../views/weather/getWeather")
+const getWeatherByLocation = require("../views/weather/getWeatherByLocation")
+const getWeatherByCoordinates = require("../views/weather/getWeatherByCoordinates")
 
-routes.get("/:location", getWeather)
+routes.get("/location/:location", getWeatherByLocation)
+
+routes.get("/coordinates/:lat/:lon", getWeatherByCoordinates)
 
 const loadWeatherRoutes = (app) => app.use("/weather", routes)
 

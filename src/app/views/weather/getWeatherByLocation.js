@@ -1,10 +1,10 @@
-const Weather = require("../../../utils/services/weather")
+const { getWeatherByLocation: getByLocation } = require("../../../utils/services/weather")
 
-const getWeather = async (req, res) => {
+const getWeatherByLocation = async (req, res) => {
   try {
-    const { location } = req.body
+    const { location } = req.params
     if (!location || location.trim().length < 3) throw new Error("LOCATION_MISSING")
-    const { status, data } = await Weather(location)
+    const { status, data } = await getByLocation(location)
     return res.status(status).json(data)
   } catch (error) {
     if (error.response) return res.status(error.response.status).json(error.response.data)
@@ -18,4 +18,4 @@ const getWeather = async (req, res) => {
   }
 }
 
-module.exports = getWeather
+module.exports = getWeatherByLocation
