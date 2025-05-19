@@ -84,11 +84,10 @@ Resposta: Apenas o conteúdo do post, sem comentários, pré-textos ou observaç
 
 const ask = async (prompts, options = {}) => {
   try {
-    const res = await aiAPI.post("/chat/completions", {
+    return await aiAPI.post("/chat/completions", {
       model: options.model,
       messages: [...sysPrompt, ...prompts]
     })
-    return res
   } catch (error) {
     console.error("Error calling OpenRouter API:", error)
     throw error
