@@ -4,9 +4,9 @@ const delReply = async (req, res) => {
   try {
     const { userID } = req
     const { reply: replyID } = req.params
-    const reply = await Comment.findById(replyID).populate("parent")
+    const reply = await Comment.findById(replyID).populate("parent").populate("user")
     if (!reply) throw new Error("REPLY_NOT_FOUND")
-    if (reply.user.toString() !== userID) throw new Error("UNAUTHORIZED")
+    if (reply.user._id.toString() !== userID) throw new Error("UNAUTHORIZED")
     const comment = reply.parent
     if (!comment) throw new Error("COMMENT_NOT_FOUND")
     comment.replies = comment.replies.filter((replyId) => replyId != replyID)
