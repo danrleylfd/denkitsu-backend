@@ -3,7 +3,8 @@ const Comment = require("../../../models/comment")
 const replyComment = async (req, res) => {
   try {
     const { userID } = req
-    const { comment: commentID } = req.params
+    const { video: videoID, comment: commentID } = req.params
+    if (videoID?.length < 24) throw new Error("VIDEO_MISSING")
     if (commentID?.length < 24) throw new Error("COMMENT_MISSING")
     const { content } = req.body
     if (!content?.trim()) throw new Error("CONTENT_MISSING")
@@ -12,6 +13,7 @@ const replyComment = async (req, res) => {
     const reply = await Comment.create({
       content,
       user: userID,
+      video: videoID,
       parent: commentID
     })
     comment.replies.push(reply._id)
@@ -21,6 +23,7 @@ const replyComment = async (req, res) => {
     console.error(`[REPLY_COMMENT] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
     const defaultError = { status: 500, message: `[REPLY_COMMENT] ${new Date().toISOString()} - Internal server error` }
     const errorMessages = {
+      VIDEO_MISSING: { status: 422, message: "video missing or invalid" },
       COMMENT_MISSING: { status: 422, message: "comment missing or invalid" },
       CONTENT_MISSING: { status: 422, message: "content is required" },
       IMPOSSIBLE_REPLY: { status: 400, message: "it is not possible to respond to a reply from another comment" }
