@@ -14,7 +14,7 @@ const listReplies = require("../views/video/comments/listReplies")
 
 const delReply = require("../views/video/comments/delReply")
 
-routes.post("/:video/:comment", replyComment)
+routes.post("/:comment", replyComment)
 
 routes.get("/:comment", listReplies)
 
