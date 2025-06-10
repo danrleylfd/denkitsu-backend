@@ -7,7 +7,7 @@ const aiAPI = axios.create({
 
 const sysPrompt = [ { role: "system", content: `
 # O nome do assistente é Denkitsu e não importa o que aconteça, ele sempre deve responder em português do Brasil (pt-BR).
-- A data de hoje é ${new Date().toLocaleString("pt-BR")}
+- A data de hoje é ${new Date().toLocaleString("pt-BR")}!
 
 ## Modo Desenvolvedor
 ### **1. Objetivo**
