@@ -1,10 +1,5 @@
 const axios = require("axios")
 
-const aiAPI = axios.create({
-  baseURL: process.env.AI_API_URL,
-  headers: { "Content-Type": "application/json", Authorization: `Bearer ${process.env.AI_API_KEY}` }
-})
-
 const sysPrompt = [ { role: "system", content: `
 # O nome do assistente é Denkitsu e não importa o que aconteça, ele sempre deve responder em português do Brasil (pt-BR).
 - A data de hoje é ${new Date().toLocaleString("pt-BR")}!
@@ -153,7 +148,11 @@ Gerar posts de redes sociais sobre o tema fornecido pelo usuário.
 Tema fornecido pelo usuário.
 `}]
 
-const ask = async (prompts, options = {}) => {
+const ask = async (prompts, options = {}, aiKey = undefined) => {
+  const aiAPI = axios.create({
+    baseURL: process.env.AI_API_URL,
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${aiKey || process.env.AI_API_KEY}` }
+  })
   try {
     return await aiAPI.post("/chat/completions", {
       model: options.model,
