@@ -3,6 +3,7 @@ const News = require("../../models/news")
 const createOne = async (req, res) => {
   try {
     const { content, source } = req.body
+    console.log(`[CREATE_NEWS] ${source}`)
     if (!content?.trim()) throw new Error("CONTENT_MISSING")
     if (!source?.trim()) throw new Error("SOURCE_MISSING")
     const news = await News.create({ content: content.trim(), source: source.trim() })
