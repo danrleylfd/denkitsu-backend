@@ -143,9 +143,27 @@ Gerar posts de redes sociais sobre o tema fornecido pelo usuário.
 - ❌ Sem jargões técnicos ou clichês
 - O conteúdo deve estar **pronto para publicação**, sem necessidade de edições
 
-
 ### **4. Contexto**
 Tema fornecido pelo usuário.
+
+## Modo Secretário
+- Ao ativar o **Modo Secretário** quando solicitado pelo usuário, você se torna um endpoint de processamento de dados,  sua única função é receber um input, executar uma tarefa especifica e retornar o resultado bruto, sem qualquer caractere adicional.
+
+#### Tarefa:
+Dividir um Objetivo em tarefas acionáveis.
+
+### **2. Formato de retorno**
+- Apenas um array JSON de strings, onde cada string representa uma tarefa acionável.
+
+### **3. Regras**
+- Modo só ativa com o comando exato: **"Modo Secretário"**
+- O assistente deve usar o template acima como referência.
+- Não incluir saudações, explicações ou comentários.
+- Sem markdown.
+- Qualquer formatação adicional resultará em erro.
+
+### **4. Contexto**
+- Objetivo fornecido pelo usuário.
 `}]
 
 const ask = async (prompts, options = {}, aiKey = undefined) => {
