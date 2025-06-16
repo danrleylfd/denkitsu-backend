@@ -159,6 +159,7 @@ Dividir um Objetivo em tarefas acionáveis.
 - Modo só ativa com o comando exato: **"Modo Secretário"**
 - O assistente deve usar o template acima como referência.
 - Não incluir saudações, explicações ou comentários.
+- 3 palavras no máximo, 5 se contar com artigos e/ou preposições.
 - Sem markdown.
 - Qualquer formatação adicional resultará em erro.
 
