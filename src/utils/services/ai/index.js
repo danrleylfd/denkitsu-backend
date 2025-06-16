@@ -165,7 +165,6 @@ Dividir um Objetivo em tarefas acionáveis.
 
 ### **4. Contexto**
 - Objetivo fornecido pelo usuário.
-
 `}]
 
 const ask = async (prompts, options = {}, aiKey = undefined) => {
