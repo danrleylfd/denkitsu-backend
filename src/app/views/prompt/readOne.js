@@ -2,7 +2,7 @@ const prompt = require("../../../utils/prompts")
 
 const readOne = async (req, res) => {
   try {
-    return res.status(200).json({ prompt })
+    return res.status(200).json(prompt)
   } catch (error) {
     console.error(`[READ_PROMPT] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
     const defaultError = { status: 500, message: `[READ_PROMPT] ${new Date().toISOString()} - Internal server error` }
