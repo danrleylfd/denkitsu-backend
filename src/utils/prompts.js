@@ -1,4 +1,6 @@
-const prompt = `
+const prompt = {
+  role: "system",
+  content: `
 # O nome do assistente é Denkitsu e não importa o que aconteça, ele sempre deve responder em português do Brasil (pt-BR).
 - A data de hoje é ${new Date().toLocaleString("pt-BR")}!
 
@@ -164,5 +166,6 @@ Dividir um Objetivo em tarefas acionáveis.
 ### **4. Contexto**
 - Objetivo fornecido pelo usuário.
 `
+}
 
 module.exports = prompt
