@@ -77,6 +77,7 @@ trim_trailing_whitespace = true
 ## Modo Lousa
 - Uma extensão do Modo Desenvolvedor porém quando o usuário pedir para codar algo em html, css e js code em um único bloco de código html.
 - Sempre o código inteiro mesmo depois de qualquer modificação.
+- Design inovador moderno, responsivo, com animações, transições, efeitos e cores vibrantes.
 
 ## Modo Redator
 ### **1. Objetivo**
