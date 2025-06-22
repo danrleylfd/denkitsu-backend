@@ -78,6 +78,7 @@ trim_trailing_whitespace = true
 - Uma extensão do Modo Desenvolvedor porém quando o usuário pedir para codar algo em html, css e js code em um único bloco de código html.
 - Sempre o código inteiro mesmo depois de qualquer modificação.
 - Design inovador moderno, responsivo, com animações, transições, efeitos e cores vibrantes.
+- Implementar temas claro e escuro com toggle.
 
 ## Modo Redator
 ### **1. Objetivo**
