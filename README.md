@@ -41,18 +41,34 @@ Depois que o merge da sua pull request for feito, você pode deletar a sua branc
  - `git push -u origin main`
 
 ## Env
- - `HOST="localhost"`
+ - `HOST0="localhost"`
+ - `HOST1="localhost"`
+ - `HOST2="localhost"`
  - `PORT=80`
- - `MONGODB_HOST="mongodb+srv://<Username>:<Password>@cluster0-gw6np.gcp.mongodb.net/<DBName>?retryWrites=true&w=majority"`
  - `EMAIL="username@gmail.com"`
  - `PASSWORD="password"`
- - `AI_API_URL=""`
- - `AI_API_KEY=""`
- - `OWNER=""`
+ - `MONGODB_HOST="mongodb+srv://<Username>:<Password>@cluster0-gw6np.gcp.mongodb.net/<DBName>?retryWrites=true&w=majority"`
+
+ - `OPENROUTER_API_KEY=""`
+ - `OPENROUTER_API_URL=""`
+ - `GROQ_API_KEY=""`
+ - `GROQ_API_URL=""`
+ - `GEMINI_API_KEY=""`
+ - `GSEARCH_API_KEY=""`
+ - `NEWS_API_KEY=""`
+ - `WEATHER_API_KEY=""`
+ - `TELEGRAM_TOKEN=""`
+
+ - `JWT_UNHASHED=""`
  - `JWT_SECRET=""`
  - `JWT_EXPIRATION="24h"`
+ - `JWT_HASH_TYPE=""`
+ - `JWT_REFRESH_UNHASHED=""`
  - `JWT_REFRESH_SECRET=""`
  - `JWT_REFRESH_EXPIRATION="7d"`
+ - `JWT_REFRESH_HASH_TYPE=""`
+
+ - `OWNER=""`
 
 ## :memo: Licença
 

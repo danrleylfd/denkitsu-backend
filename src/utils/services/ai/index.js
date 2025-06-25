@@ -3,8 +3,8 @@ const sysPrompt = require("../../prompts")
 
 const ask = async (prompts, options = {}, aiKey = undefined) => {
   const aiAPI = axios.create({
-    baseURL: process.env.AI_API_URL,
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${aiKey || process.env.AI_API_KEY}` }
+    baseURL: process.env.OPENROUTER_API_URL,
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${aiKey || process.env.OPENROUTER_API_KEY}` }
   })
   try {
     return await aiAPI.post("/chat/completions", {
