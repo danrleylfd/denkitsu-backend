@@ -22,9 +22,10 @@ const cleanAiOutput = (text = "") => {
     .trim()
 }
 
-const createWithAI = async (req, res) => {
+const generateOne = async (req, res) => {
   try {
-    const { data: newsData } = await newsService()
+    const { searchTerm = "" } = req.body
+    const { data: newsData } = await newsService(searchTerm)
     if(!newsData) throw new Error("NEWS_NOT_FOUND")
     const article = newsData.articles[0]
     const articleExists = await News.findOne({ source: article.url })
@@ -54,4 +55,4 @@ const createWithAI = async (req, res) => {
   }
 }
 
-module.exports = createWithAI
+module.exports = generateOne
