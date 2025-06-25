@@ -15,7 +15,7 @@ const cleanAiOutput = (text = "") => {
     .replaceAll("Subtítulo 3: ","").replaceAll("Subtítulo 3:","")
     .replaceAll("Subtítulo de conclusão: ","").replaceAll("Subtítulo de conclusão - ","").replaceAll("Subtítulo de conclusão","")
     .replaceAll("Conclusão: ","").replaceAll("Conclusão: ","").replaceAll("Conclusão e ","").replaceAll("Conclusão","")
-    .replaceAll("** ","**")
+    .replaceAll("\n** ","\n**")
     .replaceAll(" **","**")
     .replaceAll("****","")
     .replaceAll("**:** ","")
@@ -45,8 +45,8 @@ const createWithAI = async (req, res) => {
     console.error(`[CREATE_NEWS] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
     const defaultError = { status: 500, message: `[CREATE_NEWS] ${new Date().toISOString()} - Internal server error` }
     const errorMessages = {
-      ARTICLE_EXISTS: { status: 409, message: `[CREATE_NEWS] ${new Date().toISOString()} - Article already exists` },
-      NEWS_NOT_FOUND: { status: 404, message: `[CREATE_NEWS] ${new Date().toISOString()} - News not found` },
+      ARTICLE_EXISTS: { status: 409, message: "article already exists" },
+      NEWS_NOT_FOUND: { status: 404, message: "news not found" },
       AI_ERROR: { status: 500, message: `[CREATE_NEWS] ${new Date().toISOString()} - AI error` },
     }
     const { status, message } = errorMessages[error.message] || defaultError
