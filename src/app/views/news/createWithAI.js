@@ -26,7 +26,7 @@ const createWithAI = async (req, res) => {
       role: "user",
       content: `Modo Redator Tema:\n\n### ${article.title}\n![${article.title}](${article.urlToImage})\n${article.description}\n\n${article.content}\n\n**Fonte(s):** [${article.source.name}](${article.url})`
     }
-    const { data: aiData } = await ask([prompt,userPrompt], { model: "deepseek/deepseek-chat:free" })
+    const { data: aiData } = await ask([prompt,userPrompt], { model: "deepseek/deepseek-r1:free" })
     if(!aiData || !aiData.choices || aiData.choices.length === 0) throw new Error("AI_ERROR")
     const cleanContent = cleanAiOutput(aiData.choices[0].message.content)
     const news = await News.create({
