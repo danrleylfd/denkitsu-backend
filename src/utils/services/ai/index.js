@@ -10,7 +10,7 @@ const ask = async (llm = "openrouter", prompts, options = {}, aiKey = undefined)
   })
   try {
     return await aiAPI.post("/chat/completions", {
-      model: options.model,
+      model: llm === "grok" ? "deepseek-r1-distill-llama-70b" : options.model,
       messages: [sysPrompt, ...prompts]
     })
   } catch (error) {
