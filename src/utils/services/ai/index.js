@@ -1,10 +1,12 @@
 const axios = require("axios")
 const sysPrompt = require("../../prompts")
 
-const ask = async (prompts, options = {}, aiKey = undefined) => {
+const ask = async (llm = "openrouter", prompts, options = {}, aiKey = undefined) => {
+  const apiKey = llm === "groq" ? process.env.GROQ_API_KEY : process.env.OPENROUTER_API_KEY
+  const apiUrl = llm === "groq"? process.env.GROQ_API_URL : process.env.OPENROUTER_API_URL
   const aiAPI = axios.create({
-    baseURL: process.env.OPENROUTER_API_URL,
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${aiKey || process.env.OPENROUTER_API_KEY}` }
+    baseURL: apiUrl,
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${aiKey || apiKey}` }
   })
   try {
     return await aiAPI.post("/chat/completions", {
