@@ -7,7 +7,7 @@ const ask = async (llm = "openrouter", prompts, options = {}, aiKey = undefined)
   const apiUrl = llm === "groq"? process.env.GROQ_API_URL : process.env.OPENROUTER_API_URL
   const aiAPI = axios.create({
     baseURL: apiUrl,
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${aiKey || apiKey}` }
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` }
   })
   try {
     return await aiAPI.post("/chat/completions", {
