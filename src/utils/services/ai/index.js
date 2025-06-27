@@ -15,7 +15,7 @@ const ask = async (llm = "openrouter", prompts, options = {}, aiKey = undefined)
       messages: [sysPrompt, ...prompts]
     })
   } catch (error) {
-    console.error(`Error calling ${llm} API:`, error)
+    console.error(`Error calling ${llm} API:`, error.response.data)
     throw error
   }
 }
