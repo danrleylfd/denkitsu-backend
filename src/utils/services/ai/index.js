@@ -2,9 +2,9 @@ const axios = require("axios")
 const sysPrompt = require("../../prompts")
 
 const ask = async (llm = "openrouter", prompts, options = {}, aiKey = undefined) => {
-  console.log("llm:", llm)
   const apiKey = llm === "groq" ? process.env.GROQ_API_KEY : aiKey ? aiKey : process.env.OPENROUTER_API_KEY
   const apiUrl = llm === "groq"? process.env.GROQ_API_URL : process.env.OPENROUTER_API_URL
+  console.log({ llm, apiUrl, apiKey })
   const aiAPI = axios.create({
     baseURL: apiUrl,
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` }
