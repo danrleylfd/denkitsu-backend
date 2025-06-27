@@ -24,7 +24,7 @@ const cleanAiOutput = (text = "") => {
 
 const generateOne = async (req, res) => {
   try {
-    const { llm = "openrouter", searchTerm = "" } = req.body
+    const { llm = "groq", searchTerm = "" } = req.body
     const { data: newsData } = await newsService(searchTerm)
     if(!newsData) throw new Error("NEWS_NOT_FOUND")
     const article = newsData.articles[0]
