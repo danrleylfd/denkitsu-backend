@@ -48,7 +48,7 @@ const generateOne = async (req, res) => {
     const errorMessages = {
       ARTICLE_EXISTS: { status: 409, message: "article already exists" },
       NEWS_NOT_FOUND: { status: 404, message: "news not found" },
-      AI_ERROR: { status: 500, message: `[CREATE_NEWS] ${new Date().toISOString()} - AI error` },
+      AI_ERROR: { status: 500, message: "AI error" },
     }
     const { status, message } = errorMessages[error.message] || defaultError
     return res.status(status).json({ code: error.message, message })
