@@ -1,8 +1,6 @@
 const { Router } = require("express")
-// const logMiddleware = require("../middlewares/log")
 
 const routes = Router()
-// routes.use(logMiddleware)
 
 const getWeatherByLocation = require("../views/weather/getWeatherByLocation")
 const getWeatherByCoordinates = require("../views/weather/getWeatherByCoordinates")

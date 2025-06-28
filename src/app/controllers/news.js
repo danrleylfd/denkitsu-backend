@@ -1,8 +1,6 @@
 const { Router } = require("express")
-// const logMiddleware = require("../middlewares/log")
 
 const routes = Router()
-// routes.use(logMiddleware)
 
 const createOne = require("../views/news/createOne")
 const generateOne = require("../views/news/generateOne")
