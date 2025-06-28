@@ -41,7 +41,7 @@ const ask = async (llm = "openrouter", prompts, options = {}, aiKey = undefined)
   const config = llmConfig[llm];
   if (!config) throw new Error(`Provedor de LLM inválido ou não configurado: ${llm}`)
   const finalApiKey = aiKey || config.apiKey
-  const finalModel = options.model || config.defaultModel
+  const finalModel = llm === LLMs.GROQ ? config.defaultModel : options.model || config.defaultModel
   if (!finalApiKey) throw new Error(`API key para ${llm} não encontrada.`)
   const aiAPI = axios.create({
     baseURL: config.baseURL,
