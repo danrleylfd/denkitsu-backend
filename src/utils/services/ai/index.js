@@ -40,7 +40,7 @@ const ask = async (aiProvider = "openrouter", prompts, options = {}, aiKey = und
   const config = providerConfig[aiProvider];
   if (!config) throw new Error(`Provedor de aiProvider inválido ou não configurado: ${aiProvider}`)
   const finalApiKey = aiKey || config.apiKey
-  const finalModel = aiProvider === options.model || config.defaultModel
+  const finalModel = aiProvider === AIPROVIDER.GROQ ? config.defaultModel : options.model || config.defaultModel
   if (!finalApiKey) throw new Error(`API key para ${aiProvider} não encontrada.`)
   const aiAPI = axios.create({
     baseURL: config.baseURL,
