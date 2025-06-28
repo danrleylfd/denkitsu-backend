@@ -44,7 +44,7 @@ const ask = async (llm = "openrouter", prompts, options = {}, aiKey = undefined)
   const finalModel = options.model || config.defaultModel
   if (!finalApiKey) throw new Error(`API key para ${llm} não encontrada.`)
   const aiAPI = axios.create({
-    baseURL: apiUrl,
+    baseURL: config.baseURL,
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${finalApiKey}` }
   })
   const payload = { model: finalModel, messages: [sysPrompt,...prompts] }
