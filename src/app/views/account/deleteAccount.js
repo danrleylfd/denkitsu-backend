@@ -2,7 +2,6 @@ const User = require("../../models/auth")
 const Linker = require("../../models/linker")
 const Video = require("../../models/video")
 const Comment = require("../../models/comment")
-const Log = require("../../models/log")
 
 const deleteAccount = async (req, res) => {
   try {
@@ -12,7 +11,6 @@ const deleteAccount = async (req, res) => {
       Linker.deleteMany({ user: userID }),
       Comment.deleteMany({ video: { $in: videoIds } }),
       Video.deleteMany({ user: userID }),
-      Log.deleteMany({ user: userID }),
       User.deleteOne({ _id: userID })
     ])
     return res.status(204).send()
