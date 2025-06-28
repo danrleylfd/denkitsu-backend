@@ -2,12 +2,12 @@ const { ask } = require("../../../utils/services/ai")
 
 const sendMessage = async (req, res) => {
   try {
-    const { llm = "openrouter", model, messages: prompts, aiKey } = req.body
+    const { aiProvider = "openrouter", model, messages: prompts, aiKey } = req.body
     if (!model || model.trim().length < 3) throw new Error("MODEL_MISSING")
     if (!prompts || prompts.length < 1) throw new Error("PROMPTS_MISSING")
     // console.log(`MODEL ${model}`)
     // console.log(`USER ${prompts[0].content}`)
-    const { status, data } = await ask(llm, [...prompts], { model }, aiKey)
+    const { status, data } = await ask(aiProvider, [...prompts], { model }, aiKey)
     // console.log(`ASSISTANT ${data.choices[0].message.content.split("\n")[0]}...`)
     return res.status(status).json(data)
   } catch (error) {
