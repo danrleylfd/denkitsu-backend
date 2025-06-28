@@ -1,6 +1,6 @@
 const prompt = require("../../../utils/prompts")
 
-const readOne = async (req, res) => {
+const getPrompt = async (req, res) => {
   try {
     return res.status(200).json(prompt)
   } catch (error) {
@@ -11,4 +11,4 @@ const readOne = async (req, res) => {
   }
 }
 
-module.exports = readOne
+module.exports = getPrompt
