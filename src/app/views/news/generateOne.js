@@ -24,7 +24,7 @@ const cleanAiOutput = (text = "") => {
 
 const generateOne = async (req, res) => {
   try {
-    const { llm = "groq", searchTerm = "" } = req.body
+    const { aiProvider = "groq", searchTerm = "" } = req.body
     const { data: newsData } = await newsService(searchTerm)
     if(!newsData) throw new Error("NEWS_NOT_FOUND")
     const article = newsData.articles[0]
@@ -34,7 +34,7 @@ const generateOne = async (req, res) => {
       role: "user",
       content: `Modo Redator Tema:\n\n### ${article.title}\n\n![${article.title}](${article.urlToImage})\n\n${article.description}\n\n${article.content}\n\n**Fonte(s):** [${article.source.name}](${article.url})`
     }
-    const { data: aiData } = await ask(llm, [prompt,userPrompt], { model: "deepseek/deepseek-r1:free" })
+    const { data: aiData } = await ask(aiProvider, [prompt,userPrompt], { model: "deepseek/deepseek-r1:free" })
     if(!aiData || !aiData.choices || aiData.choices.length === 0) throw new Error("AI_ERROR")
     const cleanContent = cleanAiOutput(aiData.choices[0].message.content)
     const news = await News.create({
