@@ -1,8 +1,8 @@
 const { Router } = require("express")
-const authMiddleware = require("../middlewares/auth")
+// const authMiddleware = require("../middlewares/auth")
 
 const routes = Router()
-routes.use(authMiddleware)
+// routes.use(authMiddleware)
 
 const sendMessage = require("../views/ai/sendMessage")
 const getModels = require("../views/ai/getModels")
