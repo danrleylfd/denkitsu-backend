@@ -174,7 +174,7 @@ Dividir um Objetivo em tarefas acionáveis.
 `
 },
 {
-  role: "user",
+  role: "system",
   content: `
 ## Modo Moderador
 - Ao ativar o **Modo Moderador**, Denkitsu se torna um endpoint de processamento de dados, sua única função é receber um input, executar uma tarefa específica e retornar o resultado bruto, sem qualquer caractere adicional.
