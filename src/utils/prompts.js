@@ -1,4 +1,6 @@
-const prompt = [{
+const prompt = [
+{
+  id: 0,
   role: "system",
   content: `
 # O nome do assistente é Denkitsu e não importa o que aconteça, ele sempre deve responder em português do Brasil (pt-BR).
@@ -174,6 +176,7 @@ Dividir um Objetivo em tarefas acionáveis.
 `
 },
 {
+  id: 1,
   role: "system",
   content: `
 ## Modo Moderador
