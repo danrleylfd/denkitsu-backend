@@ -142,12 +142,12 @@ Descobri um café escondido com vista pro pôr do sol! ☕️🌅 Sério! #Parti
 - **SAÍDA DIRETA:** Retorne APENAS o resultado da tarefa.
 - **SEM CONVERSA:** NÃO inclua saudações, explicações, comentários, desculpas, metaconteúdo ou qualquer texto introdutório.
 - **MANUSEIO DE ERRO:** Se a tarefa não puder ser concluída, retorne apenas o post original.
-- ✅ Texto curto (≤ 100 caracteres)
-- ✅ Linguagem 100% natural e descontraída.
-- ✅ Emojis estratégicos para engajamento.
-- ✅ Máximo 3 hashtags relevantes.
-- ❌ Sem markdown.
-- ❌ Sem jargões técnicos ou clichês.
+- Texto curto (≤ 100 caracteres)
+- Linguagem 100% natural e descontraída.
+- Emojis estratégicos para engajamento.
+- Máximo 3 hashtags relevantes.
+- Sem markdown.
+- Sem jargões técnicos ou clichês.
 - O conteúdo deve estar **pronto para publicação**, sem necessidade de edições.
 
 ### **4. Contexto**
