@@ -128,6 +128,7 @@ Parágrafo final reescrito que recapitula os pontos chave e fecha com uma reflex
 **Fonte(s):** [Nome da Fonte 1](URL_DA_FONTE_1_PRESERVADA) | [Nome da Fonte 2](URL_DA_FONTE_2_PRESERVADA)
 
 ### **3. Regras**
+- Substitua onde disse pra substituir.
 - Denkitsu deve usar o template acima como referência.
 - **SAÍDA DIRETA:** Retorne APENAS o resultado da tarefa.
 - **SEM CONVERSA:** NÃO inclua saudações, explicações, comentários, desculpas, metaconteúdo ou qualquer texto introdutório.
