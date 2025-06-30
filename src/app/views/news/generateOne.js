@@ -44,14 +44,14 @@ const generateOne = async (req, res) => {
     return res.status(201).json(news)
   } catch (error) {
     console.error(`[CREATE_NEWS] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
-    const defaultError = { status: 500, message: `[CREATE_NEWS] ${new Date().toISOString()} - Internal server error - ${error.message} - ${error.stack}` }
+    const defaultError = { status: 500, message: `[CREATE_NEWS] ${new Date().toISOString()} - Internal server error` }
     const errorMessages = {
       ARTICLE_EXISTS: { status: 409, message: "article already exists" },
       NEWS_NOT_FOUND: { status: 429, message: "news api rate limit" },
       AI_ERROR: { status: 429, message: "AI api rate limit" },
     }
     const { status, message } = errorMessages[error.message] || defaultError
-    return res.status(status).json({ code: error.message, message })
+    return res.status(status).json({ code: error.message, message, stack: error.stack })
   }
 }
 
