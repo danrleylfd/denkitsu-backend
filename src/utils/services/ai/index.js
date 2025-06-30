@@ -46,7 +46,7 @@ const ask = async (aiProvider = "openrouter", prompts, options = {}, aiKey = und
     baseURL: config.baseURL,
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${finalApiKey}` }
   })
-  const payload = { model: finalModel, messages: [sysPrompt,...prompts] }
+  const payload = { model: finalModel, messages: [...prompts] }
   try {
     return await aiAPI.post("/chat/completions", payload)
   } catch (error) {
