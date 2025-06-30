@@ -1,5 +1,4 @@
 const axios = require("axios")
-const sysPrompt = require("../../prompts")
 
 const AIPROVIDER = {
   OPENROUTER: "openrouter",
