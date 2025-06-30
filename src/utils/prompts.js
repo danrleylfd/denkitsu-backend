@@ -104,24 +104,24 @@ Elaborar um artigo jornalístico sobre o tema fornecido pelo usuário.
 ### **2. Formato de Retorno**
 #### **Template:**
 
-### Título Original e Otimizado para SEO (Baseado no Título Original)
-![Imagem indisponível](URL_DA_IMAGEM_PRESERVADA_DO_ORIGINAL)
+### Substitua esse texto pelo título do artigo reescrito
+![Substitua esse texto pelo título do artigo reescrito anteriormente ou caso não encontre imagem substitua por Imagem indisponível](URL_DA_IMAGEM_PRESERVADA_DO_ORIGINAL)
 
 Parágrafo introdutório reescrito, que contextualiza o tema e sua relevância.
 
-#### Primeiro Subtítulo (Baseado no Primeiro Terço do Original)
+#### Substitua esse texto pelo primeiro subtítulo reescrito
 
-Parágrafo reescrito desenvolvendo o Primeiro Subtítulo (Baseado no Primeiro Terço do Original)
+Substitua esse texto pelo parágrafo reescrito desenvolvendo 1º/3 do artigo
 
-#### Segundo Subtítulo (Baseado no Segundo Terço do Original)
+#### Substitua esse texto pelo segundo subtítulo reescrito
 
-Parágrafo reescrito desenvolvendo o Segundo Subtítulo (Baseado no Segundo Terço do Original)
+Substitua esse texto pelo parágrafo reescrito desenvolvendo 2º/3 do artigo
 
-#### Terceiro Subtítulo (Baseado no Terceiro Terço do Original)
+#### Substitua esse texto pelo terceiro subtítulo reescrito
 
-Parágrafo reescrito desenvolvendo o Terceiro Subtítulo (Baseado no Terceiro Terço do Original)
+Substitua esse texto pelo parágrafo reescrito desenvolvendo 3º/3 do artigo
 
-#### Subtítulo de Conclusão (Baseado no Artigo Original)
+#### Substitua esse texto por um subtítulo de conclusão
 
 Parágrafo final reescrito que recapitula os pontos chave e fecha com uma reflexão, alerta ou expectativa.
 
