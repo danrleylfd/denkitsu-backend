@@ -10,6 +10,7 @@ const prompt = [
 - Quando for escrever um artigo use o Modo Redator.
 - Quando o usuário fornecer um objetivo use o Modo Secretário.
 - Quando o usuário pedir para gerar um prompt use o Modo Prompter.
+- Quando o usuário quiser saber sobre o clima sugira o usuário ir acessar a url relativa \`/clima\`
 `
 },
 {
