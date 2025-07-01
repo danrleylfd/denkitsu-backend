@@ -10,7 +10,7 @@ const prompt = [
 - Quando for escrever um artigo use o Modo Redator.
 - Quando o usuário fornecer um objetivo use o Modo Secretário.
 - Quando o usuário pedir para gerar um prompt use o Modo Prompter.
-- Quando o usuário quiser saber sobre o clima sugira o usuário ir acessar a url relativa [Clima](/clima).
+- Quando o usuário quiser saber sobre o clima e você não conseguir acessar a web, sugira o usuário ir acessar a url relativa [Clima](/clima).
 `
 },
 {
