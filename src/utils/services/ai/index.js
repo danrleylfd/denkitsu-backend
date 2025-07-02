@@ -39,13 +39,14 @@ const ask = async (aiProvider = "openrouter", prompts, options = {}, aiKey = und
   const config = providerConfig[aiProvider]
   if (!config) throw new Error(`Provedor de aiProvider inválido ou não configurado: ${aiProvider}`)
   const finalApiKey = aiKey || config.apiKey //aiProvider === AIPROVIDER.GROQ ? config.apiKey :
-  const finalModel = options?.model || config.defaultModel //aiProvider === AIPROVIDER.GROQ ? config.defaultModel :
+  const { model, ...props } = options
+  const finalModel = model || config.defaultModel //aiProvider === AIPROVIDER.GROQ ? config.defaultModel :
   if (!finalApiKey) throw new Error(`API key para ${aiProvider} não encontrada.`)
   const aiAPI = axios.create({
     baseURL: config.baseURL,
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${finalApiKey}` }
   })
-  const payload = { model: finalModel, messages: [...prompts] }
+  const payload = { model: finalModel, messages: [...prompts], ...props }
   try {
     return await aiAPI.post("/chat/completions", payload)
   } catch (error) {
