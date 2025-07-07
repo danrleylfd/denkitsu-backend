@@ -28,8 +28,8 @@ const providerConfig = {
     apiKey: process.env.GROQ_API_KEY,
     defaultModel: "deepseek-r1-distill-llama-70b",
     getModels: async (api) => {
-      const response = await api.get("/models");
-      const models = response.data?.data || [];
+      const response = await api.get("/models")
+      const models = response.data?.data || []
       return models.map(model => ({ id: model.id, aiProvider: AIPROVIDER.GROQ }))
     }
   }
