@@ -41,34 +41,37 @@ Depois que o merge da sua pull request for feito, você pode deletar a sua branc
  - `git push -u origin main`
 
 ## Env
- - `HOST0="localhost"`
- - `HOST1="localhost"`
- - `HOST2="localhost"`
- - `PORT=80`
- - `EMAIL="username@gmail.com"`
- - `PASSWORD="password"`
- - `MONGODB_HOST="mongodb+srv://<Username>:<Password>@cluster0-gw6np.gcp.mongodb.net/<DBName>?retryWrites=true&w=majority"`
+- `HOST0="http://localhost"`
+- `HOST1=""`
+- `HOST2=""`
+- `PORT="8080"`
+- `EMAIL=""`
+- `PASSWORD=""`
+- `EM=""`
+- `PW=""`
+- `MONGODB_HOST="mongodb+srv://username:password@cluster0-gw6np.gcp.mongodb.net/collection?retryWrites=true&w=majority"`
 
- - `OPENROUTER_API_KEY=""`
- - `OPENROUTER_API_URL=""`
- - `GROQ_API_KEY=""`
- - `GROQ_API_URL=""`
- - `GEMINI_API_KEY=""`
- - `GSEARCH_API_KEY=""`
- - `NEWS_API_KEY=""`
- - `WEATHER_API_KEY=""`
- - `TELEGRAM_TOKEN=""`
+- `OPENROUTER_API_KEY=""`
+- `OPENROUTER_API_URL="https://openrouter.ai/api/v1"`
+- `GROQ_API_KEY=""`
+- `GROQ_API_URL="https://api.groq.com/openai/v1"`
+- `GEMINI_API_KEY=""`
+- `GSEARCH_API_KEY=""`
+- `NEWS_API_KEY=""`
+- `NEWS_API_URL="https://newsapi.org/v2"`
+- `WEATHER_API_KEY=""`
+- `TELEGRAM_TOKEN=""`
 
- - `JWT_UNHASHED=""`
- - `JWT_SECRET=""`
- - `JWT_EXPIRATION="24h"`
- - `JWT_HASH_TYPE=""`
- - `JWT_REFRESH_UNHASHED=""`
- - `JWT_REFRESH_SECRET=""`
- - `JWT_REFRESH_EXPIRATION="7d"`
- - `JWT_REFRESH_HASH_TYPE=""`
+- `JWT_SECRET=""`
+- `JWT_EXPIRATION="1d"`
+- `JWT_HASH_TYPE="md5"`
 
- - `OWNER=""`
+- `JWT_REFRESH_SECRET=""`
+- `JWT_REFRESH_EXPIRATION="7d"`
+- `JWT_REFRESH_HASH_TYPE="md5"`
+
+- `OWNER=""`
+
 
 ## :memo: Licença
 
