@@ -42,7 +42,7 @@ const ask = async (aiProvider = "openrouter", prompts, options = {}, aiKey = und
 const getModels = async () => {
   const models = []
   for (const [provider, config] of Object.entries(providerConfig)) {
-    const apiKey = process.env[config.apiKeyEnv]
+    const apiKey = config.apiKey
     if (!apiKey) continue
     const openai = new OpenAI({ apiKey, baseURL: config.baseURL })
     try {
