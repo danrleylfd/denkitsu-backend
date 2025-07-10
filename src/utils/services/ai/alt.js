@@ -29,8 +29,21 @@ const ask = async (aiProvider, aiKey, prompts, options = {}) => {
     })
     return { status: 200, data: response }
   } catch (error) {
-    console.error(`Erro ao chamar a API ${aiProvider}:`, error)
-    throw error
+    console.error(`Erro ao chamar a API ${aiProvider}:`, {
+      message: error.message,
+      status: error.status,
+      type: error.type,
+      stack: error.stack
+    })
+    if (error instanceof OpenAI.AuthenticationError) {
+      throw new Error("AUTHENTICATION_FAILED")
+    } else if (error instanceof OpenAI.RateLimitError) {
+      throw new Error("RATE_LIMIT_EXCEEDED")
+    } else if (error instanceof OpenAI.APIError) {
+      throw new Error("API_REQUEST_FAILED")
+    } else {
+      throw new Error("API_UNEXPECTED_ERROR")
+    }
   }
 }
 

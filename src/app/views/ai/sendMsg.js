@@ -19,7 +19,11 @@ const sendMessage = async (req, res) => {
     const errorMessages = {
       MODEL_MISSING: { status: 422, message: "Por favor, selecione um modelo de IA." },
       PROMPTS_MISSING: { status: 422, message: "Por favor, envie uma mensagem." },
-      INVALID_PROVIDER: { status: 400, message: "O provedor de IA selecionado não é válido." }
+      INVALID_PROVIDER: { status: 400, message: "O provedor de IA selecionado não é válido." },
+      API_KEY_MISSING: { status: 401, message: "Chave de API não fornecida. Verifique suas credenciais." },
+      AUTHENTICATION_FAILED: { status: 401, message: "Chave de API inválida. Verifique suas credenciais." },
+      RATE_LIMIT_EXCEEDED: { status: 429, message: "Limite de requisições excedido. Tente novamente mais tarde." },
+      API_REQUEST_FAILED: { status: 502, message: "Falha na comunicação com o serviço de IA. Tente novamente." }
     }
     const defaultError = { status: 500, message: `[SEND_MESSAGE] ${new Date().toISOString()} - Internal server error` }
     const { status, message } = errorMessages[error.message] || defaultError
