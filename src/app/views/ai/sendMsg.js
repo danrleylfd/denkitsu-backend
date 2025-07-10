@@ -2,11 +2,11 @@ const { ask } = require("../../../utils/services/ai/alt")
 
 const sendMessage = async (req, res) => {
   try {
-    const { aiProvider = "openrouter", model, messages: prompts, aiKey, plugins } = req.body
+    const { aiProvider = "groq", model, messages: prompts, aiKey, plugins } = req.body
     if (!model || model.trim().length < 3) throw new Error("MODEL_MISSING")
     if (!prompts || prompts.length < 1) throw new Error("PROMPTS_MISSING")
     if (!["openrouter", "groq"].includes(aiProvider)) throw new Error("INVALID_PROVIDER")
-    const { status, data } = await ask(aiProvider, [...prompts], { model, plugins: plugins ? plugins : undefined }, aiKey)
+    const { status, data } = await ask(aiProvider, aiKey, [...prompts], { model, plugins: plugins ? plugins : undefined })
     return res.status(status).json(data)
   } catch (error) {
     if (error.response) return res.status(error.response.status).json(error.response.data)

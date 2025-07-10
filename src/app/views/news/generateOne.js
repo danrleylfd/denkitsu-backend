@@ -1,6 +1,6 @@
 const News = require("../../models/news")
 const newsService = require("../../../utils/services/news")
-const { ask } = require("../../../utils/services/ai")
+const { ask } = require("../../../utils/services/ai/alt")
 const prompt = require("../../../utils/prompts")
 
 const cleanAiOutput = (text = "") => {
@@ -24,7 +24,7 @@ const cleanAiOutput = (text = "") => {
 
 const generateOne = async (req, res) => {
   try {
-    const { aiProvider = "groq", searchTerm = "" } = req.body
+    const { aiProvider = "groq", aiKey, searchTerm = "" } = req.body
     const { data: newsData } = await newsService(searchTerm)
     if(!newsData) throw new Error("NEWS_NOT_FOUND")
     const article = newsData.articles[0]
@@ -34,7 +34,7 @@ const generateOne = async (req, res) => {
       role: "user",
       content: `Modo Redator Tema:\n\n### ${article.title}\n\n![${article.title}](${article.urlToImage})\n\n${article.description}\n\n${article.content}\n\n**Fonte(s):** [${article.source.name}](${article.url})`
     }
-    const { data: aiData } = await ask(aiProvider, [prompt[0], prompt[3],userPrompt])
+    const { data: aiData } = await ask(aiProvider, aiKey, [prompt[0], prompt[3],userPrompt])
     if(!aiData || !aiData.choices || aiData.choices.length === 0) throw new Error("AI_ERROR")
     const cleanContent = cleanAiOutput(aiData.choices[0].message.content)
     const news = await News.create({

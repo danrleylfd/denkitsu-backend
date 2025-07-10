@@ -35,7 +35,7 @@ const providerConfig = {
   }
 }
 
-const ask = async (aiProvider = "openrouter", prompts, options = {}, aiKey = undefined) => {
+const ask = async (aiProvider = "groq", aiKey, prompts, options = {}) => {
   const config = providerConfig[aiProvider]
   if (!config) throw new Error(`Provedor de aiProvider inválido ou não configurado: ${aiProvider}`)
   const finalApiKey = aiKey || config.apiKey //aiProvider === AIPROVIDER.GROQ ? config.apiKey :
