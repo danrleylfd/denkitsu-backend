@@ -7,13 +7,13 @@ const AIPROVIDER = {
 
 const providerConfig = {
   [AIPROVIDER.OPENROUTER]: {
-    baseURL: "https://openrouter.ai/api/v1",
-    apiKeyEnv: "OPENROUTER_API_KEY",
+    baseURL: process.env.OPENROUTER_API_URL,
+    apiKey: process.env.OPENROUTER_API_KEY,
     defaultModel: "deepseek/deepseek-r1:free"
   },
   [AIPROVIDER.GROQ]: {
-    baseURL: "https://api.groq.com/v1",
-    apiKeyEnv: "GROQ_API_KEY",
+    baseURL: process.env.GROQ_API_URL,
+    apiKey: process.env.GROQ_API_KEY,
     defaultModel: "deepseek-r1-distill-llama-70b"
   }
 }
@@ -21,7 +21,7 @@ const providerConfig = {
 const ask = async (aiProvider = "openrouter", prompts, options = {}, aiKey = undefined) => {
   const config = providerConfig[aiProvider]
   if (!config) throw new Error(`Provedor de aiProvider inválido ou não configurado: ${aiProvider}`)
-  const apiKey = aiKey || process.env[config.apiKeyEnv]
+  const apiKey = aiKey || config.apiKey
   if (!apiKey) throw new Error(`API key para ${aiProvider} não encontrada`)
   const openai = new OpenAI({ apiKey, baseURL: config.baseURL })
   const { model, ...props } = options
