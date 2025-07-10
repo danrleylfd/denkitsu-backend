@@ -1,4 +1,4 @@
-const { ask } = require("../../../utils/services/ai")
+const { ask } = require("../../../utils/services/ai/alt")
 
 const sendMessage = async (req, res) => {
   try {
