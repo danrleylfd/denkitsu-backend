@@ -22,6 +22,7 @@ const sendMessage = async (req, res) => {
         const functionArgs = JSON.parse(toolCall.function.arguments)
         console.log(`[TOOL CALL] Executing: ${functionName}(${JSON.stringify(functionArgs)})`)
         const functionResponse = await functionToCall(functionArgs.location)
+        console.log(functionResponse.data)
         prompts.push({
           tool_call_id: toolCall.id,
           role: "tool",
