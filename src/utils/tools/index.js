@@ -1,8 +1,9 @@
-// src/utils/tools.js
 const weatherService = require("../services/weather")
+const newsService = require("../services/news")
 
 const availableTools = {
   getWeather: weatherService.getWeatherByLocation,
+  searchNews: newsService.searchNews,
 }
 
 const tools = [
@@ -20,6 +21,23 @@ const tools = [
           },
         },
         required: ["location"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "getLatestNews",
+      description: "Busca a notícia mais recentes sobre um tópico específico. Ideal para perguntas sobre eventos atuais, política, esportes, finanças, etc.",
+      parameters: {
+        type: "object",
+        properties: {
+          query: {
+            type: "string",
+            description: "O tópico de interesse para a busca de notícias. Por exemplo: 'reforma tributária no Brasil' ou 'lançamentos de foguetes da SpaceX'.",
+          },
+        },
+        required: ["query"],
       },
     },
   },

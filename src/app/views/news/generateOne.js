@@ -1,5 +1,5 @@
 const News = require("../../models/news")
-const newsService = require("../../../utils/services/news")
+const { searchNews } = require("../../../utils/services/news")
 const { ask } = require("../../../utils/services/ai/alt")
 const prompt = require("../../../utils/prompts")
 
@@ -25,7 +25,7 @@ const cleanAiOutput = (text = "") => {
 const generateOne = async (req, res) => {
   try {
     const { aiProvider = "groq", aiKey, searchTerm = "" } = req.body
-    const { data: newsData } = await newsService(searchTerm)
+    const { data: newsData } = await searchNews(searchTerm)
     if(!newsData) throw new Error("NEWS_NOT_FOUND")
     const article = newsData.articles[0]
     const articleExists = await News.findOne({ source: article?.url })
