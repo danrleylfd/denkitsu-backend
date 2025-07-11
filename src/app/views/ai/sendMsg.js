@@ -33,7 +33,7 @@ const sendMessage = async (req, res) => {
           tool_call_id: toolCall.id,
           role: "tool",
           name: functionName,
-          content: JSON.stringify(functionResponse),
+          content: JSON.stringify(functionResponse.data),
         })
       }
       const finalResponse = await ask(aiProvider, aiKey, prompts, { model })
