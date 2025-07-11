@@ -2,28 +2,11 @@ const weatherService = require("../services/weather")
 const newsService = require("../services/news")
 
 const availableTools = {
-  getWeather: weatherService.getWeatherByLocation,
   searchNews: newsService.searchNews,
+  getWeather: weatherService.getWeatherByLocation,
 }
 
 const tools = [
-  {
-    type: "function",
-    function: {
-      name: "getWeather",
-      description: "Obtém a previsão do tempo para uma cidade específica.",
-      parameters: {
-        type: "object",
-        properties: {
-          location: {
-            type: "string",
-            description: "A cidade para a qual a previsão do tempo deve ser obtida, por exemplo, 'São Paulo'.",
-          },
-        },
-        required: ["location"],
-      },
-    },
-  },
   {
     type: "function",
     function: {
@@ -38,6 +21,23 @@ const tools = [
           },
         },
         required: ["query"],
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "getWeather",
+      description: "Obtém a previsão do tempo para uma cidade específica.",
+      parameters: {
+        type: "object",
+        properties: {
+          location: {
+            type: "string",
+            description: "A cidade para a qual a previsão do tempo deve ser obtida, por exemplo, 'São Paulo'.",
+          },
+        },
+        required: ["location"],
       },
     },
   },

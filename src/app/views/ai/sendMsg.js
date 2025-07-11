@@ -3,16 +3,23 @@ const { availableTools, tools } = require("../../../utils/tools")
 
 const sendMessage = async (req, res) => {
   try {
-    const { aiProvider = "groq", model, messages: prompts, aiKey, plugins } = req.body
+    const { aiProvider = "groq", model, messages: prompts, aiKey, plugins, use_tools } = req.body
     if (!model || model.trim().length < 3) throw new Error("MODEL_MISSING")
     if (!prompts || prompts.length < 1) throw new Error("PROMPTS_MISSING")
     if (!["openrouter", "groq"].includes(aiProvider)) throw new Error("INVALID_PROVIDER")
-    const { status, data } = await ask(aiProvider, aiKey, [...prompts], {
+    const requestOptions = {
       model,
       plugins: plugins ? plugins : undefined,
-      tools,
-      tool_choice: "auto"
-    })
+    }
+    if (use_tools && Array.isArray(use_tools) && use_tools.length > 0) {
+      const filteredTools = tools.filter(tool => use_tools.includes(tool.function.name))
+      if (filteredTools.length > 0) {
+        requestOptions.tools = filteredTools
+        requestOptions.tool_choice = "auto"
+        console.log(`[TOOL CONTROL] Usando as seguintes ferramentas: ${use_tools.join(', ')}`)
+      }
+    }
+    const { status, data } = await ask(aiProvider, aiKey, [...prompts], requestOptions)
     const resMsg = data.choices[0].message
     if (resMsg.tool_calls) {
       prompts.push(resMsg)
@@ -21,13 +28,12 @@ const sendMessage = async (req, res) => {
         const functionToCall = availableTools[functionName]
         const functionArgs = JSON.parse(toolCall.function.arguments)
         console.log(`[TOOL CALL] Executing: ${functionName}(${JSON.stringify(functionArgs)})`)
-        const functionResponse = await functionToCall(functionArgs.location)
-        console.log(functionResponse.data)
+        const functionResponse = await functionToCall(...Object.values(functionArgs))
         prompts.push({
           tool_call_id: toolCall.id,
           role: "tool",
           name: functionName,
-          content: JSON.stringify(functionResponse.data),
+          content: JSON.stringify(functionResponse),
         })
       }
       const finalResponse = await ask(aiProvider, aiKey, prompts, { model })
