@@ -27,7 +27,7 @@ const tools = [
   {
     type: "function",
     function: {
-      name: "getLatestNews",
+      name: "searchNews",
       description: "Busca a notícia mais recentes sobre um tópico específico. Ideal para perguntas sobre eventos atuais, política, esportes, finanças, etc.",
       parameters: {
         type: "object",
