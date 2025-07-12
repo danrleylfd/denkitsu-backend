@@ -17,7 +17,7 @@ const tools = [
         properties: {
           query: {
             type: "string",
-            description: "O tópico de interesse para a busca de notícias. Por exemplo: 'reforma tributária no Brasil' ou 'lançamentos de foguetes da SpaceX'.",
+            description: "O tópico de interesse(em inglês) para a busca de notícias. Por exemplo: 'reforma tributária no Brasil' ou 'lançamentos de foguetes da SpaceX'.",
           },
         },
         required: ["query"],
@@ -43,4 +43,4 @@ const tools = [
   },
 ]
 
-module.exports = { tools, availableTools }
+module.exports = { availableTools, tools }
