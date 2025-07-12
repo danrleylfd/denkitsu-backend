@@ -40,6 +40,7 @@ const sendMessage = async (req, res) => {
           content: JSON.stringify(functionResponse.data),
         })
       }
+      console.log(JSON.stringify(prompts, cleanedPrompts, null, 2))
       const finalResponse = await ask(aiProvider, aiKey, toolPrompts, { model })
       return res.status(finalResponse.status).json(finalResponse.data)
     }
