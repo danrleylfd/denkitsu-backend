@@ -23,7 +23,7 @@ const sendMessage = async (req, res) => {
         console.log(`[TOOL CONTROL] Usando as seguintes ferramentas: ${use_tools.join(', ')}`)
       }
     }
-    const { status, data } = await ask(aiProvider, aiKey, [...prompts], requestOptions)
+    const { status, data } = await ask(aiProvider, aiKey, [...cleanedPrompts], requestOptions)
     const resMsg = data.choices[0].message
     if (resMsg.tool_calls) {
       const toolPrompts = [...cleanedPrompts, resMsg]
