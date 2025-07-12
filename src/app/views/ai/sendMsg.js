@@ -7,6 +7,10 @@ const sendMessage = async (req, res) => {
     if (!model || model.trim().length < 3) throw new Error("MODEL_MISSING")
     if (!prompts || prompts.length < 1) throw new Error("PROMPTS_MISSING")
     if (!["openrouter", "groq"].includes(aiProvider)) throw new Error("INVALID_PROVIDER")
+    const cleanedPrompts = prompts.map(msg => {
+      const { reasoning, _contentBuffer, _reasoningBuffer, id, ...validMsg } = msg
+      return validMsg
+    })
     const requestOptions = {
       model,
       plugins: plugins ? plugins : undefined,
@@ -22,21 +26,21 @@ const sendMessage = async (req, res) => {
     const { status, data } = await ask(aiProvider, aiKey, [...prompts], requestOptions)
     const resMsg = data.choices[0].message
     if (resMsg.tool_calls) {
-      prompts.push(resMsg)
+      const toolPrompts = [...cleanedPrompts, resMsg]
       for (const toolCall of resMsg.tool_calls) {
         const functionName = toolCall.function.name
         const functionToCall = availableTools[functionName]
         const functionArgs = JSON.parse(toolCall.function.arguments)
         console.log(`[TOOL CALL] Executing: ${functionName}(${JSON.stringify(functionArgs)})`)
         const functionResponse = await functionToCall(...Object.values(functionArgs))
-        prompts.push({
+        toolPrompts.push({
           tool_call_id: toolCall.id,
           role: "tool",
           name: functionName,
           content: JSON.stringify(functionResponse.data),
         })
       }
-      const finalResponse = await ask(aiProvider, aiKey, prompts, { model })
+      const finalResponse = await ask(aiProvider, aiKey, toolPrompts, { model })
       return res.status(finalResponse.status).json(finalResponse.data)
     }
     return res.status(status).json(data)
