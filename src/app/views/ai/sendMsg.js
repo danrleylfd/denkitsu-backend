@@ -3,22 +3,38 @@ const { availableTools, tools } = require("../../../utils/tools")
 
 const sendMessage = async (req, res) => {
   try {
-    const { aiProvider = "groq", model, messages: prompts, aiKey, plugins, use_tools } = req.body
+    const { aiProvider = "groq", model, messages: prompts, aiKey, plugins, use_tools, stream = false } = req.body
     if (!model || model.trim().length < 3) throw new Error("MODEL_MISSING")
     if (!prompts || prompts.length < 1) throw new Error("PROMPTS_MISSING")
     if (!["openrouter", "groq"].includes(aiProvider)) throw new Error("INVALID_PROVIDER")
+    if (stream && use_tools && use_tools.length > 0) throw new Error("STREAM_WITH_TOOLS_NOT_SUPPORTED")
+
     const requestOptions = {
       model,
-      plugins: plugins ? plugins : undefined,
+      stream,
+      plugins: plugins ? plugins : undefined
     }
+
     if (use_tools && Array.isArray(use_tools) && use_tools.length > 0) {
-      const filteredTools = tools.filter(tool => use_tools.includes(tool.function.name))
+      const filteredTools = tools.filter((tool) => use_tools.includes(tool.function.name))
       if (filteredTools.length > 0) {
         requestOptions.tools = filteredTools
         requestOptions.tool_choice = "auto"
-        console.log(`[TOOL CONTROL] Usando as seguintes ferramentas: ${use_tools.join(', ')}`)
+        console.log(`[TOOL CONTROL] Usando as seguintes ferramentas: ${use_tools.join(", ")}`)
       }
     }
+
+    if (stream) {
+      const streamResponse = await ask(aiProvider, aiKey, [...prompts], requestOptions)
+      res.setHeader("Content-Type", "text/event-stream")
+      res.setHeader("Cache-Control", "no-cache")
+      res.setHeader("Connection", "keep-alive")
+      for await (const chunk of streamResponse) {
+        res.write(`data: ${JSON.stringify(chunk)}\n\n`)
+      }
+      return res.end()
+    }
+
     const { status, data } = await ask(aiProvider, aiKey, [...prompts], requestOptions)
     const resMsg = data.choices[0].message
     if (resMsg.tool_calls) {
@@ -33,7 +49,7 @@ const sendMessage = async (req, res) => {
           tool_call_id: toolCall.id,
           role: "tool",
           name: functionName,
-          content: JSON.stringify(functionResponse.data),
+          content: JSON.stringify(functionResponse.data)
         })
       }
       const finalResponse = await ask(aiProvider, aiKey, prompts, { model })
@@ -55,7 +71,8 @@ const sendMessage = async (req, res) => {
       API_KEY_MISSING: { status: 401, message: "Chave de API não fornecida. Verifique suas credenciais." },
       AUTHENTICATION_FAILED: { status: 401, message: "Chave de API inválida. Verifique suas credenciais." },
       RATE_LIMIT_EXCEEDED: { status: 429, message: "Limite de requisições excedido. Tente novamente mais tarde." },
-      API_REQUEST_FAILED: { status: 502, message: "Falha na comunicação com o serviço de IA. Tente novamente." }
+      API_REQUEST_FAILED: { status: 502, message: "Falha na comunicação com o serviço de IA. Tente novamente." },
+      STREAM_WITH_TOOLS_NOT_SUPPORTED: { status: 400, message: "O modo de streaming não pode ser usado em conjunto com ferramentas (tools)." }
     }
     const defaultError = { status: 500, message: `[SEND_MESSAGE] ${new Date().toISOString()} - Internal server error` }
     const { status, message } = errorMessages[error.message] || defaultError

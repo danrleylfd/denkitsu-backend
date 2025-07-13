@@ -10,7 +10,7 @@ const providerConfig = {
     apiUrl: process.env.OPENROUTER_API_URL,
     apiKey: process.env.OPENROUTER_API_KEY,
     defaultModel: "deepseek/deepseek-r1:free"
-  },
+  }
 }
 
 const ask = async (aiProvider, aiKey, prompts, options = {}) => {
@@ -19,12 +19,22 @@ const ask = async (aiProvider, aiKey, prompts, options = {}) => {
   const apiKey = aiKey || config.apiKey
   if (!apiKey) throw new Error(`API key para ${aiProvider} não encontrada`)
   const openai = new OpenAI({ apiKey, baseURL: config.apiUrl })
-  const { model, ...props } = options
+  const { model, stream, ...props } = options
   const finalModel = model || config.defaultModel
   try {
+    if (stream) {
+      const streamResponse = await openai.chat.completions.create({
+        model: finalModel,
+        messages: prompts,
+        stream: true,
+        ...props
+      })
+      return streamResponse
+    }
     const response = await openai.chat.completions.create({
       model: finalModel,
       messages: prompts,
+      stream: false,
       ...props
     })
     return { status: 200, data: response }
@@ -55,7 +65,7 @@ const getModels = async () => {
     const openai = new OpenAI({ apiKey, baseURL: config.apiUrl })
     try {
       const response = await openai.models.list()
-      const providerModels = response.data.map(model => ({ id: model.id, aiProvider: provider }))
+      const providerModels = response.data.map((model) => ({ id: model.id, aiProvider: provider }))
       models.push(...providerModels)
     } catch (error) {
       console.error(`Erro ao obter modelos de ${provider}:`, error)
