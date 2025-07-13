@@ -10,13 +10,14 @@ const sendMessage = async (req, res) => {
     if (!["openrouter", "groq"].includes(aiProvider)) throw new Error("INVALID_PROVIDER")
     if (stream && use_tools && use_tools.length > 0) throw new Error("STREAM_WITH_TOOLS_NOT_SUPPORTED")
 
-    const finalPrompts = [...userPrompts]
+    const finalPrompts = [allPrompts[0]]
     if (mode) {
       const modePrompt = allPrompts.find(p => p.content.includes(mode))
       if (modePrompt && !finalPrompts.some(p => p.content === modePrompt.content)) {
         finalPrompts.splice(1, 0, modePrompt)
       }
     }
+    finalPrompts.push(...userPrompts)
 
     const requestOptions = {
       model,
