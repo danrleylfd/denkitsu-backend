@@ -11,4 +11,22 @@ const searchNews = async (searchTerm) => {
   }
 }
 
-module.exports = { searchNews }
+const newsTool = {
+  type: "function",
+  function: {
+    name: "searchNews",
+    description: "Busca a notícia mais recentes sobre um tópico específico. Ideal para perguntas sobre eventos atuais, política, esportes, finanças, etc.",
+    parameters: {
+      type: "object",
+      properties: {
+        query: {
+          type: "string",
+          description: "O tópico de interesse(em inglês) para a busca de notícias. Por exemplo: 'reforma tributária no Brasil' ou 'lançamentos de foguetes da SpaceX'."
+        }
+      },
+      required: ["query"]
+    }
+  }
+}
+
+module.exports = { searchNews, newsTool }
