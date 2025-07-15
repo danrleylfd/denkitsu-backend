@@ -186,15 +186,16 @@ const filterPlayerData = (playerData) => {
       });
     }
   });
-
-  return {
+  const result = {
     level: parseInt(playerData.propMap["4001"].ival),
     friendship: playerData.fetterInfo.expLevel,
     constellations: playerData.talentIdList || [],
     stats,
     talents,
     equipment
-  };
+  }
+  console.log(result)
+  return result
 }
 
 // const filterPlayerData = (data) => {
