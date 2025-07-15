@@ -83,6 +83,7 @@ const getPlayerBuild = async (characterName, uid) => {
     return { status: 200, data: responseData }
   } catch (error) {
     console.error("[ANALYZE_TOOL] Erro durante a execução:", error.message)
+    console.error(error.stack)
     if (error.response) {
       return { status: error.response.status, data: { message: `Falha ao se comunicar com um dos serviços de Genshin Impact. Status: ${error.response.status}` } }
     }
