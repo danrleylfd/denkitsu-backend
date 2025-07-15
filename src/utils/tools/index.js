@@ -15,8 +15,9 @@ const availableTools = {
 const tools = [
   newsService.newsTool,
   weatherService.weatherTool,
-  wikipediaService.wikiPediaTool,
-  browserService.browseTool
+  wikipediaService.wikipediaTool,
+  browserService.browseTool,
+  genshinService.genshinTool
 ]
 
 module.exports = { availableTools, tools }

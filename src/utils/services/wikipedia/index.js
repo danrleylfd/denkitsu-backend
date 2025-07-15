@@ -26,7 +26,7 @@ const searchWikipedia = async (topic) => {
   }
 }
 
-const wikiPediaTool = {
+const wikipediaTool = {
   type: "function",
   function: {
     name: "searchWikipedia",
@@ -45,4 +45,4 @@ const wikiPediaTool = {
   }
 }
 
-module.exports = { searchWikipedia, wikiPediaTool }
+module.exports = { searchWikipedia, wikipediaTool }
