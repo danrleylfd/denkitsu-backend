@@ -178,7 +178,7 @@ const genshinTool = {
   type: "function",
   function: {
     name: "getPlayerBuild",
-    description: "Busca os dados atuais (arma, artefatos, status, etc.) do personagem que um jogador de Genshin Impact exibe em seu perfil no jogo, usando o UID fornecido. O assistente deve retornar em 2 sessões, uma com os dados de referência do personagem e outra com os dados da build do personagem do jogador.",
+    description: "Busca os dados atuais (arma, artefatos, status, etc.) do personagem que um jogador de Genshin Impact exibe em seu perfil no jogo, usando o UID fornecido. O assistente deve retornar em 2 sessões, a primeira mostra o necessário para upar o personagem e outra com os dados da build do personagem do jogador.",
     parameters: {
       type: "object",
       properties: {
