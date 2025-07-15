@@ -24,9 +24,10 @@ const sendMessage = async (req, res) => {
       stream,
       plugins: plugins ? plugins : undefined
     }
-
+    console.log(`[TOOL CONTROL] use_tools: ${use_tools}`)
     if (use_tools && Array.isArray(use_tools) && use_tools.length > 0) {
       const filteredTools = tools.filter((tool) => use_tools.includes(tool.function.name))
+      console.log(`[TOOL CONTROL] filteredTools: ${JSON.stringify(filteredTools)}`)
       if (filteredTools.length > 0) {
         requestOptions.tools = filteredTools
         requestOptions.tool_choice = "auto"
