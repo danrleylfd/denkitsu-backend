@@ -76,8 +76,8 @@ const getPlayerBuild = async (characterName, uid) => {
       return { status: 404, data: { message: `Personagem '${characterName}' não encontrado na Vitrine de Personagens do UID ${uid}.` } }
     }
     const responseData = {
-      referenceData: filterReferenceData(referenceResponse.data.data),
-      playerData: filterPlayerData(playerData)
+      characterInfo: filterReferenceData(referenceResponse.data.data),
+      playerCharacterBuild: filterPlayerData(playerData)
     }
     console.log(`[TOOL_CALL] Análise concluída. Retornando dados combinados.`)
     return { status: 200, data: responseData }
@@ -94,7 +94,7 @@ const genshinTool = {
   type: "function",
   function: {
     name: "getPlayerBuild",
-    description: "Busca os dados atuais (arma, artefatos, status, etc.) dos personagens que um jogador de Genshin Impact exibe em seu perfil no jogo, usando o UID fornecido.",
+    description: "Busca os dados atuais (arma, artefatos, status, etc.) do personagem que um jogador de Genshin Impact exibe em seu perfil no jogo, usando o UID fornecido. O assistente deve retornar em 2 sessões, uma com os dados de referência do personagem e outra com os dados da build do personagem do jogador.",
     parameters: {
       type: "object",
       properties: {
