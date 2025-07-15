@@ -5,7 +5,7 @@ const getPlayerBuild = async (characterName, uid) => {
     console.log(`[TOOL_CALL] Buscando dados do UID ${uid} para o personagem ${characterName}`)
 
     const playerResponse = await axios.get(`https://enka.network/api/uid/${uid}`, {
-      headers: { "User-Agent": "Denkitsu/1.0" }
+      headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36" }
     })
 
     const characters = playerResponse.data?.avatarInfoList || []
