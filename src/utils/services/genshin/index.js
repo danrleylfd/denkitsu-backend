@@ -1,17 +1,101 @@
 const axios = require("axios")
 
 const filterReferenceData = (data) => {
-  if (!data) return null
-  return {
+  if (!data) return null;
+
+  // Mapeia IDs para nomes
+  const mapIdToName = (id) => data.items[id]?.name || `Unknown Item (ID: ${id})`;
+
+  // Calcula materiais de ascensão (excluindo livros de talento e coroas)
+  const calculateUpgradeMaterials = () => {
+    const totals = {};
+
+    // Identifica materiais de talento para exclusão
+    const talentMaterialIds = new Set();
+    const firstTalent = Object.values(data.talent)[0];
+
+    if (firstTalent?.promote) {
+      for (const level in firstTalent.promote) {
+        const costItems = firstTalent.promote[level]?.costItems;
+        if (costItems) {
+          Object.keys(costItems).forEach(id => talentMaterialIds.add(id));
+        }
+      }
+    }
+
+    // Soma materiais de ascensão, excluindo os de talento
+    Object.entries(data.ascension || {}).forEach(([id, amount]) => {
+      if (!talentMaterialIds.has(id)) {
+        totals[id] = (totals[id] || 0) + amount;
+      }
+    });
+
+    return Object.entries(totals).map(([id, amount]) => ({
+      name: mapIdToName(id),
+      amount
+    }));
+  };
+
+  // Calcula materiais totais para talentos
+  const calculateTotalTalentMaterials = () => {
+    const materialsTotal = {};
+    const talent = Object.values(data.talent)[0];
+
+    if (talent?.promote) {
+      // Percorre todos os níveis de promoção (2 a 10)
+      for (let level = 2; level <= 10; level++) {
+        const costItems = talent.promote[level]?.costItems;
+        if (costItems) {
+          Object.entries(costItems).forEach(([id, amount]) => {
+            materialsTotal[id] = (materialsTotal[id] || 0) + amount;
+          });
+        }
+      }
+    }
+
+    return Object.entries(materialsTotal).map(([id, amount]) => ({
+      name: mapIdToName(id),
+      amount
+    }));
+  };
+
+  // Calcula Mora total (ascensão + talentos)
+  const calculateTotalMora = () => {
+    let total = 0;
+
+    // Mora de ascensão
+    Object.values(data.upgrade?.promote || []).forEach(level => {
+      if (level.coinCost) total += level.coinCost;
+    });
+
+    // Mora de talentos (para um talento)
+    const talent = Object.values(data.talent)[0];
+    if (talent?.promote) {
+      for (let level = 2; level <= 10; level++) {
+        const promoteData = talent.promote[level];
+        if (promoteData?.coinCost) total += promoteData.coinCost;
+      }
+    }
+
+    return total;
+  };
+
+  const result = {
     name: data.name,
     element: data.element,
     weaponType: data.weaponType,
-    upgradeMaterials: data.ascension,
-    talentMaterials: Object.values(data.talent)[0]?.promote["2"]?.costItems,
-    bossWeeklyMaterial: Object.values(data.talent)[0]?.promote["7"]?.costItems,
-    talents: Object.values(data.talent).map((t) => ({ name: t.name, description: t.description }))
+    characterXP: 419,
+    totalMora: calculateTotalMora(),
+    upgradeMaterials: calculateUpgradeMaterials(),
+    talentMaterials: calculateTotalTalentMaterials(),
+    talents: Object.values(data.talent).map(t => ({
+      name: t.name,
+      description: t.description.replace(/<[^>]+>/g, '')
+    }))
   }
-}
+  console.log(result)
+  return result
+};
 
 const filterPlayerData = (data) => {
   if (!data) return null
