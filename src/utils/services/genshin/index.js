@@ -1,5 +1,47 @@
 const axios = require("axios")
 
+const filterReferenceData = (data) => {
+  if (!data) return null
+  return {
+    name: data.name,
+    element: data.element,
+    weaponType: data.weaponType,
+    upgradeMaterials: data.ascension,
+    talentMaterials: Object.values(data.talent)[0]?.promote["2"]?.costItems,
+    bossWeeklyMaterial: Object.values(data.talent)[0]?.promote["7"]?.costItems,
+    talents: Object.values(data.talent).map((t) => ({ name: t.name, description: t.description }))
+  }
+}
+
+const filterPlayerData = (data) => {
+  if (!data) return null
+  const weapon = data.equipList.find((e) => e.flat.itemType === "ITEM_WEAPON")
+  const artifacts = data.equipList.filter((e) => e.flat.itemType === "ITEM_RELIQUARY")
+
+  return {
+    level: data.propMap["4001"].val,
+    constellation: data.talentIdList ? (Object.keys(data.proudSkillExtraLevelMap || {}).length > 0 ? 6 : data.talentIdList.length - 3) : 0,
+    skillLevels: data.skillLevelMap,
+    weapon: {
+      name: weapon.flat.nameTextMapHash,
+      level: weapon.weapon.level,
+      refinement: weapon.weapon.affixMap ? Object.values(weapon.weapon.affixMap)[0] + 1 : 1
+    },
+    artifacts: artifacts.map((art) => ({
+      type: art.flat.equipType,
+      setName: art.flat.setNameTextMapHash,
+      mainStat: art.flat.reliquaryMainstat.mainPropId,
+      mainStatValue: art.flat.reliquaryMainstat.statValue,
+      level: art.reliquary.level,
+      substats: art.flat.reliquarySubstats?.map((sub) => ({
+        stat: sub.appendPropId,
+        value: sub.statValue
+      }))
+    })),
+    stats: data.fightPropMap
+  }
+}
+
 const AMBR_API_BASE_URL = "https://gi.yatta.moe/api/v2/pt"
 
 const getPlayerBuild = async (characterName, uid) => {
@@ -34,8 +76,8 @@ const getPlayerBuild = async (characterName, uid) => {
       return { status: 404, data: { message: `Personagem '${characterName}' não encontrado na Vitrine de Personagens do UID ${uid}.` } }
     }
     const responseData = {
-      // referenceData: referenceResponse.data.data,
-      playerData: playerData
+      referenceData: filterReferenceData(referenceResponse.data),
+      playerData: filterPlayerData(playerData)
     }
     console.log(`[TOOL_CALL] Análise concluída. Retornando dados combinados.`)
     return { status: 200, data: responseData }
