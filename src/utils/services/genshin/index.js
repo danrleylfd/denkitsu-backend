@@ -97,34 +97,134 @@ const filterReferenceData = (data) => {
   return result
 };
 
-const filterPlayerData = (data) => {
-  if (!data) return null
-  const weapon = data.equipList.find((e) => e.flat.itemType === "ITEM_WEAPON")
-  const artifacts = data.equipList.filter((e) => e.flat.itemType === "ITEM_RELIQUARY")
+const filterPlayerData = (playerData) => {
+  if (!playerData) return null;
+
+  // Mapeamento de propriedades de combate
+  const propMap = {
+    "1": "HP Base",
+    "2": "ATQ Base",
+    "4": "DEF Base",
+    "5": "Proficiência Elemental",
+    "6": "Recarga de Energia",
+    "7": "Bônus de Dano",
+    "8": "Taxa CRIT",
+    "9": "Dano CRIT",
+    "20": "Bônus Dano Cryo",
+    "21": "Bônus Dano Pyro",
+    "22": "Bônus Dano Hydro",
+    "23": "Bônus Dano Electro",
+    "24": "Bônus Dano Anemo",
+    "25": "Bônus Dano Geo",
+    "26": "Bônus Dano Dendro",
+    "28": "Eficiência de Cura",
+    "29": "RES Cryo",
+    "30": "RES Pyro",
+    "40": "RES Hydro",
+    "41": "RES Electro",
+    "42": "RES Anemo",
+    "43": "RES Geo",
+    "44": "RES Físico",
+    "45": "RES Dendro",
+    "2000": "HP Total",
+    "2001": "ATQ Total",
+    "2002": "DEF Total"
+  };
+
+  // Processa atributos de combate
+  const stats = {};
+  Object.entries(playerData.fightPropMap || {}).forEach(([key, value]) => {
+    const statName = propMap[key] || key;
+    stats[statName] = value;
+  });
+
+  // Processa talentos
+  const talents = [];
+  if (playerData.skillLevelMap) {
+    Object.entries(playerData.skillLevelMap).forEach(([skillId, level]) => {
+      talents.push({
+        id: parseInt(skillId),
+        level: level
+      });
+    });
+  }
+
+  // Processa equipamentos
+  const equipment = {
+    weapon: null,
+    artifacts: []
+  };
+
+  playerData.equipList.forEach(item => {
+    if (item.weapon) {
+      // Armazenar dados da arma
+      equipment.weapon = {
+        id: item.itemId,
+        level: item.weapon.level,
+        refinement: Object.values(item.weapon.affixMap)[0] + 1,
+        rarity: item.flat.rankLevel,
+        mainStats: item.flat.weaponStats.map(stat => ({
+          stat: propMap[stat.appendPropId] || stat.appendPropId,
+          value: stat.statValue
+        }))
+      };
+    } else if (item.reliquary) {
+      // Armazenar dados de artefatos
+      equipment.artifacts.push({
+        id: item.itemId,
+        level: item.reliquary.level,
+        rarity: item.flat.rankLevel,
+        slot: item.flat.equipType,
+        mainStat: {
+          stat: propMap[item.flat.reliquaryMainstat.mainPropId] || item.flat.reliquaryMainstat.mainPropId,
+          value: item.flat.reliquaryMainstat.statValue
+        },
+        subStats: (item.flat.reliquarySubstats || []).map(sub => ({
+          stat: propMap[sub.appendPropId] || sub.appendPropId,
+          value: sub.statValue
+        }))
+      });
+    }
+  });
 
   return {
-    level: data.propMap["4001"].val,
-    constellation: data.talentIdList ? (Object.keys(data.proudSkillExtraLevelMap || {}).length > 0 ? 6 : data.talentIdList.length - 3) : 0,
-    skillLevels: data.skillLevelMap,
-    weapon: {
-      name: weapon.flat.nameTextMapHash,
-      level: weapon.weapon.level,
-      refinement: weapon.weapon.affixMap ? Object.values(weapon.weapon.affixMap)[0] + 1 : 1
-    },
-    artifacts: artifacts.map((art) => ({
-      type: art.flat.equipType,
-      setName: art.flat.setNameTextMapHash,
-      mainStat: art.flat.reliquaryMainstat.mainPropId,
-      mainStatValue: art.flat.reliquaryMainstat.statValue,
-      level: art.reliquary.level,
-      substats: art.flat.reliquarySubstats?.map((sub) => ({
-        stat: sub.appendPropId,
-        value: sub.statValue
-      }))
-    })),
-    stats: data.fightPropMap
-  }
+    level: parseInt(playerData.propMap["4001"].ival),
+    friendship: playerData.fetterInfo.expLevel,
+    constellations: playerData.talentIdList || [],
+    stats,
+    talents,
+    equipment
+  };
 }
+
+// const filterPlayerData = (data) => {
+//   if (!data) return null
+//   const weapon = data.equipList.find((e) => e.flat.itemType === "ITEM_WEAPON")
+//   const artifacts = data.equipList.filter((e) => e.flat.itemType === "ITEM_RELIQUARY")
+
+//   return {
+//     level: data.propMap["4001"].val,
+//     constellation: data.talentIdList ? (Object.keys(data.proudSkillExtraLevelMap || {}).length > 0 ? 6 : data.talentIdList.length - 3) : 0,
+//     skillLevels: data.skillLevelMap,
+//     weapon: {
+//       name: weapon.flat.nameTextMapHash,
+//       level: weapon.weapon.level,
+//       refinement: weapon.weapon.affixMap ? Object.values(weapon.weapon.affixMap)[0] + 1 : 1
+//     },
+//     artifacts: artifacts.map((art) => ({
+//       type: art.flat.equipType,
+//       setName: art.flat.setNameTextMapHash,
+//       mainStat: art.flat.reliquaryMainstat.mainPropId,
+//       mainStatValue: art.flat.reliquaryMainstat.statValue,
+//       level: art.reliquary.level,
+//       substats: art.flat.reliquarySubstats?.map((sub) => ({
+//         stat: sub.appendPropId,
+//         value: sub.statValue
+//       }))
+//     })),
+//     stats: data.fightPropMap
+//   }
+// }
 
 const AMBR_API_BASE_URL = "https://gi.yatta.moe/api/v2/pt"
 
