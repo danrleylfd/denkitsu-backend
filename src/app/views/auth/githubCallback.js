@@ -9,7 +9,7 @@ const githubCallback = async (req, res) => {
   }
 
   try {
-    // 1. Troca o 'code' temporário pelo 'access_token'
+    // 1. Troca o 'code' pelo 'access_token'
     const tokenResponse = await axios.post(
       "https://github.com/login/oauth/access_token",
       {
@@ -25,21 +25,30 @@ const githubCallback = async (req, res) => {
       throw new Error("Falha ao obter o token de acesso do GitHub.")
     }
 
-    // 2. Usa o access_token para buscar os dados do usuário no GitHub
-    const userResponse = await axios.get("https://api.github.com/user", {
+    // 2. Busca os dados do usuário e a lista de e-mails em paralelo
+    const userPromise = axios.get("https://api.github.com/user", {
       headers: { Authorization: `Bearer ${access_token}` },
     })
+    const emailsPromise = axios.get("https://api.github.com/user/emails", {
+        headers: { Authorization: `Bearer ${access_token}` },
+    })
+
+    const [userResponse, emailsResponse] = await Promise.all([userPromise, emailsPromise])
     const githubUser = userResponse.data
+
+    // Encontra o e-mail primário e verificado na lista
+    const primaryEmail = emailsResponse.data.find(e => e.primary && e.verified)?.email
+    const emailToUse = primaryEmail || githubUser.email // Usa o primário, ou o público como fallback
 
     // 3. Procura ou cria o usuário no seu banco de dados
     let user = await User.findOne({ githubId: githubUser.id })
 
     if (!user) {
-      // Se o usuário não existe pelo githubId, tenta encontrar pelo email (se houver)
-      if (githubUser.email) {
-        user = await User.findOne({ email: githubUser.email })
+      // Se não encontrou pelo ID do GitHub, tenta pelo e-mail verificado
+      if (emailToUse) {
+        user = await User.findOne({ email: emailToUse })
         if (user) {
-          // Se encontrou por e-mail, apenas vincula a conta existente ao GitHub
+          // Vincula a conta existente ao ID do GitHub
           user.githubId = githubUser.id
           await user.save()
         }
@@ -50,19 +59,18 @@ const githubCallback = async (req, res) => {
         user = await User.create({
           githubId: githubUser.id,
           name: githubUser.name || githubUser.login,
-          email: githubUser.email, // Pode ser nulo se o e-mail for privado no GitHub
+          email: emailToUse, // Usa o e-mail verificado
           avatarUrl: githubUser.avatar_url,
-          // O campo 'password' não é obrigatório para usuários do GitHub
         })
       }
     }
 
-    // 4. Gera os tokens da SUA aplicação para o usuário logado
+    // 4. Gera os tokens da SUA aplicação
     const token = generateToken({ id: user._id })
     const refreshToken = generateRefreshToken({ id: user._id })
     const userPayload = { _id: user._id, name: user.name, email: user.email, avatarUrl: user.avatarUrl }
 
-    // 5. Redireciona de volta para o frontend com os dados necessários
+    // 5. Redireciona de volta para o frontend
     const userParam = encodeURIComponent(JSON.stringify(userPayload))
     res.redirect(`${process.env.HOST1}/auth/github/callback?token=${token}&refreshToken=${refreshToken}&user=${userParam}`)
 
