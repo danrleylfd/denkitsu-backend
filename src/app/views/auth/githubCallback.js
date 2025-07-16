@@ -64,11 +64,11 @@ const githubCallback = async (req, res) => {
 
     // 5. Redireciona de volta para o frontend com os dados necessários
     const userParam = encodeURIComponent(JSON.stringify(userPayload))
-    res.redirect(`${process.env.FRONTEND_URL}/auth/github/callback?token=${token}&refreshToken=${refreshToken}&user=${userParam}`)
+    res.redirect(`${process.env.HOST1}/auth/github/callback?token=${token}&refreshToken=${refreshToken}&user=${userParam}`)
 
   } catch (error) {
     console.error("Erro no callback do GitHub:", error.response ? error.response.data : error.message)
-    res.redirect(`${process.env.FRONTEND_URL}/signin?error=github_failed`)
+    res.redirect(`${process.env.HOST1}/signin?error=github_failed`)
   }
 }
 
