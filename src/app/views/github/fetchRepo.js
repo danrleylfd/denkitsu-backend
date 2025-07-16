@@ -72,7 +72,7 @@ const fetchRepo = async (req, res) => {
     const fileTree = generateFileTree(files.map(f => f.path), repoName)
     const outputParts = [
       `PROJETO: ${repoName}`, "---",
-      `ESTRUTURA DE FICHEIROS:\n${fileTree}`, "---",
+      `ESTRUTURA DE FICHEIROS:\n${fileTree}\n---`,
       "CONTEÚDO DOS FICHEIROS:", "---",
       ...files.map(({ path, content }) => `---[ ${path} ]---\n${processContent(content)}`)
     ]
