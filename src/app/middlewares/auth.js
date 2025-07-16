@@ -4,18 +4,28 @@ const User = require("../models/auth")
 const authMiddleware = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization
-    if (!authHeader) throw new Error("TOKEN_MISSING")
+    const queryToken = req.query.token
 
-    const parts = authHeader.split(" ")
-    if (parts.length !== 2) throw new Error("TOKEN_PARTS_ERROR")
+    let token
 
-    const [scheme, token] = parts
-    if (!/^Bearer$/i.test(scheme)) throw new Error("TOKEN_SCHEMA_ERROR")
+    if (authHeader) {
+      const parts = authHeader.split(" ")
+      if (parts.length !== 2) throw new Error("TOKEN_PARTS_ERROR")
+      const [scheme, headerToken] = parts
+      if (!/^Bearer$/i.test(scheme)) throw new Error("TOKEN_SCHEMA_ERROR")
+      token = headerToken
+    } else if (queryToken) {
+      token = queryToken
+    } else {
+      throw new Error("TOKEN_MISSING")
+    }
 
     const decoded = verify(token, process.env.JWT_SECRET)
     if (!decoded) throw new Error("TOKEN_INVALID")
+
     const user = await User.findById(decoded.id).select("_id")
     if (!user) throw new Error("USER_NOT_FOUND")
+
     req.userID = user._id
     return next()
   } catch (error) {
