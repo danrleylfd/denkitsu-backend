@@ -62,6 +62,9 @@ Depois que o merge da sua pull request for feito, você pode deletar a sua branc
 - `WEATHER_API_KEY=""`
 - `TELEGRAM_TOKEN=""`
 
+- `GITHUB_CLIENT_ID=""`
+- `GITHUB_CLIENT_SECRET=""`
+
 - `JWT_SECRET=""`
 - `JWT_EXPIRATION="1d"`
 - `JWT_HASH_TYPE="md5"`
