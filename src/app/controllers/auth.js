@@ -1,5 +1,7 @@
 const { Router } = require("express")
 
+const authMiddleware = require("../middlewares/auth")
+
 const routes = Router()
 
 const signUp = require("../views/auth/signUp")
@@ -9,6 +11,7 @@ const forgotPassword = require("../views/auth/forgotPassword")
 const resetPassword = require("../views/auth/resetPassword")
 const githubRedirect = require("../views/auth/githubRedirect") // NOVO
 const githubCallback = require("../views/auth/githubCallback") // NOVO
+const githubConnect = require("../views/auth/githubConnect") // NOVO
 
 routes.post("/signup", signUp)
 
@@ -21,6 +24,8 @@ routes.post("/forgot_password", forgotPassword)
 routes.post("/reset_password", resetPassword)
 
 routes.get("/github", githubRedirect)
+
+routes.get("/github/connect", authMiddleware, githubConnect)
 
 routes.get("/github/callback", githubCallback)
 
