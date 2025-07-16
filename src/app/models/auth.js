@@ -8,6 +8,7 @@ const UserSchema = new mongoose.Schema(
       unique: true,
       sparse: true // Permite múltiplos documentos com valor nulo, mas garante unicidade para os que têm valor.
     },
+    githubAccessToken: { type: String, select: false },
     name: {
       type: String,
       required: true

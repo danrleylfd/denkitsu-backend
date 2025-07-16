@@ -3,7 +3,7 @@ const User = require("../../models/auth")
 const { generateToken, generateRefreshToken } = require("../../../utils/services/auth")
 
 const githubCallback = async (req, res) => {
-  // O 'state' conterá o userID se for um fluxo de vinculação
+  // O 'state' conterá o userID se for um fluxo de vinculação de conta
   const { code, state: userID } = req.query
 
   if (!code) {
@@ -33,7 +33,7 @@ const githubCallback = async (req, res) => {
     })
     const githubUser = userResponse.data
 
-    // Verifica se a conta do GitHub já está vinculada a OUTRO usuário
+    // 3. Verifica se a conta do GitHub já está vinculada a OUTRO usuário
     const existingGithubLink = await User.findOne({ githubId: githubUser.id })
     if (existingGithubLink && existingGithubLink._id.toString() !== userID) {
         throw new Error("Esta conta do GitHub já está vinculada a outro usuário.")
@@ -42,19 +42,19 @@ const githubCallback = async (req, res) => {
     let user
 
     if (userID) {
-      // FLUXO DE VINCULAÇÃO: O usuário já está logado e o 'state' contém seu ID
-      user = await User.findById(userID)
+      // --- FLUXO DE VINCULAÇÃO ---
+      // O usuário já está logado e o 'state' contém seu ID
+      user = await User.findById(userID).select("+githubAccessToken")
       if (!user) throw new Error("Usuário para vincular não encontrado.")
 
       user.githubId = githubUser.id
-      // Opcional: Atualizar nome/avatar se estiverem vazios na conta original
-      if (!user.name) user.name = githubUser.name || githubUser.login
-      if (!user.avatarUrl) user.avatarUrl = githubUser.avatar_url
+      user.githubAccessToken = access_token // Salva o token para uso futuro
       await user.save()
 
     } else {
-      // FLUXO DE LOGIN/CADASTRO: O usuário não está logado
-      user = await User.findOne({ githubId: githubUser.id })
+      // --- FLUXO DE LOGIN/CADASTRO ---
+      // O usuário não está logado
+      user = await User.findOne({ githubId: githubUser.id }).select("+githubAccessToken")
       if (!user) {
         // Se não encontrou pelo ID do GitHub, busca o e-mail primário
         const emailsResponse = await axios.get("https://api.github.com/user/emails", { headers: { Authorization: `Bearer ${access_token}` } })
@@ -63,11 +63,10 @@ const githubCallback = async (req, res) => {
 
         // Tenta encontrar um usuário existente pelo e-mail
         if (emailToUse) {
-          user = await User.findOne({ email: emailToUse })
+          user = await User.findOne({ email: emailToUse }).select("+githubAccessToken")
           if (user) {
             // Se encontrou, vincula a conta
             user.githubId = githubUser.id
-            await user.save()
           }
         }
         // Se ainda não há usuário, cria um novo
@@ -80,18 +79,24 @@ const githubCallback = async (req, res) => {
           })
         }
       }
+      // Garante que o token de acesso seja salvo/atualizado no login
+      user.githubAccessToken = access_token
+      await user.save()
     }
 
     // 4. Gera os tokens da SUA aplicação para o usuário logado
     const token = generateToken({ id: user._id })
     const refreshToken = generateRefreshToken({ id: user._id })
-    const userPayload = { _id: user._id, name: user.name, email: user.email, avatarUrl: user.avatarUrl }
+    const userPayload = { _id: user._id, name: user.name, email: user.email, avatarUrl: user.avatarUrl, githubId: user.githubId }
 
     // 5. Redireciona de volta para o frontend com os dados necessários
     const userParam = encodeURIComponent(JSON.stringify(userPayload))
+
+    // Se era um fluxo de vinculação (tinha userID), redireciona para o perfil.
+    // Senão, vai para a página de callback do frontend para finalizar o login.
     const redirectUrl = userID
-      ? `${process.env.HOST1}/profile` // Se era vinculação, volta para o perfil
-      : `${process.env.HOST1}/auth/github/callback?token=${token}&refreshToken=${refreshToken}&user=${userParam}` // Se era login, vai para o callback do frontend
+      ? `${process.env.HOST1}/profile`
+      : `${process.env.HOST1}/auth/github/callback?token=${token}&refreshToken=${refreshToken}&user=${userParam}`
 
     res.redirect(redirectUrl)
 
