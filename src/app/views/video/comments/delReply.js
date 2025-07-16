@@ -10,7 +10,7 @@ const delReply = async (req, res) => {
     const comment = reply.parent
     if (!comment) throw new Error("COMMENT_NOT_FOUND")
     comment.replies = comment.replies.filter((replyId) => replyId != replyID)
-    await promise.all([
+    await Promise.all([
       comment.save(),
       Comment.findByIdAndDelete(replyID)
     ])
