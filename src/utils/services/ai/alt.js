@@ -65,7 +65,13 @@ const getModels = async () => {
     const openai = new OpenAI({ apiKey, baseURL: config.apiUrl })
     try {
       const response = await openai.models.list()
-      const providerModels = response.data.map((model) => ({ id: model.id, aiProvider: provider }))
+      const providerModels = response.data.map((model) => ({
+        id: model.id,
+        name: model.name,
+        input_modalities: model.input_modalities,
+        supported_parameters: model.supported_parameters,
+        aiProvider: provider
+      }))
       models.push(...providerModels)
     } catch (error) {
       console.error(`Erro ao obter modelos de ${provider}:`, error)
