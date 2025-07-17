@@ -153,14 +153,14 @@ const filterPlayerData = (playerData) => {
     "Taxa CRIT%": (playerData.fightPropMap["20"] * 100).toFixed(1),
     "Dano CRIT%": (playerData.fightPropMap["22"] * 100).toFixed(1),
     "Recarga de Energia%": (playerData.fightPropMap["23"] * 100).toFixed(1),
+    "Bônus Dano Físico%": (playerData.fightPropMap["30"] * 100).toFixed(1),
     "Bônus Dano Pyro%": (playerData.fightPropMap["40"] * 100).toFixed(1), // OK
     "Bônus Dano Electro%": (playerData.fightPropMap["41"] * 100).toFixed(1), // OK
-    // "Bônus Dano Físico%": (playerData.fightPropMap["42"] * 100).toFixed(1),
+    // "Bônus Dano Hydro%": (playerData.fightPropMap["42"] * 100).toFixed(1),
     "Bônus Dano Dendro%": (playerData.fightPropMap["43"] * 100).toFixed(1), // OK
     "Bônus Dano Anemo%": (playerData.fightPropMap["44"] * 100).toFixed(1), // OK
-    // "Bônus Dano Hydro%": (playerData.fightPropMap["45"] * 100).toFixed(1),
-    "Bônus Dano Cryo%": (playerData.fightPropMap["46"] * 100).toFixed(1), // OK
-    "Bônus Dano Geo%": (playerData.fightPropMap["47"] * 100).toFixed(1), // OK
+    // "Bônus Dano Geo%": (playerData.fightPropMap["45"] * 100).toFixed(1),
+    "Bônus Dano Cryo%": (playerData.fightPropMap["42"] * 100).toFixed(1), // OK
   }
 
   const result = {
