@@ -204,7 +204,7 @@ const filterPlayerData = (playerData) => {
       }))
     }
   }
-
+  console.log(result)
   return result
 }
 
