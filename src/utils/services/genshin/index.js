@@ -151,7 +151,7 @@ const filterPlayerData = (playerData) => {
     "Proficiência Elemental": Math.round(playerData.fightPropMap["28"]),
     "Taxa CRIT%": (playerData.fightPropMap["20"] * 100).toFixed(1),
     "Dano CRIT%": (playerData.fightPropMap["22"] * 100).toFixed(1),
-    "Recarga de Energia%": (playerData.fightPropMap["23"] * 100).toFixed(1),
+    "Recarga de Energia%": ((playerData.fightPropMap["23"] * 100) + 100).toFixed(1),
     "Bônus Dano Pyro%": (playerData.fightPropMap["40"] * 100).toFixed(1), // OK
     "Bônus Dano Electro%": (playerData.fightPropMap["41"] * 100).toFixed(1), // OK
     // "Bônus Dano Físico%": (playerData.fightPropMap["42"] * 100).toFixed(1),
