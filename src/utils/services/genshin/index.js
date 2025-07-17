@@ -98,81 +98,68 @@ const filterReferenceData = (data) => {
 }
 
 const filterPlayerData = (playerData) => {
-  if (!playerData) return null
+  if (!playerData) {
+    return null
+  }
 
-  // 1. Mapeamento de IDs para nomes legíveis
   const propMap = {
-    "1": "HP Base", "4": "ATQ Base", "7": "DEF Base",
-    "2000": "HP Total", "2001": "ATQ Total", "2002": "DEF Total",
-    "20": "Taxa CRIT", "22": "Dano CRIT", "23": "Bônus de Cura",
-    "26": "Eficiência de Cura", "28": "Proficiência Elemental", "29": "Recarga de Energia",
-    "30": "Intensidade do Escudo",
-    "40": "Bônus Dano Físico", "41": "Bônus Dano Pyro", "42": "Bônus Dano Electro",
-    "43": "Bônus Dano Hydro", "44": "Bônus Dano Dendro", "45": "Bônus Dano Anemo",
-    "46": "Bônus Dano Geo", "47": "Bônus Dano Cryo",
-    "FIGHT_PROP_HP": "HP Plano", "FIGHT_PROP_ATTACK": "ATQ Plano", "FIGHT_PROP_DEFENSE": "DEF Plano",
-    "FIGHT_PROP_HP_PERCENT": "HP%", "FIGHT_PROP_ATTACK_PERCENT": "ATQ%", "FIGHT_PROP_DEFENSE_PERCENT": "DEF%",
-    "FIGHT_PROP_CRITICAL": "Taxa CRIT%", "FIGHT_PROP_CRITICAL_HURT": "Dano CRIT%",
-    "FIGHT_PROP_CHARGE_EFFICIENCY": "Recarga de Energia%", "FIGHT_PROP_ELEMENT_MASTERY": "Proficiência Elemental",
-    "FIGHT_PROP_PHYSICAL_ADD_HURT": "Bônus Dano Físico%", "FIGHT_PROP_FIRE_ADD_HURT": "Bônus Dano Pyro%",
-    "FIGHT_PROP_ELEC_ADD_HURT": "Bônus Dano Electro%", "FIGHT_PROP_WATER_ADD_HURT": "Bônus Dano Hydro%",
-    "FIGHT_PROP_GRASS_ADD_HURT": "Bônus Dano Dendro%", "FIGHT_PROP_WIND_ADD_HURT": "Bônus Dano Anemo%",
-    "FIGHT_PROP_ROCK_ADD_HURT": "Bônus Dano Geo%", "FIGHT_PROP_ICE_ADD_HURT": "Bônus Dano Cryo%",
+    "1": "HP Base",
+    "4": "ATQ Base",
+    "7": "DEF Base",
+    "2000": "HP Total",
+    "2001": "ATQ Total",
+    "2002": "DEF Total",
+    "20": "Taxa CRIT",
+    "22": "Dano CRIT",
+    "23": "Recarga de Energia",
+    "28": "Proficiência Elemental",
+    "40": "Bônus Dano Físico",
+    "41": "Bônus Dano Pyro",
+    "42": "Bônus Dano Electro",
+    "43": "Bônus Dano Hydro",
+    "44": "Bônus Dano Anemo",
+    "46": "Bônus Dano Geo",
+    "47": "Bônus Dano Cryo",
+    "FIGHT_PROP_HP": "HP Plano",
+    "FIGHT_PROP_ATTACK": "ATQ Plano",
+    "FIGHT_PROP_DEFENSE": "DEF Plano",
+    "FIGHT_PROP_HP_PERCENT": "HP%",
+    "FIGHT_PROP_ATTACK_PERCENT": "ATQ%",
+    "FIGHT_PROP_DEFENSE_PERCENT": "DEF%",
+    "FIGHT_PROP_CRITICAL": "Taxa CRIT%",
+    "FIGHT_PROP_CRITICAL_HURT": "Dano CRIT%",
+    "FIGHT_PROP_CHARGE_EFFICIENCY": "Recarga de Energia%",
+    "FIGHT_PROP_ELEMENT_MASTERY": "Proficiência Elemental",
+    "FIGHT_PROP_HEAL_ADD": "Bônus de Cura%",
+    "FIGHT_PROP_PHYSICAL_ADD_HURT": "Bônus Dano Físico%",
+    "FIGHT_PROP_FIRE_ADD_HURT": "Bônus Dano Pyro%",
+    "FIGHT_PROP_ELEC_ADD_HURT": "Bônus Dano Electro%",
+    "FIGHT_PROP_WATER_ADD_HURT": "Bônus Dano Hydro%",
+    "FIGHT_PROP_GRASS_ADD_HURT": "Bônus Dano Dendro%",
+    "FIGHT_PROP_WIND_ADD_HURT": "Bônus Dano Anemo%",
+    "FIGHT_PROP_ROCK_ADD_HURT": "Bônus Dano Geo%",
+    "FIGHT_PROP_ICE_ADD_HURT": "Bônus Dano Cryo%"
   }
 
-  // 2. Extração de dados base do personagem e arma
-  const baseStats = {
-    hp: playerData.fightPropMap["1"],
-    atk: playerData.fightPropMap["4"],
-    def: playerData.fightPropMap["7"],
-  }
+  const artifacts = playerData.equipList.filter((item) => item.reliquary)
+  const weapon = playerData.equipList.find((item) => item.weapon)
 
-  const artifacts = playerData.equipList.filter(item => item.reliquary)
-  const weapon = playerData.equipList.find(item => item.weapon)
-
-  // 3. Cálculo dos bônus totais (planos e percentuais) dos artefatos
-  let flatBonuses = { hp: 0, atk: 0, def: 0 }
-  let percentBonuses = { hp: 0, atk: 0, def: 0, critRate: 0, critDmg: 0, er: 0, em: 0 }
-
-  artifacts.forEach(art => {
-    // Soma o atributo principal
-    const mainStatProp = art.flat.reliquaryMainstat.mainPropId
-    const mainStatValue = art.flat.reliquaryMainstat.statValue
-    if (mainStatProp === "FIGHT_PROP_HP") flatBonuses.hp += mainStatValue
-    if (mainStatProp === "FIGHT_PROP_ATTACK") flatBonuses.atk += mainStatValue
-    if (mainStatProp === "FIGHT_PROP_HP_PERCENT") percentBonuses.hp += mainStatValue
-    if (mainStatProp === "FIGHT_PROP_ATTACK_PERCENT") percentBonuses.atk += mainStatValue
-    // ... adicione outros main stats se necessário (DEF%, EM, etc)
-
-    // Soma os substats
-    art.flat.reliquarySubstats?.forEach(sub => {
-      const subStatProp = sub.appendPropId
-      const subStatValue = sub.statValue
-      if (subStatProp === "FIGHT_PROP_HP") flatBonuses.hp += subStatValue
-      if (subStatProp === "FIGHT_PROP_ATTACK") flatBonuses.atk += subStatValue
-      if (subStatProp === "FIGHT_PROP_DEFENSE") flatBonuses.def += subStatValue
-      if (subStatProp === "FIGHT_PROP_HP_PERCENT") percentBonuses.hp += subStatValue
-      if (subStatProp === "FIGHT_PROP_ATTACK_PERCENT") percentBonuses.atk += subStatValue
-      if (subStatProp === "FIGHT_PROP_DEFENSE_PERCENT") percentBonuses.def += subStatValue
-      if (subStatProp === "FIGHT_PROP_CRITICAL") percentBonuses.critRate += subStatValue
-      if (subStatProp === "FIGHT_PROP_CRITICAL_HURT") percentBonuses.critDmg += subStatValue
-      if (subStatProp === "FIGHT_PROP_CHARGE_EFFICIENCY") percentBonuses.er += subStatValue
-      if (subStatProp === "FIGHT_PROP_ELEMENT_MASTERY") percentBonuses.em += subStatValue
-    })
-  })
-
-  // 4. Aplicação das fórmulas
-  // Nota: Os valores finais do fightPropMap já são os mais precisos. Este cálculo é para demonstração da fórmula.
   const finalStats = {
-    "HP Total": playerData.fightPropMap["2000"], // Valor direto do Enka para máxima precisão
-    "ATQ Total": playerData.fightPropMap["2001"], // Valor direto do Enka para máxima precisão
-    "DEF Total": playerData.fightPropMap["2002"], // Valor direto do Enka para máxima precisão
-    "Proficiência Elemental": playerData.fightPropMap["28"],
-    "Recarga de Energia%": (playerData.fightPropMap["29"] * 100).toFixed(1),
+    "HP Total": Math.round(playerData.fightPropMap["2000"]),
+    "ATQ Total": Math.round(playerData.fightPropMap["2001"]),
+    "DEF Total": Math.round(playerData.fightPropMap["2002"]),
+    "Proficiência Elemental": Math.round(playerData.fightPropMap["28"]),
     "Taxa CRIT%": (playerData.fightPropMap["20"] * 100).toFixed(1),
     "Dano CRIT%": (playerData.fightPropMap["22"] * 100).toFixed(1),
-    "Bônus Dano Anemo%": (playerData.fightPropMap["45"] * 100).toFixed(1),
-     // Adicione outros bônus elementais conforme necessário
+    "Recarga de Energia%": (playerData.fightPropMap["23"] * 100).toFixed(1),
+    // "Bônus Dano Físico%": (playerData.fightPropMap["40"] * 100).toFixed(1),
+    "Bônus Dano Pyro%": (playerData.fightPropMap["40"] * 100).toFixed(1), // OK
+    "Bônus Dano Electro%": (playerData.fightPropMap["41"] * 100).toFixed(1), // OK
+    "Bônus Dano Dendro%": (playerData.fightPropMap["43"] * 100).toFixed(1), // OK
+    "Bônus Dano Anemo%": (playerData.fightPropMap["44"] * 100).toFixed(1), // OK
+    "Bônus Dano Geo%": (playerData.fightPropMap["46"] * 100).toFixed(1),
+    // "Bônus Dano Hydro%": (playerData.fightPropMap["43"] * 100).toFixed(1),
+    "Bônus Dano Cryo%": (playerData.fightPropMap["47"] * 100).toFixed(1),
   }
 
   const result = {
@@ -185,10 +172,10 @@ const filterPlayerData = (playerData) => {
       weapon: {
         id: weapon.itemId,
         level: weapon.weapon.level,
-        refinement: Object.values(weapon.weapon.affixMap)[0] + 1,
-        rarity: weapon.flat.rankLevel,
+        refinement: weapon.weapon.affixMap ? Object.values(weapon.weapon.affixMap)[0] + 1 : 1,
+        rarity: weapon.flat.rankLevel
       },
-      artifacts: artifacts.map(art => ({
+      artifacts: artifacts.map((art) => ({
         id: art.itemId,
         level: art.reliquary.level,
         rarity: art.flat.rankLevel,
@@ -197,14 +184,13 @@ const filterPlayerData = (playerData) => {
           stat: propMap[art.flat.reliquaryMainstat.mainPropId] || art.flat.reliquaryMainstat.mainPropId,
           value: art.flat.reliquaryMainstat.statValue
         },
-        subStats: (art.flat.reliquarySubstats || []).map(sub => ({
+        subStats: (art.flat.reliquarySubstats || []).map((sub) => ({
           stat: propMap[sub.appendPropId] || sub.appendPropId,
           value: sub.statValue
         }))
       }))
     }
   }
-  console.log(result)
   return result
 }
 
