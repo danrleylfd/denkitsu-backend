@@ -1,24 +1,24 @@
 const axios = require("axios")
 
 const filterReferenceData = (data) => {
-  if (!data) return null;
+  if (!data) return null
 
   // Mapeia IDs para nomes
-  const mapIdToName = (id) => data.items[id]?.name || `Unknown Item (ID: ${id})`;
+  const mapIdToName = (id) => data.items[id]?.name || `Unknown Item (ID: ${id})`
 
   // Calcula materiais de ascensão (excluindo livros de talento e coroas)
   const calculateUpgradeMaterials = () => {
-    const totals = {};
+    const totals = {}
 
     // Identifica materiais de talento para exclusão
-    const talentMaterialIds = new Set();
-    const firstTalent = Object.values(data.talent)[0];
+    const talentMaterialIds = new Set()
+    const firstTalent = Object.values(data.talent)[0]
 
     if (firstTalent?.promote) {
       for (const level in firstTalent.promote) {
-        const costItems = firstTalent.promote[level]?.costItems;
+        const costItems = firstTalent.promote[level]?.costItems
         if (costItems) {
-          Object.keys(costItems).forEach(id => talentMaterialIds.add(id));
+          Object.keys(costItems).forEach(id => talentMaterialIds.add(id))
         }
       }
     }
@@ -26,29 +26,29 @@ const filterReferenceData = (data) => {
     // Soma materiais de ascensão, excluindo os de talento
     Object.entries(data.ascension || {}).forEach(([id, amount]) => {
       if (!talentMaterialIds.has(id)) {
-        totals[id] = (totals[id] || 0) + amount;
+        totals[id] = (totals[id] || 0) + amount
       }
-    });
+    })
 
     return Object.entries(totals).map(([id, amount]) => ({
       name: mapIdToName(id),
       amount
-    }));
-  };
+    }))
+  }
 
   // Calcula materiais totais para talentos
   const calculateTotalTalentMaterials = () => {
-    const materialsTotal = {};
-    const talent = Object.values(data.talent)[0];
+    const materialsTotal = {}
+    const talent = Object.values(data.talent)[0]
 
     if (talent?.promote) {
       // Percorre todos os níveis de promoção (2 a 10)
-      for (let level = 2; level <= 10; level++) {
-        const costItems = talent.promote[level]?.costItems;
+      for (let level = 2;level <= 10; level++) {
+        const costItems = talent.promote[level]?.costItems
         if (costItems) {
           Object.entries(costItems).forEach(([id, amount]) => {
-            materialsTotal[id] = (materialsTotal[id] || 0) + amount;
-          });
+            materialsTotal[id] = (materialsTotal[id] || 0) + amount
+          })
         }
       }
     }
@@ -56,29 +56,29 @@ const filterReferenceData = (data) => {
     return Object.entries(materialsTotal).map(([id, amount]) => ({
       name: mapIdToName(id),
       amount
-    }));
-  };
+    }))
+  }
 
   // Calcula Mora total (ascensão + talentos)
   const calculateTotalMora = () => {
-    let total = 0;
+    let total = 0
 
     // Mora de ascensão
     Object.values(data.upgrade?.promote || []).forEach(level => {
-      if (level.coinCost) total += level.coinCost;
-    });
+      if (level.coinCost) total += level.coinCost
+    })
 
     // Mora de talentos (para um talento)
-    const talent = Object.values(data.talent)[0];
+    const talent = Object.values(data.talent)[0]
     if (talent?.promote) {
       for (let level = 2; level <= 10; level++) {
-        const promoteData = talent.promote[level];
-        if (promoteData?.coinCost) total += promoteData.coinCost;
+        const promoteData = talent.promote[level]
+        if (promoteData?.coinCost) total += promoteData.coinCost
       }
     }
 
-    return total;
-  };
+    return total
+  }
 
   const result = {
     name: data.name,
@@ -95,106 +95,116 @@ const filterReferenceData = (data) => {
   }
   console.log(result)
   return result
-};
+}
 
 const filterPlayerData = (playerData) => {
-  if (!playerData) return null;
+  if (!playerData) return null
 
-  // Mapeamento de propriedades de combate
+  // 1. Mapeamento de IDs para nomes legíveis
   const propMap = {
-    "1": "HP Base",
-    "2": "ATQ Base",
-    "4": "DEF Base",
-    "5": "Proficiência Elemental",
-    "6": "Recarga de Energia",
-    "7": "Bônus de Dano",
-    "8": "Taxa CRIT",
-    "9": "Dano CRIT",
-    "20": "Bônus Dano Cryo",
-    "21": "Bônus Dano Pyro",
-    "22": "Bônus Dano Hydro",
-    "23": "Bônus Dano Electro",
-    "24": "Bônus Dano Anemo",
-    "25": "Bônus Dano Geo",
-    "26": "Bônus Dano Dendro",
-    "28": "Eficiência de Cura",
-    "29": "RES Cryo",
-    "30": "RES Pyro",
-    "40": "RES Hydro",
-    "41": "RES Electro",
-    "42": "RES Anemo",
-    "43": "RES Geo",
-    "44": "RES Físico",
-    "45": "RES Dendro",
-    "2000": "HP Total",
-    "2001": "ATQ Total",
-    "2002": "DEF Total"
-  };
-
-  // Processa atributos de combate
-  const stats = {};
-  Object.entries(playerData.fightPropMap || {}).forEach(([key, value]) => {
-    const statName = propMap[key] || key;
-    stats[statName] = value;
-  });
-
-  // Processa talentos
-  const talents = [];
-  if (playerData.skillLevelMap) {
-    Object.entries(playerData.skillLevelMap).forEach(([skillId, level]) => {
-      talents.push({
-        id: parseInt(skillId),
-        level: level
-      });
-    });
+    "1": "HP Base", "4": "ATQ Base", "7": "DEF Base",
+    "2000": "HP Total", "2001": "ATQ Total", "2002": "DEF Total",
+    "20": "Taxa CRIT", "22": "Dano CRIT", "23": "Bônus de Cura",
+    "26": "Eficiência de Cura", "28": "Proficiência Elemental", "29": "Recarga de Energia",
+    "30": "Intensidade do Escudo",
+    "40": "Bônus Dano Físico", "41": "Bônus Dano Pyro", "42": "Bônus Dano Electro",
+    "43": "Bônus Dano Hydro", "44": "Bônus Dano Dendro", "45": "Bônus Dano Anemo",
+    "46": "Bônus Dano Geo", "47": "Bônus Dano Cryo",
+    "FIGHT_PROP_HP": "HP Plano", "FIGHT_PROP_ATTACK": "ATQ Plano", "FIGHT_PROP_DEFENSE": "DEF Plano",
+    "FIGHT_PROP_HP_PERCENT": "HP%", "FIGHT_PROP_ATTACK_PERCENT": "ATQ%", "FIGHT_PROP_DEFENSE_PERCENT": "DEF%",
+    "FIGHT_PROP_CRITICAL": "Taxa CRIT%", "FIGHT_PROP_CRITICAL_HURT": "Dano CRIT%",
+    "FIGHT_PROP_CHARGE_EFFICIENCY": "Recarga de Energia%", "FIGHT_PROP_ELEMENT_MASTERY": "Proficiência Elemental",
+    "FIGHT_PROP_PHYSICAL_ADD_HURT": "Bônus Dano Físico%", "FIGHT_PROP_FIRE_ADD_HURT": "Bônus Dano Pyro%",
+    "FIGHT_PROP_ELEC_ADD_HURT": "Bônus Dano Electro%", "FIGHT_PROP_WATER_ADD_HURT": "Bônus Dano Hydro%",
+    "FIGHT_PROP_GRASS_ADD_HURT": "Bônus Dano Dendro%", "FIGHT_PROP_WIND_ADD_HURT": "Bônus Dano Anemo%",
+    "FIGHT_PROP_ROCK_ADD_HURT": "Bônus Dano Geo%", "FIGHT_PROP_ICE_ADD_HURT": "Bônus Dano Cryo%",
   }
 
-  // Processa equipamentos
-  const equipment = {
-    weapon: null,
-    artifacts: []
-  };
+  // 2. Extração de dados base do personagem e arma
+  const baseStats = {
+    hp: playerData.fightPropMap["1"],
+    atk: playerData.fightPropMap["4"],
+    def: playerData.fightPropMap["7"],
+  }
 
-  playerData.equipList.forEach(item => {
-    if (item.weapon) {
-      // Armazenar dados da arma
-      equipment.weapon = {
-        id: item.itemId,
-        level: item.weapon.level,
-        refinement: Object.values(item.weapon.affixMap)[0] + 1,
-        rarity: item.flat.rankLevel,
-        mainStats: item.flat.weaponStats.map(stat => ({
-          stat: propMap[stat.appendPropId] || stat.appendPropId,
-          value: stat.statValue
-        }))
-      };
-    } else if (item.reliquary) {
-      // Armazenar dados de artefatos
-      equipment.artifacts.push({
-        id: item.itemId,
-        level: item.reliquary.level,
-        rarity: item.flat.rankLevel,
-        slot: item.flat.equipType,
-        mainStat: {
-          stat: propMap[item.flat.reliquaryMainstat.mainPropId] || item.flat.reliquaryMainstat.mainPropId,
-          value: item.flat.reliquaryMainstat.statValue
-        },
-        subStats: (item.flat.reliquarySubstats || []).map(sub => ({
-          stat: propMap[sub.appendPropId] || sub.appendPropId,
-          value: sub.statValue
-        }))
-      });
-    }
-  });
+  const artifacts = playerData.equipList.filter(item => item.reliquary)
+  const weapon = playerData.equipList.find(item => item.weapon)
+
+  // 3. Cálculo dos bônus totais (planos e percentuais) dos artefatos
+  let flatBonuses = { hp: 0, atk: 0, def: 0 }
+  let percentBonuses = { hp: 0, atk: 0, def: 0, critRate: 0, critDmg: 0, er: 0, em: 0 }
+
+  artifacts.forEach(art => {
+    // Soma o atributo principal
+    const mainStatProp = art.flat.reliquaryMainstat.mainPropId
+    const mainStatValue = art.flat.reliquaryMainstat.statValue
+    if (mainStatProp === "FIGHT_PROP_HP") flatBonuses.hp += mainStatValue
+    if (mainStatProp === "FIGHT_PROP_ATTACK") flatBonuses.atk += mainStatValue
+    if (mainStatProp === "FIGHT_PROP_HP_PERCENT") percentBonuses.hp += mainStatValue
+    if (mainStatProp === "FIGHT_PROP_ATTACK_PERCENT") percentBonuses.atk += mainStatValue
+    // ... adicione outros main stats se necessário (DEF%, EM, etc)
+
+    // Soma os substats
+    art.flat.reliquarySubstats?.forEach(sub => {
+      const subStatProp = sub.appendPropId
+      const subStatValue = sub.statValue
+      if (subStatProp === "FIGHT_PROP_HP") flatBonuses.hp += subStatValue
+      if (subStatProp === "FIGHT_PROP_ATTACK") flatBonuses.atk += subStatValue
+      if (subStatProp === "FIGHT_PROP_DEFENSE") flatBonuses.def += subStatValue
+      if (subStatProp === "FIGHT_PROP_HP_PERCENT") percentBonuses.hp += subStatValue
+      if (subStatProp === "FIGHT_PROP_ATTACK_PERCENT") percentBonuses.atk += subStatValue
+      if (subStatProp === "FIGHT_PROP_DEFENSE_PERCENT") percentBonuses.def += subStatValue
+      if (subStatProp === "FIGHT_PROP_CRITICAL") percentBonuses.critRate += subStatValue
+      if (subStatProp === "FIGHT_PROP_CRITICAL_HURT") percentBonuses.critDmg += subStatValue
+      if (subStatProp === "FIGHT_PROP_CHARGE_EFFICIENCY") percentBonuses.er += subStatValue
+      if (subStatProp === "FIGHT_PROP_ELEMENT_MASTERY") percentBonuses.em += subStatValue
+    })
+  })
+
+  // 4. Aplicação das fórmulas
+  // Nota: Os valores finais do fightPropMap já são os mais precisos. Este cálculo é para demonstração da fórmula.
+  const finalStats = {
+    "HP Total": playerData.fightPropMap["2000"], // Valor direto do Enka para máxima precisão
+    "ATQ Total": playerData.fightPropMap["2001"], // Valor direto do Enka para máxima precisão
+    "DEF Total": playerData.fightPropMap["2002"], // Valor direto do Enka para máxima precisão
+    "Proficiência Elemental": playerData.fightPropMap["28"],
+    "Recarga de Energia%": (playerData.fightPropMap["29"] * 100).toFixed(1),
+    "Taxa CRIT%": (playerData.fightPropMap["20"] * 100).toFixed(1),
+    "Dano CRIT%": (playerData.fightPropMap["22"] * 100).toFixed(1),
+    "Bônus Dano Anemo%": (playerData.fightPropMap["45"] * 100).toFixed(1),
+     // Adicione outros bônus elementais conforme necessário
+  }
+
   const result = {
     level: parseInt(playerData.propMap["4001"].ival),
     friendship: playerData.fetterInfo.expLevel,
-    constellations: playerData.talentIdList || [],
-    stats,
-    talents,
-    equipment
+    constellations: (playerData.talentIdList || []).length,
+    stats: finalStats,
+    talents: playerData.skillLevelMap,
+    equipment: {
+      weapon: {
+        id: weapon.itemId,
+        level: weapon.weapon.level,
+        refinement: Object.values(weapon.weapon.affixMap)[0] + 1,
+        rarity: weapon.flat.rankLevel,
+      },
+      artifacts: artifacts.map(art => ({
+        id: art.itemId,
+        level: art.reliquary.level,
+        rarity: art.flat.rankLevel,
+        slot: art.flat.equipType,
+        mainStat: {
+          stat: propMap[art.flat.reliquaryMainstat.mainPropId] || art.flat.reliquaryMainstat.mainPropId,
+          value: art.flat.reliquaryMainstat.statValue
+        },
+        subStats: (art.flat.reliquarySubstats || []).map(sub => ({
+          stat: propMap[sub.appendPropId] || sub.appendPropId,
+          value: sub.statValue
+        }))
+      }))
+    }
   }
-  console.log(result)
+
   return result
 }
 
