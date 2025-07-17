@@ -113,14 +113,14 @@ const filterPlayerData = (playerData) => {
     "22": "Dano CRIT",
     "23": "Recarga de Energia",
     "28": "Proficiência Elemental",
+    "30": "Bônus Dano Físico",
     "40": "Bônus Dano Pyro",
     "41": "Bônus Dano Electro",
-    "42": "Bônus Dano Físico",
+    "42": "Bônus Dano Hydro",
     "43": "Bônus Dano Dendro",
     "44": "Bônus Dano Anemo",
-    "45": "Bônus Dano Hydro",
+    "45": "Bônus Dano Geo",
     "46": "Bônus Dano Cryo",
-    "47": "Bônus Dano Geo",
     "FIGHT_PROP_HP": "HP Plano",
     "FIGHT_PROP_ATTACK": "ATQ Plano",
     "FIGHT_PROP_DEFENSE": "DEF Plano",
@@ -156,11 +156,11 @@ const filterPlayerData = (playerData) => {
     "Bônus Dano Físico%": (playerData.fightPropMap["30"] * 100).toFixed(1),
     "Bônus Dano Pyro%": (playerData.fightPropMap["40"] * 100).toFixed(1), // OK
     "Bônus Dano Electro%": (playerData.fightPropMap["41"] * 100).toFixed(1), // OK
-    // "Bônus Dano Hydro%": (playerData.fightPropMap["42"] * 100).toFixed(1),
+    "Bônus Dano Hydro%": (playerData.fightPropMap["42"] * 100).toFixed(1),
     "Bônus Dano Dendro%": (playerData.fightPropMap["43"] * 100).toFixed(1), // OK
     "Bônus Dano Anemo%": (playerData.fightPropMap["44"] * 100).toFixed(1), // OK
-    // "Bônus Dano Geo%": (playerData.fightPropMap["45"] * 100).toFixed(1),
-    "Bônus Dano Cryo%": (playerData.fightPropMap["42"] * 100).toFixed(1), // OK
+    "Bônus Dano Geo%": (playerData.fightPropMap["45"] * 100).toFixed(1),
+    "Bônus Dano Cryo%": (playerData.fightPropMap["46"] * 100).toFixed(1),
   }
 
   const result = {
