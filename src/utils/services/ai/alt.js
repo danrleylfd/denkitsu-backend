@@ -67,8 +67,7 @@ const getModels = async () => {
       const response = await openai.models.list()
       const providerModels = response.data.map((model) => ({
         id: model.id,
-        name: model.name,
-        input_modalities: model.input_modalities,
+        input_modalities: model.architecture.input_modalities,
         supported_parameters: model.supported_parameters,
         aiProvider: provider
       }))
