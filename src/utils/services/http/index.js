@@ -9,11 +9,8 @@ const executeHttpRequest = async (config) => {
       data: config.body || undefined,
       params: config.params || undefined
     })
-    return {
-      status: response.status,
-      headers: response.headers,
-      data: response.data
-    }
+    console.log(response.data, response.error)
+    return { data: response.data }
   } catch (error) {
     return {
       error: true,
