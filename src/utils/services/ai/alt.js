@@ -66,6 +66,7 @@ const getModels = async () => {
     try {
       const response = await openai.models.list()
       if (provider === "groq") {
+          console.log(config)
           const providerModels = response.data.map((model) => ({
           id: model.id,
           input_modalities: ["text"],
