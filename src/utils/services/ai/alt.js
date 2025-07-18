@@ -57,6 +57,21 @@ const ask = async (aiProvider, aiKey, prompts, options = {}) => {
   }
 }
 
+const checkToolCompatibility = (model) => {
+  if (model.supported_parameters && Array.isArray(model.supported_parameters)) {
+    const params = new Set(model.supported_parameters)
+    return params.has("tools") && params.has("tool_choice")
+  }
+  return false
+}
+
+const checkImageCompatibility = (model) => {
+  if (model.input_modalities && Array.isArray(model.input_modalities)) {
+    return model.input_modalities.includes("image")
+  }
+  return false
+}
+
 const getModels = async () => {
   const models = []
   for (const [provider, config] of Object.entries(providerConfig)) {
@@ -69,8 +84,10 @@ const getModels = async () => {
           console.log(response.data[0])
           const providerModels = response.data.map((model) => ({
           id: model.id,
-          input_modalities: ["text"],
-          supported_parameters: [],
+          input_modalities: model.architecture?.input_modalities,
+          supported_parameters: ["tools", "tool_choice"],
+          supports_tools: checkToolCompatibility(model),
+          supports_images: checkImageCompatibility(model),
           aiProvider: provider
         }))
         models.push(...providerModels)
@@ -80,6 +97,8 @@ const getModels = async () => {
         id: model.id,
         input_modalities: model.architecture?.input_modalities,
         supported_parameters: model.supported_parameters,
+        supports_tools: checkToolCompatibility(model),
+        supports_images: checkImageCompatibility(model),
         aiProvider: provider
       }))
       models.push(...providerModels)
