@@ -1,6 +1,7 @@
 const { ask } = require("../../../utils/services/ai")
 const { availableTools, tools } = require("../../../utils/tools")
 const allPrompts = require("../../../utils/prompts")
+const { sanitizeMessages } = require("../../../utils/ai/messageProcessor")
 
 const sendMessage = async (req, res) => {
   try {
@@ -71,7 +72,8 @@ const sendMessage = async (req, res) => {
           content: JSON.stringify(functionResponse.data)
         })
       }
-      const finalResponse = await ask(aiProvider, aiKey, finalPrompts, { model })
+      const sanitizedPrompts = sanitizeMessages(finalPrompts)
+      const finalResponse = await ask(aiProvider, aiKey, sanitizedPrompts, { model })
       return res.status(finalResponse.status).json(finalResponse.data)
     }
     return res.status(status).json(data)
