@@ -12,6 +12,7 @@ const executeHttpRequest = async (config) => {
     console.log(response.data, response.error)
     return { data: response.data }
   } catch (error) {
+    console.error(error)
     return {
       error: true,
       code: error.response?.status || "NETWORK_ERROR",
