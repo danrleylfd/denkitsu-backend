@@ -4,7 +4,7 @@ const aiMiddleware = (req, res, next) => {
   try {
     if (!req.body.messages || !Array.isArray(req.body.messages)) return next()
     // const limitedMessages = cleanMessageHistory(req.body.messages, 15)
-    const finalMessages = sanitizeMessages(limitedMessages)
+    const finalMessages = sanitizeMessages(req.body.messages)
     req.body.messages = finalMessages
     return next()
   } catch (error) {
