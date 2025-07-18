@@ -6,8 +6,8 @@ const executeHttpRequest = async (config) => {
       url: config.url,
       method: config.method || "GET",
       headers: config.headers || {},
-      data: config.body,
-      params: config.params
+      data: config.body || undefined,
+      params: config.params || undefined
     })
     return {
       status: response.status,
