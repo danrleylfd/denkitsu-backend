@@ -53,6 +53,16 @@ const sendMessage = async (req, res) => {
         const functionToCall = availableTools[functionName]
         const functionArgs = JSON.parse(toolCall.function.arguments)
         console.log(`[TOOL CALL] Executing: ${functionName}(${JSON.stringify(functionArgs)})`)
+        if (functionName === "executeHttpRequest") {
+           const functionResponse = await functionToCall(functionArgs)
+           finalPrompts.push({
+             tool_call_id: toolCall.id,
+             role: "tool",
+             name: functionName,
+             content: JSON.stringify(functionResponse.data)
+           })
+           continue
+        }
         const functionResponse = await functionToCall(...Object.values(functionArgs))
         finalPrompts.push({
           tool_call_id: toolCall.id,
