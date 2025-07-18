@@ -66,8 +66,8 @@ const checkToolCompatibility = (model) => {
 }
 
 const checkImageCompatibility = (model) => {
-  if (model.input_modalities && Array.isArray(model.input_modalities)) {
-    return model.input_modalities.includes("image")
+  if (model.architecture?.input_modalities && Array.isArray(model.architecture.input_modalities)) {
+    return model.architecture.input_modalities.includes("image")
   }
   return false
 }
