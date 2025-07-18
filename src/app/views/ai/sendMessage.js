@@ -25,14 +25,6 @@ const sendMessage = async (req, res) => {
       stream,
       plugins: plugins ? plugins : undefined
     }
-    if (use_tools && Array.isArray(use_tools) && use_tools.length > 0) {
-      const filteredTools = tools.filter((tool) => use_tools.includes(tool.function.name))
-      if (filteredTools.length > 0) {
-        requestOptions.tools = filteredTools
-        requestOptions.tool_choice = "auto"
-        console.log(`[TOOL CONTROL] Usando as seguintes ferramentas: ${use_tools.join(", ")}`)
-      }
-    }
 
     if (stream) {
       const streamResponse = await ask(aiProvider, aiKey, finalPrompts, requestOptions)
@@ -45,10 +37,20 @@ const sendMessage = async (req, res) => {
       return res.end()
     }
 
+    if (use_tools && Array.isArray(use_tools) && use_tools.length > 0) {
+      const filteredTools = tools.filter((tool) => use_tools.includes(tool.function.name))
+      if (filteredTools.length > 0) {
+        requestOptions.tools = filteredTools
+        requestOptions.tool_choice = "auto"
+        console.log(`[TOOL CONTROL] Usando as seguintes ferramentas: ${use_tools.join(", ")}`)
+      }
+    }
+
     const { status, data } = await ask(aiProvider, aiKey, finalPrompts, requestOptions)
     const resMsg = data.choices[0].message
     if (resMsg.tool_calls) {
       finalPrompts.push(resMsg)
+      console.log(resMsg.tool_calls)
       for (const toolCall of resMsg.tool_calls) {
         const functionName = toolCall.function.name
         const functionToCall = availableTools[functionName]
