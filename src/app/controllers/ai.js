@@ -4,7 +4,7 @@ const { Router } = require("express")
 const routes = Router()
 // routes.use(authMiddleware)
 
-const sendMessage = require("../views/ai/sendMsg")
+const sendMessage = require("../views/ai/sendMessage")
 const getModels = require("../views/ai/getModels")
 const getPrompt = require("../views/ai/getPrompt")
 

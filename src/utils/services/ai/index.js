@@ -1,71 +1,104 @@
-const axios = require("axios")
-
-const AIPROVIDER = {
-  OPENROUTER: "openrouter",
-  GROQ: "groq"
-}
+const OpenAI = require("openai")
 
 const providerConfig = {
-  [AIPROVIDER.OPENROUTER]: {
-    baseURL: process.env.OPENROUTER_API_URL,
-    apiKey: process.env.OPENROUTER_API_KEY,
-    defaultModel: "deepseek/deepseek-r1:free",
-    getModels: async (api) => {
-      const response = await api.get("/models")
-      const models = response.data?.data || []
-      const { freeModels, payModels } = models.reduce((acc, model) => {
-        if (!model.id) return acc
-        const minimalModel = { id: model.id, aiProvider: AIPROVIDER.OPENROUTER }
-        const isFree = model.id.includes(":free")
-        isFree ? acc.freeModels.push(minimalModel) : acc.payModels.push(minimalModel)
-        return acc
-      }, { freeModels: [], payModels: [] })
-      return [...freeModels,...payModels]
-    },
-  },
-  [AIPROVIDER.GROQ]: {
-    baseURL: process.env.GROQ_API_URL,
+  groq: {
+    apiUrl: process.env.GROQ_API_URL,
     apiKey: process.env.GROQ_API_KEY,
-    defaultModel: "deepseek-r1-distill-llama-70b",
-    getModels: async (api) => {
-      const response = await api.get("/models")
-      const models = response.data?.data || []
-      return models.map(model => ({ id: model.id, aiProvider: AIPROVIDER.GROQ }))
+    defaultModel: "deepseek-r1-distill-llama-70b"
+  },
+  openrouter: {
+    apiUrl: process.env.OPENROUTER_API_URL,
+    apiKey: process.env.OPENROUTER_API_KEY,
+    defaultModel: "deepseek/deepseek-r1:free"
+  }
+}
+
+const ask = async (aiProvider, aiKey, prompts, options = {}) => {
+  const config = providerConfig[aiProvider]
+  if (!config) throw new Error(`Provedor de aiProvider inválido ou não configurado: ${aiProvider}`)
+  const apiKey = aiKey || config.apiKey
+  if (!apiKey) throw new Error(`API key para ${aiProvider} não encontrada`)
+  const openai = new OpenAI({ apiKey, baseURL: config.apiUrl })
+  const { model, stream, ...props } = options
+  const finalModel = model || config.defaultModel
+  try {
+    if (stream) {
+      const streamResponse = await openai.chat.completions.create({
+        model: finalModel,
+        messages: prompts,
+        stream: true,
+        ...props
+      })
+      return streamResponse
+    }
+    const response = await openai.chat.completions.create({
+      model: finalModel,
+      messages: prompts,
+      stream: false,
+      ...props
+    })
+    return { status: 200, data: response }
+  } catch (error) {
+    console.error(`Erro ao chamar a API ${aiProvider}:`, {
+      message: error.message,
+      status: error.status,
+      type: error.type,
+      stack: error.stack
+    })
+    if (error instanceof OpenAI.AuthenticationError) {
+      throw new Error("AUTHENTICATION_FAILED")
+    } else if (error instanceof OpenAI.RateLimitError) {
+      throw new Error("RATE_LIMIT_EXCEEDED")
+    } else if (error instanceof OpenAI.APIError) {
+      throw new Error("API_REQUEST_FAILED")
+    } else {
+      throw new Error("API_UNEXPECTED_ERROR")
     }
   }
 }
 
-const ask = async (aiProvider = "groq", aiKey, prompts, options = {}) => {
-  const config = providerConfig[aiProvider]
-  if (!config) throw new Error(`Provedor de aiProvider inválido ou não configurado: ${aiProvider}`)
-  const finalApiKey = aiKey || config.apiKey //aiProvider === AIPROVIDER.GROQ ? config.apiKey :
-  const { model, ...props } = options
-  const finalModel = model || config.defaultModel //aiProvider === AIPROVIDER.GROQ ? config.defaultModel :
-  if (!finalApiKey) throw new Error(`API key para ${aiProvider} não encontrada.`)
-  const aiAPI = axios.create({
-    baseURL: config.baseURL,
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${finalApiKey}` }
-  })
-  const payload = { model: finalModel, messages: [...prompts], ...props }
-  try {
-    return await aiAPI.post("/chat/completions", payload)
-  } catch (error) {
-    const errorData = error.response?.data || { message: error.message }
-    console.error(`Erro ao chamar a API ${aiProvider}:`, JSON.stringify(errorData, null, 2))
-    throw error
+const checkToolCompatibility = (model) => {
+  if (model.supported_parameters && Array.isArray(model.supported_parameters)) {
+    const params = new Set(model.supported_parameters)
+    return params.has("tools") && params.has("tool_choice")
   }
+  return false
+}
+
+const checkImageCompatibility = (model) => {
+  if (model.architecture?.input_modalities && Array.isArray(model.architecture.input_modalities)) {
+    return model.architecture.input_modalities.includes("image")
+  }
+  return false
+}
+
+const checkFileCompatibility = (model) => {
+  if (model.architecture?.input_modalities && Array.isArray(model.architecture.input_modalities)) {
+    return model.architecture.input_modalities.includes("file")
+  }
+  return false
 }
 
 const getModels = async () => {
-  const promises = Object.values(providerConfig).map(async (config) => {
-    if (!config.apiKey) return []
-    const api = axios.create({
-      baseURL: config.baseURL,
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${config.apiKey}` }
-    })
-    return await config.getModels(api)
-  })
-  const models = (await Promise.all(promises)).flat()
+  const models = []
+  for (const [provider, config] of Object.entries(providerConfig)) {
+    const apiKey = config.apiKey
+    if (!apiKey) continue
+    const openai = new OpenAI({ apiKey, baseURL: config.apiUrl })
+    try {
+      const response = await openai.models.list()
+      const providerModels = response.data.map((model) => ({
+        id: model.id,
+        supports_tools: provider === "groq" ? true : checkToolCompatibility(model),
+        supports_images: checkImageCompatibility(model),
+        supports_files: checkFileCompatibility(model),
+        aiProvider: provider
+      }))
+      models.push(...providerModels)
+    } catch (error) {
+      console.error(`Erro ao obter modelos de ${provider}:`, error)
+    }
+  }
   return models
 }
 
