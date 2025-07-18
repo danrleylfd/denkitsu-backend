@@ -2,7 +2,6 @@ const axios = require("axios")
 
 const executeHttpRequest = async (config) => {
   try {
-    console.log(config)
     const response = await axios({
       url: config.url,
       method: config.method || "GET",
@@ -10,7 +9,6 @@ const executeHttpRequest = async (config) => {
       data: config.body || undefined,
       params: config.params || undefined
     })
-    console.log(response.data, response.error)
     return { data: response.data }
   } catch (error) {
     console.error(error)
