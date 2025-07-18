@@ -80,24 +80,9 @@ const getModels = async () => {
     const openai = new OpenAI({ apiKey, baseURL: config.apiUrl })
     try {
       const response = await openai.models.list()
-      if (provider === "groq") {
-          console.log(response.data[0])
-          const providerModels = response.data.map((model) => ({
-          id: model.id,
-          input_modalities: model.architecture?.input_modalities,
-          supported_parameters: ["tools", "tool_choice"],
-          supports_tools: checkToolCompatibility(model),
-          supports_images: checkImageCompatibility(model),
-          aiProvider: provider
-        }))
-        models.push(...providerModels)
-        continue
-      }
       const providerModels = response.data.map((model) => ({
         id: model.id,
-        input_modalities: model.architecture?.input_modalities,
-        supported_parameters: model.supported_parameters,
-        supports_tools: checkToolCompatibility(model),
+        supports_tools: provider === "groq" ? true : checkToolCompatibility(model),
         supports_images: checkImageCompatibility(model),
         aiProvider: provider
       }))
