@@ -11,14 +11,14 @@ const sendMessage = async (req, res) => {
     if (!["openrouter", "groq"].includes(aiProvider)) throw new Error("INVALID_PROVIDER")
     if (stream && use_tools && use_tools.length > 0) throw new Error("STREAM_WITH_TOOLS_NOT_SUPPORTED")
 
-    const finalPrompts = [allPrompts[0]]
+    const messages = [allPrompts[0]]
     if (mode) {
       const modePrompt = allPrompts.find(p => p.content.includes(mode))
-      if (modePrompt && !finalPrompts.some(p => p.content === modePrompt.content)) {
-        finalPrompts.splice(1, 0, modePrompt)
+      if (modePrompt && !messages.some(p => p.content === modePrompt.content)) {
+        messages.splice(1, 0, modePrompt)
       }
     }
-    finalPrompts.push(...userPrompts)
+    messages.push(...userPrompts)
 
     const requestOptions = {
       model,
@@ -27,7 +27,7 @@ const sendMessage = async (req, res) => {
     }
 
     if (stream) {
-      const streamResponse = await ask(aiProvider, aiKey, finalPrompts, requestOptions)
+      const streamResponse = await ask(aiProvider, aiKey, messages, requestOptions)
       res.setHeader("Content-Type", "text/event-stream")
       res.setHeader("Cache-Control", "no-cache")
       res.setHeader("Connection", "keep-alive")
@@ -46,10 +46,10 @@ const sendMessage = async (req, res) => {
       }
     }
 
-    const { status, data } = await ask(aiProvider, aiKey, finalPrompts, requestOptions)
+    const { status, data } = await ask(aiProvider, aiKey, messages, requestOptions)
     const resMsg = data.choices[0].message
     if (resMsg.tool_calls) {
-      finalPrompts.push(resMsg)
+      messages.push(resMsg)
       console.log(resMsg.tool_calls)
       for (const toolCall of resMsg.tool_calls) {
         const functionName = toolCall.function.name
@@ -58,7 +58,7 @@ const sendMessage = async (req, res) => {
         console.log(`[TOOL CALL] Executing: ${functionName}(${JSON.stringify(functionArgs)})`)
         if (functionName === "executeHttpRequest") {
            const functionResponse = await functionToCall(functionArgs)
-           finalPrompts.push({
+           messages.push({
              tool_call_id: toolCall.id,
              role: "tool",
              name: functionName,
@@ -67,15 +67,15 @@ const sendMessage = async (req, res) => {
            continue
         }
         const functionResponse = await functionToCall(...Object.values(functionArgs))
-        finalPrompts.push({
+        messages.push({
           tool_call_id: toolCall.id,
           role: "tool",
           name: functionName,
           content: JSON.stringify(functionResponse.data)
         })
       }
-      const sanitizedPrompts = sanitizeMessages(finalPrompts)
-      const finalResponse = await ask(aiProvider, aiKey, sanitizedPrompts, { model })
+      const sanitizedMessages = sanitizeMessages(messages)
+      const finalResponse = await ask(aiProvider, aiKey, sanitizedMessages, { model })
       return res.status(finalResponse.status).json(finalResponse.data)
     }
     return res.status(status).json(data)
