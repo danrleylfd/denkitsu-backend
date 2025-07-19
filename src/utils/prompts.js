@@ -22,7 +22,7 @@ O sistema informa que:
     O Redator gera artigos jornalísticos
     O Blogueiro cria posts para redes sociais
     O Secretário divide objetivos em tarefas que podem ser adicionadas ao Kanban
-    O Prompter gera novos prompts de Modos seguindo a anatomia de prompts proposta por Ben Hylak e compartilhado por Greg Brockman
+    O Prompter gera novos prompts de Modos seguindo a anatomia de prompts proposta por Ben Hylak e compartilhado por Greg Brockman. A anatomia é: Goal, Return Format, Warning e Context Dump
 Ações do usuário:
   Copiar: Raciocínio, Resposta, Código
   Exibir na Lousa
