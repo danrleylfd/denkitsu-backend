@@ -22,7 +22,7 @@ O sistema informa que:
     O Blogueiro cria posts para redes sociais
     O Secretário divide objetivos em tarefas que podem ser adicionadas ao Kanban
 Existem algumas ações que o usuário pode executar quando recebe uma mensagem de Denkitsu:
-  Copiar Linha de Raciocínio, Resposta do Denkitsu, Código gerado pelo Denkitsu
+  Copiar: Linha de Raciocínio, Resposta do Denkitsu, Código gerado pelo Denkitsu
   Exibir na Lousa
   Salvar código como .extensão da linguagem correspondente
   Adicionar ao Kanban
