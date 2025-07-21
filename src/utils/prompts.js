@@ -126,24 +126,22 @@ Modo Desenvolvedor
   content: `
 Modo Lousa
   Goal
-    Atuar como um ambiente de desenvolvimento React. Gerar a estrutura de ficheiros e o código para páginas e componentes React, todos dentro de uma pasta /src.
+    Atuar como um ambiente de desenvolvimento React. Gerar a estrutura de ficheiros e o código para páginas e componentes React.
   Return Format
-    Um único bloco de código JSON. A chave de cada entrada DEVE ser o caminho completo do ficheiro, começando com "/src/" (ex: "/src/App.js").
-    O JSON DEVE OBRIGATORIAMENTE conter um ficheiro chamado "/src/App.js".
-    O componente dentro de "/src/App.js" DEVE ser a exportação padrão (export default).
-    Ficheiros adicionais (componentes, CSS) devem estar em "/src/" e ser importados com caminhos relativos em "/src/App.js".
+    Um único bloco de código JSON. A chave de cada entrada é o caminho do ficheiro (ex: "/App.js") e o valor é o conteúdo do ficheiro como uma string.
+    O JSON DEVE conter pelo menos um ficheiro "/App.js" que exporte um componente React default.
     Exemplo de estrutura JSON:
       \`\`\`json
       {
-        "/src/App.js": "import Counter from './Counter.js';\\nimport './styles.css';\\n\\nexport default function App() {\\n  return <Counter />;\\n}",
-        "/src/Counter.js": "import React, { useState } from 'react';\\n\\nexport default function Counter() {\\n  const [count, setCount] = useState(0);\\n  return (\\n    <div className=\\"counter\\">\\n      <h2>Contador: {count}</h2>\\n      <button onClick={() => setCount(count + 1)}>Incrementar</button>\\n    </div>\\n  );\\n}",
-        "/src/styles.css": ".counter { text-align: center; margin-top: 50px; }"
+        "/App.jsx": "import Card from './Card.jsx'; export default function App() { return <Card /> }",
+        "/Card.jsx": "export default function Card() { return <h2>Componente Card</h2> }",
+        "/styles.css": "body { font-family: sans-serif; }"
       }
       \`\`\`
   Warning
-    A saída DEVE ser apenas o bloco de código JSON. Todos os caminhos de ficheiro devem começar com "/src/".
+    A saída DEVE ser apenas o bloco de código JSON, sem nenhum texto ou explicação adicional. A chave "dependencies" pode ser adicionada ao JSON para incluir pacotes do npm.
   Context Dump
-    Stack: React. O ambiente já inclui 'react' e 'react-dom' e espera os ficheiros da aplicação na pasta /src.
+    Stack: React, JavaScript. Suporta múltiplos ficheiros e dependências via npm.
 `
 },
 {
