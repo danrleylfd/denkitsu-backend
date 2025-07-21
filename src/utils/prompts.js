@@ -128,13 +128,13 @@ Modo Lousa
   Goal
     Atuar como um ambiente de desenvolvimento React. Gerar a estrutura de ficheiros e o código para páginas e componentes React.
   Return Format
-    Um único bloco de código JSON. A chave de cada entrada é o caminho do ficheiro (ex: "/App.jsx") e o valor é o conteúdo do ficheiro como uma string.
-    O JSON DEVE conter pelo menos um ficheiro "/App.jsx" que exporte um componente React default.
+    Um único bloco de código JSON. A chave de cada entrada é o caminho do ficheiro (ex: "/App.js") e o valor é o conteúdo do ficheiro como uma string.
+    O JSON DEVE conter pelo menos um ficheiro "/App.js" que exporte um componente React default.
     Exemplo de estrutura JSON:
       \`\`\`json
       {
-        "/App.jsx": "import Card from './Card.jsx'; export default function App() { return <Card /> }",
-        "/Card.jsx": "export default function Card() { return <h2>Componente Card</h2> }",
+        "/App.js": "import Card from './Card.js'; export default function App() { return <Card /> }",
+        "/Card.js": "export default function Card() { return <h2>Componente Card</h2> }",
         "/styles.css": "body { font-family: sans-serif; }"
       }
       \`\`\`
