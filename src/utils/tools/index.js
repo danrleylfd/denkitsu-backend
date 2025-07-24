@@ -1,26 +1,29 @@
-const weatherService = require("../services/weather")
-const newsService = require("../services/news")
-const wikipediaService = require("../services/wikipedia")
 const browserService = require("../services/browser")
-const genshinService = require("../services/genshin")
 const httpService = require("../services/http")
+const wikipediaService = require("../services/wikipedia")
+const newsService = require("../services/news")
+const weatherService = require("../services/weather")
+const genshinService = require("../services/genshin")
+const pokedexService = require("../services/pokedex")
 
 const availableTools = {
+  browseUrl: browserService.browseUrl,
+  executeHttpRequest: httpService.executeHttpRequest,
+  searchWikipedia: wikipediaService.searchWikipedia,
   searchNews: newsService.searchNews,
   getWeather: weatherService.getWeatherByLocation,
-  searchWikipedia: wikipediaService.searchWikipedia,
-  browseUrl: browserService.browseUrl,
   getPlayerBuild: genshinService.getPlayerBuild,
-  executeHttpRequest: httpService.executeHttpRequest
+  getPokemonInfo: pokedexService.getPokemonInfo,
 }
 
 const tools = [
+  browserService.browseTool,
+  httpService.httpTool,
+  wikipediaService.wikipediaTool,
   newsService.newsTool,
   weatherService.weatherTool,
-  wikipediaService.wikipediaTool,
-  browserService.browseTool,
   genshinService.genshinTool,
-  httpService.httpTool
+  pokedexService.pokedexTool,
 ]
 
 module.exports = { availableTools, tools }
