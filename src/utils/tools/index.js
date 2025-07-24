@@ -13,7 +13,7 @@ const availableTools = {
   searchNews: newsService.searchNews,
   getWeather: weatherService.getWeatherByLocation,
   getPlayerBuild: genshinService.getPlayerBuild,
-  getPokemonInfo: pokedexService.getPokemonInfo,
+  getPokemonDetails: pokedexService.getPokemonDetails,
 }
 
 const tools = [
