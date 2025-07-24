@@ -43,7 +43,7 @@ const criptoTool = {
       properties: {
         symbols: {
           type: "string",
-          description: "Uma string com os pares de negociação separados por vírgula, no formato 'MOEDA-CRIPTO'. Exemplo: 'BTC-BRL,ETH-BRL,SOL-BRL'."
+          description: "Uma string com os pares de negociação separados por vírgula, no formato 'CRIPTO-MOEDA'. Exemplo: 'BTC-BRL,ETH-BRL,SOL-BRL'. Sempre use BRL como a segunda parte se o usuário não especificar."
         }
       },
       required: ["symbols"]
