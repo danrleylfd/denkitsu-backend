@@ -48,7 +48,7 @@ const criptoTool = {
       properties: {
         product: {
           type: "string",
-          description: "O par de negociação no formato 'MOEDA-CRIPTO', por exemplo, 'BRL-BTC' para Bitcoin, 'BRL-ETH' para Ethereum. Sempre use BRL como a primeira parte se o usuário não especificar."
+          description: "O par de negociação no formato 'CRIPTO-MOEDA', por exemplo, 'BTC-BRL' para Bitcoin, 'ETH-BRL' para Ethereum. Sempre use BRL como a segunda parte se o usuário não especificar."
         }
       },
       required: ["product"]
