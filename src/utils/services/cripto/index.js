@@ -21,7 +21,7 @@ const getCoinQuote = async (symbols) => {
       open: formatBRL(ticker.open),
       pair: ticker.pair,
       sell: formatBRL(ticker.sell),
-      volume: parseFloat(ticker.vol).toFixed(8),
+      volume: `${parseFloat(ticker.vol).toFixed(8)} ${ticker.pair.split("-")[0]}`,
     }))
     return { status: 200, data: tickers }
   } catch (error) {
