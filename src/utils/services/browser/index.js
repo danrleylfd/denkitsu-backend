@@ -32,7 +32,7 @@ const browseUrl = async (url) => {
   }
 }
 
-const browseTool = {
+const browserTool = {
   type: "function",
   function: {
     name: "browseUrl",
@@ -51,4 +51,4 @@ const browseTool = {
   },
 }
 
-module.exports = { browseUrl, browseTool }
+module.exports = { browseUrl, browserTool }
