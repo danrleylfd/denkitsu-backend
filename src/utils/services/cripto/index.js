@@ -15,11 +15,11 @@ const getCoinQuote = async (symbols) => {
     const tickers = data.map((ticker) => ({
       pair: ticker.pair,
       open: formatBRL(ticker.open),
-      buy: formatBRL(ticker.buy),
-      sell: formatBRL(ticker.sell),
+      last: formatBRL(ticker.last),
       low: formatBRL(ticker.low),
       high: formatBRL(ticker.high),
-      last: formatBRL(ticker.last),
+      buy: formatBRL(ticker.buy),
+      sell: formatBRL(ticker.sell),
       volume: `${parseFloat(ticker.vol).toFixed(8)} ${ticker.pair.split("-")[0]}`,
       date: new Date(Number(ticker.date) * 1000).toLocaleString("pt-BR"),
     }))
@@ -37,7 +37,7 @@ const criptoTool = {
   type: "function",
   function: {
     name: "getCoinQuote",
-    description: "Busca a cotação (ticker) de um ou mais pares de criptomoedas simultaneamente na exchange Mercado Bitcoin. As cotações são em Reais (BRL). O Denkitsu deve retornar uma tabela ao usuário sem metaconteúdo, as colulas são as props { pair, open, buy, sell, low, high, last, volume, date }. Caso haja cotações anteriores nas mensagens anteriores, o Denkitsu deve adicionar as cotações do histórico antes da linha atual. Não deve responder cotações com base no histórico, mas sim buscar as cotações atualizadas com essa tool.",
+    description: "Busca a cotação (ticker) de um ou mais pares de criptomoedas simultaneamente na exchange Mercado Bitcoin. As cotações são em Reais (BRL).",
     parameters: {
       type: "object",
       properties: {
