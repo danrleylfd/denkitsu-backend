@@ -1,6 +1,6 @@
 const News = require("../../models/news")
-const { searchNews } = require("../../../utils/services/news")
-const { ask } = require("../../../utils/services/ai")
+const { searchNews } = require("../../../utils/api/news")
+const { ask } = require("../../../utils/api/ai")
 const prompt = require("../../../utils/prompts")
 
 const cleanAiOutput = (text = "") => {

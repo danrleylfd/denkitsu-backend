@@ -1,6 +1,6 @@
 const { verify } = require("jsonwebtoken")
 
-const { generateToken, generateRefreshToken } = require("../../../utils/services/auth")
+const { generateToken, generateRefreshToken } = require("../../../utils/api/auth")
 
 const refreshToken = async (req, res) => {
   try {

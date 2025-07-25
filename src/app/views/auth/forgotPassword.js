@@ -1,9 +1,9 @@
 const { renderFile } = require("ejs")
 
 const User = require("../../models/auth")
-const mailer = require("../../../utils/services/mail")
+const mailer = require("../../../utils/api/mail")
 
-const { generateOTPToken, generateOTPCode } = require("../../../utils/services/auth")
+const { generateOTPToken, generateOTPCode } = require("../../../utils/api/auth")
 
 const forgotPassword = async (req, res) => {
   try {

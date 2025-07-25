@@ -1,4 +1,4 @@
-const { getWeatherByCoordinates: getByCoordinates } = require("../../../utils/services/weather")
+const { getWeatherByCoordinates: getByCoordinates } = require("../../../utils/api/weather")
 
 const getWeatherByCoordinates = async (req, res) => {
   try {

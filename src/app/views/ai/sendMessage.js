@@ -1,4 +1,4 @@
-const { ask } = require("../../../utils/services/ai")
+const { ask } = require("../../../utils/api/ai")
 const { availableTools, tools } = require("../../../utils/tools")
 const allPrompts = require("../../../utils/prompts")
 const { sanitizeMessages } = require("../../../utils/ai/messageProcessor")

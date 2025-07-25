@@ -1,11 +1,11 @@
-const browserService = require("../services/browser")
-const httpService = require("../services/http")
-const wikipediaService = require("../services/wikipedia")
-const newsService = require("../services/news")
-const weatherService = require("../services/weather")
-const genshinService = require("../services/genshin")
-const pokedexService = require("../services/pokedex")
-const criptoService = require("../services/cripto")
+const browserService = require("../api/browser")
+const httpService = require("../api/http")
+const wikipediaService = require("../api/wikipedia")
+const newsService = require("../api/news")
+const weatherService = require("../api/weather")
+const genshinService = require("../api/genshin")
+const pokedexService = require("../api/pokedex")
+const criptoService = require("../api/cripto")
 
 const availableTools = {
   browseUrl: browserService.browseUrl,

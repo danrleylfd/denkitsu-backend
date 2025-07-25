@@ -1,5 +1,5 @@
 const User = require("../../models/auth")
-const { generateRefreshToken, generateToken } = require("../../../utils/services/auth")
+const { generateRefreshToken, generateToken } = require("../../../utils/api/auth")
 
 const signUp = async (req, res) => {
   try {

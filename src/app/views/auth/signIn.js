@@ -1,7 +1,7 @@
 const { compare } = require("bcryptjs")
 
 const User = require("../../models/auth")
-const { generateRefreshToken, generateToken } = require("../../../utils/services/auth")
+const { generateRefreshToken, generateToken } = require("../../../utils/api/auth")
 
 const signIn = async (req, res) => {
   try {

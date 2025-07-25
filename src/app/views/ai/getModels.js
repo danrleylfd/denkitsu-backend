@@ -1,4 +1,4 @@
-const { getModels: listModels } = require("../../../utils/services/ai")
+const { getModels: listModels } = require("../../../utils/api/ai")
 
 const getModels = async (req, res) => {
   try {

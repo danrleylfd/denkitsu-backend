@@ -1,6 +1,6 @@
 const axios = require("axios")
 const User = require("../../models/auth")
-const { generateToken, generateRefreshToken } = require("../../../utils/services/auth")
+const { generateToken, generateRefreshToken } = require("../../../utils/api/auth")
 
 const githubCallback = async (req, res) => {
   const { code, state: userID } = req.query
