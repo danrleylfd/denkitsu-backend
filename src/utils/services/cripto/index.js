@@ -37,7 +37,7 @@ const criptoTool = {
   type: "function",
   function: {
     name: "getCoinQuote",
-    description: "Busca a cotação (ticker) de um ou mais pares de criptomoedas simultaneamente na exchange Mercado Bitcoin. As cotações são em Reais (BRL).",
+    description: "Busca a cotação (ticker) de um ou mais pares de criptomoedas simultaneamente na exchange Mercado Bitcoin. As cotações são em Reais (BRL). O Denkitsu deve retornar uma tabela onde as colulas são as props ao usuário sem metaconteúdo. Caso haja um histórico de cotações, o Denkitsu deve adicionar as linhas do histórico na tabela antes da linha atual.",
     parameters: {
       type: "object",
       properties: {
