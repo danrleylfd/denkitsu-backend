@@ -13,15 +13,15 @@ const getCoinQuote = async (symbols) => {
       return parseFloat(value).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
     }
     const tickers = data.map((ticker) => ({
+      pair: ticker.pair,
+      open: formatBRL(ticker.open),
       buy: formatBRL(ticker.buy),
-      date: new Date(Number(ticker.date) * 1000).toLocaleString("pt-BR"),
+      sell: formatBRL(ticker.sell),
+      low: formatBRL(ticker.low),
       high: formatBRL(ticker.high),
       last: formatBRL(ticker.last),
-      low: formatBRL(ticker.low),
-      open: formatBRL(ticker.open),
-      pair: ticker.pair,
-      sell: formatBRL(ticker.sell),
       volume: `${parseFloat(ticker.vol).toFixed(8)} ${ticker.pair.split("-")[0]}`,
+      date: new Date(Number(ticker.date) * 1000).toLocaleString("pt-BR"),
     }))
     return { status: 200, data: tickers }
   } catch (error) {
@@ -37,7 +37,7 @@ const criptoTool = {
   type: "function",
   function: {
     name: "getCoinQuote",
-    description: "Busca a cotação (ticker) de um ou mais pares de criptomoedas simultaneamente na exchange Mercado Bitcoin. As cotações são em Reais (BRL). O Denkitsu deve retornar uma tabela onde as colulas são as props ao usuário sem metaconteúdo. Caso haja um histórico de cotações, o Denkitsu deve adicionar as linhas do histórico na tabela antes da linha atual.",
+    description: "Busca a cotação (ticker) de um ou mais pares de criptomoedas simultaneamente na exchange Mercado Bitcoin. As cotações são em Reais (BRL). O Denkitsu deve retornar uma tabela ao usuário sem metaconteúdo, as colulas são as props { pair, open, buy, sell, low, high, last, volume, date }. Caso haja um histórico de cotações nas mensagens anteriores, o Denkitsu deve adicionar as cotações do histórico antes da linha atual.",
     parameters: {
       type: "object",
       properties: {
