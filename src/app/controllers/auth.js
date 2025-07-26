@@ -7,6 +7,7 @@ const {
   signInRules,
   forgotPasswordRules,
   resetPasswordRules,
+  refreshTokenRules,
 } = require("../validators/auth")
 
 const routes = Router()
@@ -16,15 +17,15 @@ const signIn = require("../views/auth/signIn")
 const refreshToken = require("../views/auth/refreshToken")
 const forgotPassword = require("../views/auth/forgotPassword")
 const resetPassword = require("../views/auth/resetPassword")
-const githubRedirect = require("../views/auth/githubRedirect") // NOVO
-const githubCallback = require("../views/auth/githubCallback") // NOVO
-const githubConnect = require("../views/auth/githubConnect") // NOVO
+const githubRedirect = require("../views/auth/githubRedirect")
+const githubCallback = require("../views/auth/githubCallback")
+const githubConnect = require("../views/auth/githubConnect")
 
 routes.post("/signup", signUpRules(), validate, signUp)
 
 routes.post("/signin", signInRules(), validate, signIn)
 
-routes.post("/refresh_token", refreshToken)
+routes.post("/refresh_token", refreshTokenRules(), validate, refreshToken)
 
 routes.post("/forgot_password", forgotPasswordRules(), validate, forgotPassword)
 

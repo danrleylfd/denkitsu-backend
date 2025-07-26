@@ -47,9 +47,20 @@ const resetPasswordRules = () => {
   ]
 }
 
+const refreshTokenRules = () => {
+  return [
+    body("refreshToken")
+      .notEmpty()
+      .withMessage("O refresh token é obrigatório.")
+      .matches(/^Bearer\s.+$/)
+      .withMessage("O refresh token está mal formatado. O formato esperado é 'Bearer <token>'.")
+  ]
+}
+
 module.exports = {
   signUpRules,
   signInRules,
   forgotPasswordRules,
   resetPasswordRules,
+  refreshTokenRules,
 }
