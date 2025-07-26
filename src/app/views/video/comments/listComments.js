@@ -1,20 +1,14 @@
 const Comment = require("../../../models/comment")
 
-const countComments = async (req, res) => {
+const listComments = async (req, res) => {
   try {
     const { video: videoID } = req.params
     const comments = await Comment.find({ video: videoID }).sort("-createdAt").populate("user")
-    if (!comments) throw new Error("VIDEO_NOT_FOUND")
     return res.status(200).json(comments)
   } catch (error) {
-    console.error(`[COUNT_COMMENTS] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
-    const defaultError = { status: 500, message: `[COUNT_COMMENTS] ${new Date().toISOString()} - Internal server error` }
-    const errorMessages = {
-      VIDEO_NOT_FOUND: { status: 404, message: "video not found/exists." }
-    }
-    const { status, message } = errorMessages[error.message] || defaultError
-    return res.status(status).json({ code: error.message, error: message })
+    console.error(`[LIST_COMMENTS] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
+    return res.status(500).json({ error: { code: "INTERNAL_SERVER_ERROR", message: "Ocorreu um erro inesperado ao listar os comentários." } })
   }
 }
 
-module.exports = countComments
+module.exports = listComments
