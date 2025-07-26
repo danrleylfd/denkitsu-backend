@@ -14,8 +14,7 @@ const sendMessageRules = () => {
       .isIn(["openrouter", "groq"])
       .withMessage("O provedor de IA selecionado é inválido."),
     body("stream").custom((streamValue, { req }) => {
-      // if (!req.body) return true
-      console.log(req)
+      if (!req.body) return console.error("req.body é undefined, Danrley o problema é que a requisição está vindo sem Content-Type: application/json")
       const use_tools = req.body.use_tools
       if (streamValue === true && use_tools && Array.isArray(use_tools) && use_tools.length > 0) {
         throw new Error("O modo de streaming não pode ser usado em conjunto com ferramentas (tools).")
