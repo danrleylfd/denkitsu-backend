@@ -22,6 +22,11 @@ const signIn = async (req, res) => {
     })
   } catch (error) {
     console.error(`[SIGNIN] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
+    const defaultError = { status: 500, message: "Ocorreu um erro inesperado ao tentar fazer login." }
+    const errorMessages = {
+      USER_NOT_FOUND: { status: 401, message: "E-mail ou senha inválidos." },
+      INVALID_PASSWORD: { status: 401, message: "E-mail ou senha inválidos." }
+    }
     // const defaultError = { status: 500, message: `[SIGNIN] ${new Date().toISOString()} - Internal server error` }
     // const errorMessages = {
     //   EMAIL_MISSING: { status: 422, message: "email is required" },
@@ -30,9 +35,8 @@ const signIn = async (req, res) => {
     //   USER_NOT_FOUND: { status: 404, message: "user not found/exists" },
     //   INVALID_PASSWORD: { status: 401, message: "invalid credentials" }
     // }
-    // const { status, message } = errorMessages[error.message] || defaultError
-    // return res.status(status).json({ code: error.message, message })
-    return res.status(500).json({ code: "INTERNAL_SERVER_ERROR", error: "Ocorreu um erro inesperado ao tentar fazer login." })
+    const { status, message } = errorMessages[error.message] || defaultError
+    return res.status(status).json({ code: error.message, message })
   }
 }
 
