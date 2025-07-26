@@ -1,7 +1,7 @@
 const { Router } = require("express")
 const authMiddleware = require("../middlewares/auth")
 const videoMiddleware = require("../middlewares/video")
-const { validate } = require("../middlewares/validator")
+const validate = require("../middlewares/validator")
 const { videoIdInParams } = require("../validators/like")
 
 const routes = Router()
