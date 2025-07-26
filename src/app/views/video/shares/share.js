@@ -11,10 +11,9 @@ const registerShare = async (req, res) => {
     return res.status(201).send()
   } catch (error) {
     console.error(`[SHARE] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
-    const defaultError = { status: 500, message: `[SHARE] ${new Date().toISOString()} - Internal server error` }
-    const errorMessages = {}
-    const { status, message } = errorMessages[error.message] || defaultError
-    return res.status(status).json({ code: error.message, error: message })
+    return res.status(500).json({
+      error: { code: "INTERNAL_SERVER_ERROR", message: "Ocorreu um erro inesperado ao registrar o compartilhamento." }
+    })
   }
 }
 
