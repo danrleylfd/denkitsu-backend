@@ -1,7 +1,7 @@
 const { Router } = require("express")
 
 const authMiddleware = require("../middlewares/auth")
-const validate = require("../middlewares/validate")
+const validate = require("../middlewares/validator")
 const {
   signUpRules,
   signInRules,
