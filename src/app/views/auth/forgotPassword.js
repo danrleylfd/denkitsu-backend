@@ -20,13 +20,13 @@ const forgotPassword = async (req, res) => {
         username: user.name,
         token
       })
+      mailer.sendMail({ to: email, subject: "Token de recuperação", html }, (err) => {
+        if (err) {
+          console.error(`[MAIL_ERROR] ${new Date().toISOString()} -`, { error: err.message, stack: err.stack })
+          throw new Error("MAIL_ERROR")
+        }
+      })
     }
-    mailer.sendMail({ to: email, subject: "Token de recuperação", html }, (err) => {
-      if (err) {
-        console.error(`[MAIL_ERROR] ${new Date().toISOString()} -`, { error: err.message, stack: err.stack })
-        throw new Error("MAIL_ERROR")
-      }
-    })
     return res.status(200).send()
   } catch (error) {
     if (error.message !== "MAIL_ERROR") {
@@ -37,7 +37,7 @@ const forgotPassword = async (req, res) => {
       MAIL_ERROR: { status: 500, message: "Não foi possível enviar o e-mail de recuperação. Tente novamente mais tarde." }
     }
     const { status, message } = errorMessages[error.message] || defaultError
-    return res.status(status).json({ code: error.message, message })
+    return res.status(status).json({ error: { code: error.message, message } })
   }
 }
 

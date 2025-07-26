@@ -24,7 +24,7 @@ const signIn = async (req, res) => {
       INVALID_PASSWORD: { status: 401, message: "E-mail ou senha inválidos." }
     }
     const { status, message } = errorMessages[error.message] || defaultError
-    return res.status(status).json({ code: error.message, message })
+    return res.status(status).json({ error: { code: error.message, message } })
   }
 }
 

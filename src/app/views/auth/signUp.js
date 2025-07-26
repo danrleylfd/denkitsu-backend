@@ -26,7 +26,7 @@ const signUp = async (req, res) => {
       USER_EXISTS: { status: 409, message: "Este e-mail já está em uso." }
     }
     const { status, message } = errorMessages[error.message] || defaultError
-    return res.status(status).json({ code: error.message, message })
+    return res.status(status).json({ error: { code: error.message, message } })
   }
 }
 

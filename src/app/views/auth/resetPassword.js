@@ -29,7 +29,7 @@ const resetPassword = async (req, res) => {
       TOKEN_EXPIRED: { status: 401, message: "Token expirado. Por favor, solicite uma nova redefinição de senha." }
     }
     const { status, message } = errorMessages[error.message] || defaultError
-    return res.status(status).json({ code: error.message, message })
+    return res.status(status).json({ error: { code: error.message, message } })
   }
 }
 
