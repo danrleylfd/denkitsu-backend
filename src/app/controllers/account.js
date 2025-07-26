@@ -1,5 +1,7 @@
 const { Router } = require("express")
 const authMiddleware = require("../middlewares/auth")
+const validate = require("../middlewares/validator")
+const { editAccountRules, getUserRules } = require("../validators/account")
 
 const routes = Router()
 routes.use(authMiddleware)
@@ -11,9 +13,9 @@ const unlinkGithub = require("../views/account/unlinkGithub") // NOVO
 
 routes.get("/", getUser)
 
-routes.get("/:userID", getUser)
+routes.get("/:userID", getUserRules(), validate, getUser)
 
-routes.put("/", editAccount)
+routes.put("/", editAccountRules(), validate, editAccount)
 
 routes.delete("/", deleteAccount)
 
