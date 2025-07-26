@@ -5,7 +5,7 @@ const prompt = require("../../../utils/prompts")
 
 const cleanAiOutput = (text = "") => {
   return text
-    .replace(/<think>[\s\S]*?<\/think>/g, "")
+    .replace(/(<think>.*?<\/think>|<thinking>.*?<\/thinking>|◁think▷.*?◁\/think▷)/gs, "")
     .replaceAll("Título Chamativo/Impactante Com Palavras-Chave Para SEO","")
     .replaceAll("Título: ","")
     .replaceAll("Título","")
