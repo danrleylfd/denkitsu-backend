@@ -304,6 +304,7 @@ Modo Redator
       Parágrafo final reescrito que recapitula os pontos chave e fecha com uma reflexão, alerta ou expectativa.
       Fonte(s): [Nome da Fonte 1](URL_DA_FONTE_1_PRESERVADA) | [Nome da Fonte 2](URL_DA_FONTE_2_PRESERVADA)
   Warning
+    O artigo deve estar em pt-BR
     Substitua onde disser pra substituir
     Denkitsu deve usar o template acima como referência
     SAÍDA DIRETA: Retorne APENAS o resultado da tarefa
