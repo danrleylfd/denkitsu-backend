@@ -9,7 +9,7 @@ const providerConfig = {
   openrouter: {
     apiUrl: process.env.OPENROUTER_API_URL,
     apiKey: process.env.OPENROUTER_API_KEY,
-    defaultModel: "deepseek/deepseek-r1:free"
+    defaultModel: "deepseek/deepseek-r1-0528:free"
   }
 }
 
