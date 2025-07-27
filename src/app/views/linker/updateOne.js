@@ -5,27 +5,26 @@ const updateOne = async (req, res) => {
     const { userID } = req
     const { oldLabel } = req.params
     const { newLabel, newLink } = req.body
-    if (!oldLabel?.trim()) throw new Error("OLD_LABEL_MISSING")
-    if (!newLabel?.trim()) throw new Error("NEW_LABEL_MISSING")
-    if (!newLink?.trim()) throw new Error("NEW_LINK_MISSING")
     const linker = await Linker.findOneAndUpdate(
       { label: oldLabel.trim(), user: userID },
       { $set: { label: newLabel.trim(), link: newLink.trim() } },
       { new: true }
     )
-    if (!linker) throw new Error("LINKER_NOT_FOUND")
+    if (!linker) throw new Error("LINKER_NOT_FOUND_OR_UNAUTHORIZED")
     return res.status(200).json(linker)
   } catch (error) {
+    if (error.code === 11000) {
+      return res.status(409).json({
+        error: { code: "LABEL_ALREADY_EXISTS", message: "O novo rótulo (label) já está em uso." }
+      })
+    }
     console.error(`[UPDATE_LINKER] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
-    const defaultError = { status: 500, message: `[UPDATE_LINKER] ${new Date().toISOString()} - Internal server error` }
+    const defaultError = { status: 500, message: "Ocorreu um erro inesperado ao atualizar o atalho." }
     const errorMessages = {
-      OLD_LABEL_MISSING: { status: 422, message: "oldLabel is required" },
-      NEW_LABEL_MISSING: { status: 422, message: "newLabel is required" },
-      NEW_LINK_MISSING: { status: 422, message: "newLink is required" },
-      LINKER_NOT_FOUND: { status: 404, message: "linker not found/exists or you are not the owner" }
+      LINKER_NOT_FOUND_OR_UNAUTHORIZED: { status: 404, message: "Atalho não encontrado ou você não tem permissão para editá-lo." }
     }
     const { status, message } = errorMessages[error.message] || defaultError
-    return res.status(status).json({ code: error.message, error: message })
+    return res.status(status).json({ error: { code: error.message, message } })
   }
 }
 
