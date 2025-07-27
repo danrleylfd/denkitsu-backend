@@ -7,7 +7,7 @@ const sendMessage = async (req, res) => {
   try {
     const { aiProvider = "groq", model, messages: userPrompts, aiKey, plugins, use_tools, stream = false, mode } = req.body
     const messages = [allPrompts[0]]
-    if (mode) {
+    if (mode !== "Padrão") {
       const modePrompt = allPrompts.find(p => p.content.includes(mode))
       if (modePrompt && !messages.some(p => p.content === modePrompt.content)) {
         messages.splice(1, 0, modePrompt)
