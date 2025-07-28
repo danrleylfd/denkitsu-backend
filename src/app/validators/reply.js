@@ -8,14 +8,6 @@ const commentIdInParams = () => {
   ]
 }
 
-const replyIdInParams = () => {
-  return [
-    param("reply")
-      .isMongoId()
-      .withMessage("O ID da resposta na URL é inválido.")
-  ]
-}
-
 const contentInBody = () => {
   return [
     body("content")
@@ -35,5 +27,4 @@ const createReplyRules = () => {
 module.exports = {
   createReplyRules,
   listRepliesRules: commentIdInParams,
-  deleteReplyRules: replyIdInParams,
 }
