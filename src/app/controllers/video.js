@@ -7,7 +7,7 @@ const {
   deleteVideoRules,
   readOneVideoRules,
   readUserVideosRules
-} = require("../validators/videoValidator")
+} = require("../validators/video")
 
 const routes = Router()
 
