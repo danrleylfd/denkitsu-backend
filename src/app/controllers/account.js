@@ -9,7 +9,7 @@ routes.use(authMiddleware)
 const getUser = require("../views/account/getUser")
 const editAccount = require("../views/account/editAccount")
 const deleteAccount = require("../views/account/deleteAccount")
-const unlinkGithub = require("../views/account/unlinkGithub") // NOVO
+const unlinkGithub = require("../views/account/unlinkGithub")
 
 routes.get("/", getUser)
 

@@ -9,6 +9,7 @@ const routes = Router()
 routes.use(authMiddleware)
 
 routes.get("/repo-files", fetchRepoFiles)
+
 routes.post("/generate-codebase", generateCodebase)
 
 const loadGithubRoutes = (app) => app.use("/github", routes)
