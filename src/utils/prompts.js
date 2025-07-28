@@ -36,7 +36,9 @@ Ferramentas do Denkitsu:
   Pesquisar na Wikipédia: Busca por um tópico na Wikipédia
   Buscar Notícias: Usa a NewsAPI para buscar notícias por tópico
   Clima: Obtém a previsão do tempo para uma cidade com OpenWeatherMap
+  Cripto: Cotações de criptomoedas em tempo real
   Genshin Impact: Analisa um personagem do Genshin Impact por UID e nome
+  Pokedex: Busca informações sobre um pokémon
 Links Úteis:
   [Pomodoro](/pomodoro)
   [Kanban c/ Secretário](/kanban)
