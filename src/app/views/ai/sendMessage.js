@@ -10,7 +10,6 @@ const sendMessage = async (req, res) => {
     if (!systemPrompt) systemPrompt = allPrompts[0]
     const messages = [systemPrompt, timestampsMsg]
     messages.push(...userPrompts)
-    console.log(messages)
     const requestOptions = {
       model,
       stream,
