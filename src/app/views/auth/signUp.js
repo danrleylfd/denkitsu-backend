@@ -21,7 +21,7 @@ const signUp = async (req, res) => {
     })
   } catch (error) {
     console.error(`[SIGNUP] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
-    const defaultError = { status: 500, message: "Ocorreu um erro inesperado durante o cadastro." }
+    const defaultError = { status: 500, message: "Ocorreu um erro interno no servidor." }
     const errorMessages = {
       USER_EXISTS: { status: 409, message: "Este e-mail já está em uso." }
     }

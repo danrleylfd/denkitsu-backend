@@ -12,7 +12,7 @@ const getWeatherByLocation = async (req, res) => {
         error: { code: "EXTERNAL_API_ERROR", message: error.response.data.message || "Falha ao buscar dados de clima." }
       })
     }
-    const defaultError = { status: 500, message: "Ocorreu um erro inesperado ao consultar o clima." }
+    const defaultError = { status: 500, message: "Ocorreu um erro interno no servidor." }
     const errorMessages = {
       "LOCATION_NOT_FOUND": { status: 404, message: "A localização especificada não foi encontrada." }
     }

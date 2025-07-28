@@ -16,10 +16,9 @@ const deleteAccount = async (req, res) => {
     return res.status(204).send()
   } catch (error) {
     console.error(`[DEL_ACCOUNT] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
-    const defaultError = { status: 500, message: `[DEL_ACCOUNT] ${new Date().toISOString()} - Internal server error` }
-    const errorMessages = {}
-    const { status, message } = errorMessages[error.message] || defaultError
-    return res.status(status).json({ code: error.message, error: message })
+    const defaultError = { status: 500, message: "Ocorreu um erro interno no servidor." }
+    const { status, message } = defaultError
+    return res.status(status).json({ error: { code: error.message, message } })
   }
 }
 

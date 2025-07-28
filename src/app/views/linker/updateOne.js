@@ -13,13 +13,13 @@ const updateOne = async (req, res) => {
     if (!linker) throw new Error("LINKER_NOT_FOUND_OR_UNAUTHORIZED")
     return res.status(200).json(linker)
   } catch (error) {
+    console.error(`[UPDATE_LINKER] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
     if (error.code === 11000) {
       return res.status(409).json({
         error: { code: "LABEL_ALREADY_EXISTS", message: "O novo rótulo (label) já está em uso." }
       })
     }
-    console.error(`[UPDATE_LINKER] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
-    const defaultError = { status: 500, message: "Ocorreu um erro inesperado ao atualizar o atalho." }
+    const defaultError = { status: 500, message: "Ocorreu um erro interno no servidor." }
     const errorMessages = {
       LINKER_NOT_FOUND_OR_UNAUTHORIZED: { status: 404, message: "Atalho não encontrado ou você não tem permissão para editá-lo." }
     }

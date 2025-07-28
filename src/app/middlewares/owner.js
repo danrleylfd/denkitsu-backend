@@ -13,15 +13,15 @@ const ownerMiddleware = (req, res, next) => {
     next()
   } catch (error) {
     console.error(`[OWNER_MIDDLEWARE] ${new Date().toISOString()} - `, { error: error.message, stack: error.stack })
-    const defaultError = { status: 500, message: `[OWNER_MIDDLEWARE] ${new Date().toISOString()} - Internal server error` }
+    const defaultError = { status: 500, message: "Ocorreu um erro interno no servidor." }
     const errorMessages = {
-      TOKEN_MISSING: { status: 401, message: "No token provided" },
-      TOKEN_PARTS_ERROR: { status: 401, message: "Invalid token format" },
-      TOKEN_SCHEMA_ERROR: { status: 401, message: "Token must use Bearer scheme" },
-      TOKEN_INVALID: { status: 401, message: "Invalid or expired token" }
+      TOKEN_MISSING: { status: 401, message: "Nenhum token de autorização fornecido." },
+      TOKEN_PARTS_ERROR: { status: 401, message: "Formato de token inválido." },
+      TOKEN_SCHEMA_ERROR: { status: 401, message: "O token deve ser do tipo 'Bearer'." },
+      TOKEN_INVALID: { status: 401, message: "Token inválido." }
     }
     const { status, message } = errorMessages[error.message] || defaultError
-    return res.status(status).json({ error: message })
+    return res.status(status).json({ error: { code: error.message, message } })
   }
 }
 

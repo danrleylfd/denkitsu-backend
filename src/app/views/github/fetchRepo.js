@@ -82,8 +82,10 @@ const fetchRepo = async (req, res) => {
     res.status(200).send(codebaseString)
 
   } catch (error) {
-    console.error("[FETCH_REPO_ERROR]", error.message)
-    res.status(500).json({ error: "Falha ao buscar o conteúdo do repositório." })
+    console.error("[FETCH_REPO_ERROR]", { error: error.message, stack: error.stack })
+    const defaultError = { status: 500, message: "Ocorreu um erro interno no servidor." }
+    const { status, message } = defaultError
+    return res.status(status).json({ error: { code: error.message, message } })
   }
 }
 

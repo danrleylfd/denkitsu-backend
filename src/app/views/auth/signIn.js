@@ -18,7 +18,7 @@ const signIn = async (req, res) => {
     })
   } catch (error) {
     console.error(`[SIGNIN] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
-    const defaultError = { status: 500, message: "Ocorreu um erro inesperado ao tentar fazer login." }
+    const defaultError = { status: 500, message: "Ocorreu um erro interno no servidor." }
     const errorMessages = {
       USER_NOT_FOUND: { status: 401, message: "E-mail ou senha inválidos." },
       INVALID_PASSWORD: { status: 401, message: "E-mail ou senha inválidos." }

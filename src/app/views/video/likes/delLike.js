@@ -13,7 +13,7 @@ const delLike = async (req, res) => {
     return res.status(204).send()
   } catch (error) {
     console.error(`[UNLIKE] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
-    const defaultError = { status: 500, message: "Ocorreu um erro inesperado ao descurtir o vídeo." }
+    const defaultError = { status: 500, message: "Ocorreu um erro interno no servidor." }
     const errorMessages = {
       VIDEO_NOT_FOUND_OR_NOT_LIKED: { status: 404, message: "Vídeo não encontrado ou não curtido por este usuário." }
     }

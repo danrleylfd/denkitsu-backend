@@ -22,7 +22,7 @@ const resetPassword = async (req, res) => {
     })
   } catch (error) {
     console.error(`[RESET_PASSWORD] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
-    const defaultError = { status: 500, message: "Ocorreu um erro inesperado ao redefinir a senha." }
+    const defaultError = { status: 500, message: "Ocorreu um erro interno no servidor." }
     const errorMessages = {
       USER_NOT_FOUND: { status: 404, message: "Usuário não encontrado." },
       TOKEN_INVALID: { status: 401, message: "Token inválido. Por favor, verifique os dados informados." },

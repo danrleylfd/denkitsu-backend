@@ -7,9 +7,9 @@ const listReplies = async (req, res) => {
     return res.status(200).json(replies)
   } catch (error) {
     console.error(`[LIST_REPLIES] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
-    return res.status(500).json({
-      error: { code: "INTERNAL_SERVER_ERROR", message: "Ocorreu um erro inesperado ao listar as respostas." }
-    })
+    const defaultError = { status: 500, message: "Ocorreu um erro interno no servidor." }
+    const { status, message } = defaultError
+    return res.status(status).json({ error: { code: error.message, message } })
   }
 }
 

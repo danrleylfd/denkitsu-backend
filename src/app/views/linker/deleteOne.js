@@ -9,7 +9,7 @@ const deleteOne = async (req, res) => {
     return res.status(204).send()
   } catch (error) {
     console.error(`[DEL_LINKER] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
-    const defaultError = { status: 500, message: "Ocorreu um erro inesperado ao deletar o atalho." }
+    const defaultError = { status: 500, message: "Ocorreu um erro interno no servidor." }
     const errorMessages = {
       LINKER_NOT_FOUND_OR_UNAUTHORIZED: { status: 404, message: "Atalho não encontrado ou você não tem permissão para excluí-lo." }
     }

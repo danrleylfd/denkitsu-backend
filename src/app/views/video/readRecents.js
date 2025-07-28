@@ -7,9 +7,9 @@ const readRecents = async (req, res) => {
     return res.status(200).json(videos)
   } catch (error) {
     console.error(`[RECENT_VIDEOS] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
-    const defaultError = { status: 500, message: `[RECENT_VIDEOS] ${new Date().toISOString()} - Internal server error` }
+    const defaultError = { status: 500, message: "Ocorreu um erro interno no servidor." }
     const errorMessages = {
-      VIDEOS_NOT_FOUND: { status: 404, message: "videos not found/exists" },
+      VIDEOS_NOT_FOUND: { status: 404, message: "Nenhum vídeo foi encontrado." },
     }
     const { status, message } = errorMessages[error.message] || defaultError
     return res.status(status).json({ code: error.message, error: message })

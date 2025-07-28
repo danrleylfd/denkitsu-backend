@@ -14,7 +14,7 @@ const replyComment = async (req, res) => {
     return res.status(201).json(populatedReply)
   } catch (error) {
     console.error(`[REPLY_COMMENT] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
-    const defaultError = { status: 500, message: "Ocorreu um erro inesperado ao responder o comentário." }
+    const defaultError = { status: 500, message: "Ocorreu um erro interno no servidor." }
     const errorMessages = {
       IMPOSSIBLE_REPLY: { status: 400, message: "Não é possível responder a uma resposta de outro comentário." }
     }

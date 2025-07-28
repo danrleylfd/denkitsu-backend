@@ -14,7 +14,7 @@ const updateOne = async (req, res) => {
     return res.status(200).json(video)
   } catch (error) {
     console.error(`[UPDATE_VIDEO] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
-    const defaultError = { status: 500, message: "Ocorreu um erro inesperado ao atualizar o vídeo." }
+    const defaultError = { status: 500, message: "Ocorreu um erro interno no servidor." }
     const errorMessages = {
       VIDEO_NOT_FOUND_OR_UNAUTHORIZED: { status: 404, message: "Vídeo não encontrado ou você não tem permissão para editá-lo." }
     }

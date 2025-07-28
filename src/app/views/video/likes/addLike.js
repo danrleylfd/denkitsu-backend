@@ -13,7 +13,7 @@ const addLike = async (req, res) => {
     return res.status(201).send()
   } catch (error) {
     console.error(`[LIKE] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
-    const defaultError = { status: 500, message: "Ocorreu um erro inesperado ao curtir o vídeo." }
+    const defaultError = { status: 500, message: "Ocorreu um erro interno no servidor." }
     const errorMessages = {
       VIDEO_NOT_FOUND_OR_ALREADY_LIKED: { status: 409, message: "Vídeo não encontrado ou já curtido por este usuário." }
     }

@@ -15,9 +15,9 @@ const countShares = async (req, res) => {
     })
   } catch (error) {
     console.error(`[COUNT_SHARES] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
-    return res.status(500).json({
-      error: { code: "INTERNAL_SERVER_ERROR", message: "Ocorreu um erro inesperado ao contar os compartilhamentos." }
-    })
+    const defaultError = { status: 500, message: "Ocorreu um erro interno no servidor." }
+    const { status, message } = defaultError
+    return res.status(status).json({ error: { code: error.message, message } })
   }
 }
 

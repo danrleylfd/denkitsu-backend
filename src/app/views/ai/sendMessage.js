@@ -77,7 +77,7 @@ const sendMessage = async (req, res) => {
       aiProvider: req.body.aiProvider,
       model: req.body.model
     })
-    const defaultError = { status: 500, message: "Ocorreu um erro interno no servidor ao processar a mensagem." }
+    const defaultError = { status: 500, message: "Ocorreu um erro interno no servidor." }
     const errorMessages = {
       AUTHENTICATION_FAILED: { status: 401, message: "Chave de API inválida. Verifique suas credenciais." },
       RATE_LIMIT_EXCEEDED: { status: 429, message: "Limite de requisições excedido. Tente novamente mais tarde." },

@@ -11,7 +11,7 @@ const deleteOne = async (req, res) => {
     return res.status(204).send()
   } catch (error) {
     console.error(`[DEL_VIDEO] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
-    const defaultError = { status: 500, message: "Ocorreu um erro inesperado ao deletar o vídeo." }
+    const defaultError = { status: 500, message: "Ocorreu um erro interno no servidor." }
     const errorMessages = {
       VIDEO_NOT_FOUND_OR_UNAUTHORIZED: { status: 404, message: "Vídeo não encontrado ou você não tem permissão para excluí-lo." },
     }

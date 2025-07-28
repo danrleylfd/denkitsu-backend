@@ -47,8 +47,10 @@ const fetchRepoFiles = async (req, res) => {
     })
 
   } catch (error) {
-    console.error("[FETCH_REPO_FILES_ERROR]", error.message)
-    res.status(500).json({ error: "Falha ao buscar os arquivos do repositório." })
+    console.error("[FETCH_REPO_FILES_ERROR]", { error: error.message, stack: error.stack })
+    const defaultError = { status: 500, message: "Ocorreu um erro interno no servidor." }
+    const { status, message } = defaultError
+    return res.status(status).json({ error: { code: error.message, message } })
   }
 }
 

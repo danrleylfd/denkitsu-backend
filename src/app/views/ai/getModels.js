@@ -7,10 +7,9 @@ const getModels = async (req, res) => {
   } catch (error) {
     if (error.response) return res.status(error.response.status).json(error.response.data)
     console.error(`[GET_MODELS] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
-    const defaultError = { status: 500, message: `[GET_MODELS] ${new Date().toISOString()} - Internal server error` }
-    const errorMessages = {}
-    const { status, message } = errorMessages[error.message] || defaultError
-    return res.status(status).json({ code: error.message, message })
+    const defaultError = { status: 500, message: "Ocorreu um erro interno no servidor." }
+    const { status, message } = defaultError
+    return res.status(status).json({ error: { code: error.message, message } })
   }
 }
 

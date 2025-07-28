@@ -19,11 +19,11 @@ const baseOptions = {
     blockHistory.set(ip, (blockHistory.get(ip) || 0) + 1)
     options.windowMs = getBlockDuration(ip)
     res.status(429).json({
-      error: `Too many requests, please try again after ${options.windowMs / (60 * 1000)} minutes`,
+      error: { code: "RATE_LIMIT", message: `Muitas requisições. Por favor, tente novamente em ${options.windowMs / (60 * 1000)} minutos.`},
       nextValidRequest: new Date(Date.now() + options.windowMs)
     })
   },
-  message: { error: "Too many requests, please try again later after 1 minute" }
+  message: { error: { code: "RATE_LIMIT", message: "Muitas requisições. Por favor, tente novamente em 1 minuto." } }
 }
 
 const globalLimiter = rateLimit({

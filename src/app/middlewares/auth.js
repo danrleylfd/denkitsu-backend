@@ -30,16 +30,16 @@ const authMiddleware = async (req, res, next) => {
     return next()
   } catch (error) {
     console.error(`[AUTH_MIDDLEWARE] ${new Date().toISOString()} - `, { error: error.message, stack: error.stack })
-    const defaultError = { status: 500, message: `[AUTH_MIDDLEWARE] ${new Date().toISOString()} - Internal server error` }
+    const defaultError = { status: 500, message: "Ocorreu um erro interno no servidor." }
     const errorMessages = {
-      TOKEN_MISSING: { status: 401, message: "No token provided" },
-      TOKEN_PARTS_ERROR: { status: 401, message: "Invalid token format" },
-      TOKEN_SCHEMA_ERROR: { status: 401, message: "Token must use Bearer scheme" },
-      TOKEN_INVALID: { status: 401, message: "Invalid or expired token" },
-      USER_NOT_FOUND: { status: 404, message: "user not found/exists" },
+      TOKEN_MISSING: { status: 401, message: "Nenhum token de autenticação fornecido." },
+      TOKEN_PARTS_ERROR: { status: 401, message: "Formato de token inválido." },
+      TOKEN_SCHEMA_ERROR: { status: 401, message: "O token deve ser do tipo 'Bearer'." },
+      TOKEN_INVALID: { status: 401, message: "Token inválido ou expirado." },
+      USER_NOT_FOUND: { status: 404, message: "Usuário associado ao token não encontrado." },
     }
     const { status, message } = errorMessages[error.message] || defaultError
-    return res.status(status).json({ code: error.message, error: message })
+    return res.status(status).json({ error: { code: error.message, message } })
   }
 }
 

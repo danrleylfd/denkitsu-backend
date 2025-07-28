@@ -17,9 +17,9 @@ const readManyPaginate = async (req, res) => {
     })
   } catch (error) {
     console.error(`[READ_MANY_PAGINATE_NEWS] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
-    return res.status(500).json({
-      error: { code: "INTERNAL_SERVER_ERROR", message: "Ocorreu um erro inesperado ao buscar as notícias." }
-    })
+    const defaultError = { status: 500, message: "Ocorreu um erro interno no servidor." }
+    const { status, message } = defaultError
+    return res.status(status).json({ error: { code: error.message, message } })
   }
 }
 

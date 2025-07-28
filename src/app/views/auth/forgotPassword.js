@@ -32,7 +32,7 @@ const forgotPassword = async (req, res) => {
     if (error.message !== "MAIL_ERROR") {
       console.error(`[FORGOT_PASSWORD] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
     }
-    const defaultError = { status: 500, message: "Ocorreu um erro inesperado." }
+    const defaultError = { status: 500, message: "Ocorreu um erro interno no servidor." }
     const errorMessages = {
       MAIL_ERROR: { status: 500, message: "Não foi possível enviar o e-mail de recuperação. Tente novamente mais tarde." }
     }

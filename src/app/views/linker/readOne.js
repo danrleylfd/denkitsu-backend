@@ -8,7 +8,7 @@ const readOne = async (req, res) => {
     return res.status(200).json({ link: linker.link })
   } catch (error) {
     console.error(`[READ_LINKER] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
-    const defaultError = { status: 500, message: "Ocorreu um erro inesperado ao processar o atalho." }
+    const defaultError = { status: 500, message: "Ocorreu um erro interno no servidor." }
     const errorMessages = {
       LINKER_NOT_FOUND: { status: 404, message: "O atalho solicitado não foi encontrado." }
     }

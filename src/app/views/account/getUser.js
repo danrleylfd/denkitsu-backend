@@ -8,12 +8,12 @@ const getUser = async (req, res) => {
     return res.status(200).json({ user })
   } catch (error) {
     console.error(`[GET_USER] ${new Date().toISOString()} - `, { error: error.message, stack: error.stack })
-    const defaultError = { status: 500, message: `[GET_USER] ${new Date().toISOString()} - Internal server error` }
+    const defaultError = { status: 500, message: "Ocorreu um erro interno no servidor." }
     const errorMessages = {
-      USER_NOT_FOUND: { status: 404, message: "user not found/exists" },
+      USER_NOT_FOUND: { status: 404, message: "Usuário não encontrado." },
     }
     const { status, message } = errorMessages[error.message] || defaultError
-    return res.status(status).json({ code: error.message, error: message })
+    return res.status(status).json({ error: { code: error.message, message } })
   }
 }
 

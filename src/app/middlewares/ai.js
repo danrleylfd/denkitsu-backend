@@ -8,7 +8,9 @@ const aiMiddleware = (req, res, next) => {
     return next()
   } catch (error) {
     console.error(`[AI_MIDDLEWARE] ${new Date().toISOString()} - `, { error: error.message, stack: error.stack })
-    return res.status(500).json({ error: { code: "AI_MIDDLEWARE_ERROR", message: "Ocorreu um erro interno ao processar as mensagens da IA." } })
+    const defaultError = { status: 500, message: "Ocorreu um erro interno no servidor." }
+    const { status, message } = defaultError
+    return res.status(status).json({ error: { code: error.message, message } })
   }
 }
 

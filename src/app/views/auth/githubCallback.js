@@ -62,7 +62,7 @@ const githubCallback = async (req, res) => {
       : `${process.env.HOST1}/auth/github/callback?token=${token}&refreshToken=${refreshToken}&user=${userParam}`
     res.redirect(redirectUrl)
   } catch (error) {
-    console.error("Erro no callback do GitHub:", error.message)
+    console.error("Erro no callback do GitHub:", { error: error.message, stack: error.stack })
     const knownErrorCodes = [
       "GITHUB_CODE_MISSING",
       "GITHUB_TOKEN_FETCH_FAILED",

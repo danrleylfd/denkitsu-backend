@@ -7,9 +7,9 @@ const readManyByUser = async (req, res) => {
     return res.status(200).json(videos)
   } catch (error) {
     console.error(`[VIDEOS_BY_USER] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
-    return res.status(500).json({
-      error: { code: "INTERNAL_SERVER_ERROR", message: "Ocorreu um erro inesperado ao buscar os vídeos." }
-    })
+    const defaultError = { status: 500, message: "Ocorreu um erro interno no servidor." }
+    const { status, message } = defaultError
+    return res.status(status).json({ error: { code: error.message, message } })
   }
 }
 

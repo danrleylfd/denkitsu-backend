@@ -12,9 +12,13 @@ const refreshToken = async (req, res) => {
   } catch (error) {
     console.error(`[REFRESH_TOKEN] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
     if (error instanceof JsonWebTokenError || error instanceof TokenExpiredError) {
-      return res.status(401).json({ error: { code: "REFRESH_TOKEN_INVALID", message: "O refresh token é inválido ou expirou." } })
+      return res.status(401).json({
+        error: { code: "REFRESH_TOKEN_INVALID", message: "O refresh token é inválido ou expirou." }
+      })
     }
-    return res.status(500).json({ error: { code: "INTERNAL_SERVER_ERROR", message: "Ocorreu um erro inesperado." } })
+    const defaultError = { status: 500, message: "Ocorreu um erro interno no servidor." }
+    const { status, message } = defaultError
+    return res.status(status).json({ error: { code: error.message, message } })
   }
 }
 

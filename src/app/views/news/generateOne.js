@@ -41,7 +41,7 @@ const generateOne = async (req, res) => {
     return res.status(201).json(news)
   } catch (error) {
     console.error(`[GENERATE_NEWS] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
-    const defaultError = { status: 500, message: "Ocorreu um erro inesperado ao gerar a notícia." }
+    const defaultError = { status: 500, message: "Ocorreu um erro interno no servidor." }
     const errorMessages = {
       ARTICLE_EXISTS: { status: 409, message: "Esta notícia já foi gerada e publicada." },
       NEWS_NOT_FOUND: { status: 404, message: "Nenhuma notícia encontrada para o termo pesquisado." },
