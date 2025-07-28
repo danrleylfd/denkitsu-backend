@@ -8,6 +8,7 @@ const sendMessage = async (req, res) => {
     const { aiProvider = "groq", model, messages: userPrompts, aiKey, plugins, use_tools, stream = false, mode = "Padrão" } = req.body
     let systemPrompt = allPrompts.find(p => p.content.trim().startsWith(`Modo ${mode}`))
     if (!systemPrompt) systemPrompt = allPrompts[0]
+    console.log(systemPrompt)
     const messages = [systemPrompt]
     messages.push(...userPrompts)
     const requestOptions = {
