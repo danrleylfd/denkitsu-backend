@@ -8,7 +8,8 @@ const sendMessage = async (req, res) => {
     const { aiProvider = "groq", model, messages: userPrompts, aiKey, plugins, use_tools, stream = false, mode = "Padrão" } = req.body
     let systemPrompt = allPrompts.find(p => p.content.trim().startsWith(`Modo ${mode}`))
     if (!systemPrompt) systemPrompt = allPrompts[0]
-    const messages = [systemPrompt]
+    const timestampsMsg = { role: "system", content: `A data atual ${new Date().toISOString()} deve ser manuseada internamente com o fuso horário de Brasília`}
+    const messages = [systemPrompt, timestampsMsg]
     messages.push(...userPrompts)
     console.log(messages)
     const requestOptions = {
