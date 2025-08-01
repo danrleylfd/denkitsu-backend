@@ -21,10 +21,6 @@ const sendMessageRules = () => {
       }
       return true
     }),
-    body("mcp_server_url")
-      .optional()
-      .isURL()
-      .withMessage("A URL do servidor MCP fornecida é inválida."),
   ]
 }
 
