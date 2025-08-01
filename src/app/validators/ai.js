@@ -13,10 +13,6 @@ const sendMessageRules = () => {
       .optional()
       .isIn(["openrouter", "groq"])
       .withMessage("O provedor de IA selecionado é inválido."),
-    body("mcp_server_url")
-      .optional()
-      .isURL()
-      .withMessage("A URL do servidor MCP fornecida é inválida."),
     body("stream").custom((streamValue, { req }) => {
       if (!req.body) return console.error("req.body é undefined, Danrley o problema é que a requisição está vindo sem Content-Type: application/json")
       const use_tools = req.body.use_tools

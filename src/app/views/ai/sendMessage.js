@@ -1,38 +1,7 @@
 const { ask } = require("../../../utils/api/ai")
 const { availableTools, tools } = require("../../../utils/tools")
 const allPrompts = require("../../../utils/prompts")
-const {
-  cleanMessageHistory,
-  sanitizeMessages,
-  selectSystemPrompt,
-  prepareRequestOptions,
-  handleStreamingResponse,
-  executeToolCalls,
-  handleError,
-} = require("../../../utils/helpers/ai")
-
-// const sendMessage = async (req, res) => {
-//   try {
-//     const { aiProvider = "groq", aiKey, messages: userPrompts, stream = false, mode = "Padrão" } = req.body
-//     const systemPrompt = selectSystemPrompt(mode)
-//     const messages = [systemPrompt, ...userPrompts]
-//     const requestOptions = prepareRequestOptions(req.body)
-//     if (stream) {
-//       const streamParams = { aiProvider, aiKey, messages, requestOptions }
-//       return handleStreamingResponse(res, streamParams)
-//     }
-//     const initialResponse = await ask(aiProvider, aiKey, messages, requestOptions)
-//     const responseMessage = initialResponse.data.choices[0].message
-//     if (responseMessage.tool_calls) {
-//       const toolParams = { aiProvider, aiKey, model: requestOptions.model }
-//       const finalResponse = await executeToolCalls(initialResponse, messages, toolParams)
-//       return res.status(finalResponse.status).json(finalResponse.data)
-//     }
-//     return res.status(initialResponse.status).json(initialResponse.data)
-//   } catch (error) {
-//     return handleError(error, res, req)
-//   }
-// }
+const { sanitizeMessages } = require("../../../utils/helpers/ai")
 
 const sendMessage = async (req, res) => {
   try {
