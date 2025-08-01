@@ -20,7 +20,11 @@ const sendMessageRules = () => {
         throw new Error("O modo de streaming não pode ser usado em conjunto com ferramentas (tools).")
       }
       return true
-    })
+    }),
+    body("mcp_server_url")
+      .optional()
+      .isURL()
+      .withMessage("A URL do servidor MCP fornecida é inválida."),
   ]
 }
 
