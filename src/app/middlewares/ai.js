@@ -1,4 +1,4 @@
-const { cleanMessageHistory, sanitizeMessages } = require("../../utils/ai/messageProcessor")
+const { cleanMessageHistory, sanitizeMessages } = require("../../utils/helpers/ai")
 
 const aiMiddleware = (req, res, next) => {
   try {

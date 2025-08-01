@@ -1,86 +1,117 @@
 const { ask } = require("../../../utils/api/ai")
-const { availableTools, tools } = require("../../../utils/tools")
-const allPrompts = require("../../../utils/prompts")
-const { sanitizeMessages } = require("../../../utils/ai/messageProcessor")
+// const { availableTools, tools } = require("../../../utils/tools")
+// const allPrompts = require("../../../utils/prompts")
+const {
+  // cleanMessageHistory,
+  // sanitizeMessages,
+  selectSystemPrompt,
+  prepareRequestOptions,
+  handleStreamingResponse,
+  executeToolCalls,
+  handleError,
+} = require("../../../utils/helpers/ai")
 
 const sendMessage = async (req, res) => {
   try {
-    const { aiProvider = "groq", model, messages: userPrompts, aiKey, plugins, use_tools, stream = false, mode = "Padrão" } = req.body
-    let systemPrompt = allPrompts.find(p => p.content.trim().startsWith(`Modo ${mode}`))
-    if (!systemPrompt) systemPrompt = allPrompts[0]
+    const { aiProvider = "groq", aiKey, messages: userPrompts, stream = false, mode = "Padrão" } = req.body
+    const systemPrompt = selectSystemPrompt(mode)
     const messages = [systemPrompt, ...userPrompts]
-    const requestOptions = {
-      model,
-      stream,
-      plugins: plugins ? plugins : undefined
-    }
+    const requestOptions = prepareRequestOptions(req.body)
     if (stream) {
-      const streamResponse = await ask(aiProvider, aiKey, messages, requestOptions)
-      res.setHeader("Content-Type", "text/event-stream")
-      res.setHeader("Cache-Control", "no-cache")
-      res.setHeader("Connection", "keep-alive")
-      for await (const chunk of streamResponse) {
-        res.write(`data: ${JSON.stringify(chunk)}\n\n`)
-      }
-      return res.end()
+      const streamParams = { aiProvider, aiKey, messages, requestOptions }
+      return handleStreamingResponse(res, streamParams)
     }
-    if (use_tools && Array.isArray(use_tools) && use_tools.length > 0) {
-      const filteredTools = tools.filter((tool) => use_tools.includes(tool.function.name))
-      if (filteredTools.length > 0) {
-        requestOptions.tools = filteredTools
-        requestOptions.tool_choice = "auto"
-        console.log(`[TOOL CONTROL] Usando as seguintes ferramentas: ${use_tools.join(", ")}`)
-      }
-    }
-    const { status, data } = await ask(aiProvider, aiKey, messages, requestOptions)
-    const resMsg = data.choices[0].message
-    if (resMsg.tool_calls) {
-      messages.push(resMsg)
-      console.log(resMsg.tool_calls)
-      for (const toolCall of resMsg.tool_calls) {
-        const functionName = toolCall.function.name
-        const functionToCall = availableTools[functionName]
-        const functionArgs = JSON.parse(toolCall.function.arguments)
-        console.log(`[TOOL CALL] Executing: ${functionName}(${JSON.stringify(functionArgs)})`)
-        if (functionName === "executeHttpRequest") {
-          const functionResponse = await functionToCall(functionArgs)
-          messages.push({
-            tool_call_id: toolCall.id,
-            role: "tool",
-            name: functionName,
-            content: JSON.stringify(functionResponse.data)
-          })
-          continue
-        }
-        const functionResponse = await functionToCall(...Object.values(functionArgs))
-        messages.push({
-          tool_call_id: toolCall.id,
-          role: "tool",
-          name: functionName,
-          content: JSON.stringify(functionResponse.data)
-        })
-      }
-      const sanitizedMessages = sanitizeMessages(messages)
-      const finalResponse = await ask(aiProvider, aiKey, sanitizedMessages, { model })
+    const initialResponse = await ask(aiProvider, aiKey, messages, requestOptions)
+    const responseMessage = initialResponse.data.choices[0].message
+    if (responseMessage.tool_calls) {
+      const toolParams = { aiProvider, aiKey, model: requestOptions.model }
+      const finalResponse = await executeToolCalls(initialResponse, messages, toolParams)
       return res.status(finalResponse.status).json(finalResponse.data)
     }
-    return res.status(status).json(data)
+    return res.status(initialResponse.status).json(initialResponse.data)
   } catch (error) {
-    console.error(`[SEND_MESSAGE] ${new Date().toISOString()} -`, {
-      error: error.message,
-      stack: error.stack,
-      aiProvider: req.body.aiProvider,
-      model: req.body.model
-    })
-    const defaultError = { status: 500, message: "Ocorreu um erro interno no servidor." }
-    const errorMessages = {
-      AUTHENTICATION_FAILED: { status: 401, message: "Chave de API inválida. Verifique suas credenciais." },
-      RATE_LIMIT_EXCEEDED: { status: 429, message: "Limite de requisições excedido. Tente novamente mais tarde." },
-      API_REQUEST_FAILED: { status: 502, message: "Falha na comunicação com o serviço de IA. Tente novamente." },
-    }
-    const { status, message } = errorMessages[error.message] || defaultError
-    return res.status(status).json({ error: { code: error.message, message } })
+    return handleError(error, res, req)
   }
 }
+
+// const sendMessage = async (req, res) => {
+//   try {
+//     const { aiProvider = "groq", model, messages: userPrompts, aiKey, plugins, use_tools, stream = false, mode = "Padrão" } = req.body
+//     let systemPrompt = allPrompts.find(p => p.content.trim().startsWith(`Modo ${mode}`))
+//     if (!systemPrompt) systemPrompt = allPrompts[0]
+//     const messages = [systemPrompt, ...userPrompts]
+//     const requestOptions = {
+//       model,
+//       stream,
+//       plugins: plugins ? plugins : undefined
+//     }
+//     if (stream) {
+//       const streamResponse = await ask(aiProvider, aiKey, messages, requestOptions)
+//       res.setHeader("Content-Type", "text/event-stream")
+//       res.setHeader("Cache-Control", "no-cache")
+//       res.setHeader("Connection", "keep-alive")
+//       for await (const chunk of streamResponse) {
+//         res.write(`data: ${JSON.stringify(chunk)}\n\n`)
+//       }
+//       return res.end()
+//     }
+//     if (use_tools && Array.isArray(use_tools) && use_tools.length > 0) {
+//       const filteredTools = tools.filter((tool) => use_tools.includes(tool.function.name))
+//       if (filteredTools.length > 0) {
+//         requestOptions.tools = filteredTools
+//         requestOptions.tool_choice = "auto"
+//         console.log(`[TOOL CONTROL] Usando as seguintes ferramentas: ${use_tools.join(", ")}`)
+//       }
+//     }
+//     const { status, data } = await ask(aiProvider, aiKey, messages, requestOptions)
+//     const resMsg = data.choices[0].message
+//     if (resMsg.tool_calls) {
+//       messages.push(resMsg)
+//       console.log(resMsg.tool_calls)
+//       for (const toolCall of resMsg.tool_calls) {
+//         const functionName = toolCall.function.name
+//         const functionToCall = availableTools[functionName]
+//         const functionArgs = JSON.parse(toolCall.function.arguments)
+//         console.log(`[TOOL CALL] Executing: ${functionName}(${JSON.stringify(functionArgs)})`)
+//         if (functionName === "executeHttpRequest") {
+//           const functionResponse = await functionToCall(functionArgs)
+//           messages.push({
+//             tool_call_id: toolCall.id,
+//             role: "tool",
+//             name: functionName,
+//             content: JSON.stringify(functionResponse.data)
+//           })
+//           continue
+//         }
+//         const functionResponse = await functionToCall(...Object.values(functionArgs))
+//         messages.push({
+//           tool_call_id: toolCall.id,
+//           role: "tool",
+//           name: functionName,
+//           content: JSON.stringify(functionResponse.data)
+//         })
+//       }
+//       const sanitizedMessages = sanitizeMessages(messages)
+//       const finalResponse = await ask(aiProvider, aiKey, sanitizedMessages, { model })
+//       return res.status(finalResponse.status).json(finalResponse.data)
+//     }
+//     return res.status(status).json(data)
+//   } catch (error) {
+//     console.error(`[SEND_MESSAGE] ${new Date().toISOString()} -`, {
+//       error: error.message,
+//       stack: error.stack,
+//       aiProvider: req.body.aiProvider,
+//       model: req.body.model
+//     })
+//     const defaultError = { status: 500, message: "Ocorreu um erro interno no servidor." }
+//     const errorMessages = {
+//       AUTHENTICATION_FAILED: { status: 401, message: "Chave de API inválida. Verifique suas credenciais." },
+//       RATE_LIMIT_EXCEEDED: { status: 429, message: "Limite de requisições excedido. Tente novamente mais tarde." },
+//       API_REQUEST_FAILED: { status: 502, message: "Falha na comunicação com o serviço de IA. Tente novamente." },
+//     }
+//     const { status, message } = errorMessages[error.message] || defaultError
+//     return res.status(status).json({ error: { code: error.message, message } })
+//   }
+// }
 
 module.exports = sendMessage
