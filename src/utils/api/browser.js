@@ -35,7 +35,7 @@ const browseUrl = async (url) => {
 const browserTool = {
   type: "function",
   function: {
-    name: "browseUrl",
+    name: "browserTool",
     description:
       "Acessa e lê o conteúdo de uma URL específica fornecida pelo usuário. Use esta ferramenta quando o usuário fornecer um link e pedir para acessar, resumir, analisar, ou extrair informações daquela página.",
     parameters: {

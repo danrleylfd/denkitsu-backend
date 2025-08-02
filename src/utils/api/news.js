@@ -14,7 +14,7 @@ const searchNews = async (searchTerm) => {
 const newsTool = {
   type: "function",
   function: {
-    name: "searchNews",
+    name: "newsTool",
     description: "Busca a notícia mais recentes sobre um tópico específico. Ideal para perguntas sobre eventos atuais, política, esportes, finanças, etc.",
     parameters: {
       type: "object",

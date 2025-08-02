@@ -42,7 +42,7 @@ const sendMessage = async (req, res) => {
         const functionToCall = availableTools[functionName]
         const functionArgs = JSON.parse(toolCall.function.arguments)
         console.log(`[TOOL CALL] Executing: ${functionName}(${JSON.stringify(functionArgs)})`)
-        if (functionName === "executeHttpRequest") {
+        if (functionName === "httpTool") {
           const functionResponse = await functionToCall(functionArgs)
           messages.push({
             tool_call_id: toolCall.id,

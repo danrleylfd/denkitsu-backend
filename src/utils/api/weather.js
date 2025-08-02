@@ -29,7 +29,7 @@ const getWeatherByCoordinates = async (lat, lon) => {
 const weatherTool = {
   type: "function",
   function: {
-    name: "getWeather",
+    name: "weatherTool",
     description: "Obtém a previsão do tempo para uma cidade específica.",
     parameters: {
       type: "object",

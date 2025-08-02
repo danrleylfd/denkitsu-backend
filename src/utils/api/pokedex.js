@@ -57,7 +57,7 @@ const getPokemonDetails = async (pokemonNameOrId) => {
 const pokedexTool = {
   type: "function",
   function: {
-    name: "getPokemonDetails",
+    name: "pokedexTool",
     description: "Busca informações detalhadas sobre um Pokémon específico usando seu nome ou número da Pokédex.",
     parameters: {
       type: "object",

@@ -36,7 +36,7 @@ const getCoinQuote = async (symbols) => {
 const criptoTool = {
   type: "function",
   function: {
-    name: "getCoinQuote",
+    name: "criptoTool",
     description: "Busca a cotação (ticker) de um ou mais pares de criptomoedas simultaneamente na exchange Mercado Bitcoin. As cotações são em Reais (BRL).",
     parameters: {
       type: "object",

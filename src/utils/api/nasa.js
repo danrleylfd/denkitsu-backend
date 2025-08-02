@@ -22,7 +22,7 @@ const nasaDailyPicture = async () => {
 const nasaTool = {
   type: "function",
   function: {
-    name: "nasaDailyPicture",
+    name: "nasaTool",
     description: "Busca a 'Foto Astronômica do Dia' (APOD) da NASA de hoje.",
     parameters: {
       type: "object",

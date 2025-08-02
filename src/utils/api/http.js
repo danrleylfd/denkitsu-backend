@@ -24,7 +24,7 @@ const executeHttpRequest = async (config) => {
 const httpTool = {
   type: "function",
   function: {
-    name: "executeHttpRequest",
+    name: "httpTool",
     description: "Executa requisições HTTP pré-configuradas e retorna respostas brutas",
     parameters: {
       type: "object",
