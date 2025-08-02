@@ -11,11 +11,7 @@ const nasaDailyPicture = async () => {
     return { status: 200, data }
   } catch (error) {
     console.error(`[NASA_SERVICE] Erro ao buscar APOD:`, error.response?.data || error.message)
-    const errorData = error.response?.data
-    if (errorData?.code === 400) {
-      return { status: 400, data: { error: `Requisição inválida. Detalhes: ${errorData.msg}` } }
-    }
-    return { status: 500, data: { error: "Não foi possível acessar a API da NASA no momento." } }
+    throw error
   }
 }
 

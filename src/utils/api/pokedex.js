@@ -47,10 +47,7 @@ const getPokemonDetails = async (pokemonNameOrId) => {
     return result
   } catch (error) {
     console.error(`[POKEDEX_SERVICE] Erro ao buscar o Pokémon "${pokemonNameOrId}":`, error.message)
-    if (error.response?.status === 404) {
-      return { status: 404, data: { error: `Pokémon '${pokemonNameOrId}' não encontrado.` } }
-    }
-    return { status: 500, data: { error: "Não foi possível acessar os dados da Pokédex no momento." } }
+    throw error
   }
 }
 

@@ -26,10 +26,7 @@ const getCoinQuote = async (symbols) => {
     return { status: 200, data: tickers }
   } catch (error) {
     console.error(`[CRIPTO_SERVICE] Erro ao buscar os tickers "${symbols}":`, error.message)
-    if (error.response?.status === 400) {
-      return { status: 400, data: { error: `Um ou mais pares de negociação são inválidos: '${symbols}'.` } }
-    }
-    return { status: 500, data: { error: "Não foi possível acessar a API do Mercado Bitcoin no momento." } }
+    throw error
   }
 }
 

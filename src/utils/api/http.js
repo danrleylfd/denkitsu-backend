@@ -12,12 +12,8 @@ const executeHttpRequest = async (config) => {
     })
     return { data: response.data }
   } catch (error) {
-    console.error(error)
-    return {
-      error: true,
-      code: error.response?.status || "NETWORK_ERROR",
-      details: error.response?.data || error.message
-    }
+    console.error(`[HTTP_SERVICE] Erro ao consumir API "${config}":`, error.message)
+    throw error
   }
 }
 

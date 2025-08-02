@@ -25,10 +25,7 @@ const browseUrl = async (url) => {
     }
   } catch (error) {
     console.error(`[Browse_SERVICE] Erro ao navegar na URL "${url}":`, error.message)
-    return {
-      status: 500,
-      data: { error: `Não foi possível processar a URL. Verifique o link ou tente outra página.` },
-    }
+    throw error
   }
 }
 

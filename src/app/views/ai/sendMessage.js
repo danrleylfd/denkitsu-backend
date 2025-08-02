@@ -9,11 +9,7 @@ const sendMessage = async (req, res) => {
     let systemPrompt = allPrompts.find(p => p.content.trim().startsWith(`Modo ${mode}`))
     if (!systemPrompt) systemPrompt = allPrompts[0]
     const messages = [systemPrompt, ...userPrompts]
-    const requestOptions = {
-      model,
-      stream,
-      plugins: plugins ? plugins : undefined
-    }
+    const requestOptions = { model, stream, plugins: plugins ? plugins : undefined }
     if (stream) {
       const streamResponse = await ask(aiProvider, aiKey, messages, requestOptions)
       res.setHeader("Content-Type", "text/event-stream")
@@ -36,7 +32,6 @@ const sendMessage = async (req, res) => {
     const resMsg = data.choices[0].message
     if (resMsg.tool_calls) {
       messages.push(resMsg)
-      console.log(resMsg.tool_calls)
       for (const toolCall of resMsg.tool_calls) {
         const functionName = toolCall.function.name
         const functionToCall = availableTools[functionName]
