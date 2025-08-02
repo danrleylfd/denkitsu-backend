@@ -15,7 +15,7 @@ const searchWikipedia = async (topic) => {
     return { status: 200, data: summary }
   } catch (error) {
     console.error(`[WIKIPEDIA_SERVICE] Erro ao buscar o tópico "${topic}":`, error.response?.data || error.message)
-    throw error
+    throw new Error("TOOL_ERROR")
   }
 }
 

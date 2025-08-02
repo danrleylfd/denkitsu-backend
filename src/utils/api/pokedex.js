@@ -47,7 +47,7 @@ const getPokemonDetails = async (pokemonNameOrId) => {
     return result
   } catch (error) {
     console.error(`[POKEDEX_SERVICE] Erro ao buscar o Pokémon "${pokemonNameOrId}":`, error.message)
-    throw error
+    throw new Error("TOOL_ERROR")
   }
 }
 

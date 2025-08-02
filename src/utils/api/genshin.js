@@ -220,8 +220,8 @@ const getPlayerBuild = async (characterName, uid) => {
     console.log(`[TOOL_CALL] Análise concluída. Retornando dados combinados.`)
     return { status: 200, data: responseData }
   } catch (error) {
-    console.error("[ANALYZE_TOOL] Erro durante a execução:", error.message)
-    throw error
+    console.error("[GENSHIN_SERVICE] Erro durante a execução:", error.message)
+    throw new Error("TOOL_ERROR")
   }
 }
 

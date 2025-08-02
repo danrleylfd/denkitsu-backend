@@ -6,8 +6,8 @@ const searchNews = async (searchTerm) => {
     // return newsAPI.get(`/top-headlines/?apiKey=${process.env.NEWS_API_KEY}&pageSize=1&category=technology`)
     return newsAPI.get(`/everything/?apiKey=${process.env.NEWS_API_KEY}&pageSize=1${searchTerm ? `&q=${searchTerm}` : ""}&sources=the-next-web,wired,ars-technica,engadget,techcrunch,techcrunch-cn,techradar,the-verge,wired-de,hacker-news,recode,t3n,gruenderszene,crypto-coins-news`)
   } catch (error) {
-    console.error("Error calling API:", error)
-    throw error
+    console.error(`[NEWS_SERVICE] Falha ao buscar notícias:`, error.message)
+    throw new Error("TOOL_ERROR")
   }
 }
 

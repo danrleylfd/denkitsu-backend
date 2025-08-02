@@ -11,7 +11,7 @@ const nasaDailyPicture = async () => {
     return { status: 200, data }
   } catch (error) {
     console.error(`[NASA_SERVICE] Erro ao buscar APOD:`, error.response?.data || error.message)
-    throw error
+    throw new Error("TOOL_ERROR")
   }
 }
 

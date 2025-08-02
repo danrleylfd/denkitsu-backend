@@ -24,8 +24,8 @@ const browseUrl = async (url) => {
       },
     }
   } catch (error) {
-    console.error(`[Browse_SERVICE] Erro ao navegar na URL "${url}":`, error.message)
-    throw error
+    console.error(`[BROWSER_SERVICE] Erro ao navegar na URL "${url}":`, error.message)
+    throw new Error("TOOL_ERROR")
   }
 }
 

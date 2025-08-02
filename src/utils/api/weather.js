@@ -12,8 +12,8 @@ const getWeatherByLocation = async (location) => {
     const { lat, lon } = geoCodeData[0]
     return await api.get(`/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&lang=pt_br&appid=${process.env.WEATHER_API_KEY}`)
   } catch (error) {
-    console.error(error)
-    throw error
+    console.error(`[WEATHER_SERVICE] Erro ao obter dados climáticos:`, error.message)
+    throw new Error("TOOL_ERROR")
   }
 }
 
@@ -21,8 +21,8 @@ const getWeatherByCoordinates = async (lat, lon) => {
   try {
     return await api.get(`/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&lang=pt_br&appid=${process.env.WEATHER_API_KEY}`)
   } catch (error) {
-    console.error(error)
-    throw error
+    console.error(`[WEATHER_SERVICE] Erro ao obter dados climáticos:`, error.message)
+    throw new Error("TOOL_ERROR")
   }
 }
 

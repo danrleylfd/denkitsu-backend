@@ -26,7 +26,7 @@ const getCoinQuote = async (symbols) => {
     return { status: 200, data: tickers }
   } catch (error) {
     console.error(`[CRIPTO_SERVICE] Erro ao buscar os tickers "${symbols}":`, error.message)
-    throw error
+    throw new Error("TOOL_ERROR")
   }
 }
 

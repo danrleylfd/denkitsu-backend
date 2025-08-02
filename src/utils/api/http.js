@@ -13,7 +13,7 @@ const executeHttpRequest = async (config) => {
     return { data: response.data }
   } catch (error) {
     console.error(`[HTTP_SERVICE] Erro ao consumir API "${config}":`, error.message)
-    throw error
+    throw new Error("TOOL_ERROR")
   }
 }
 
