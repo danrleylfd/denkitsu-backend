@@ -6,6 +6,7 @@ const weatherService = require("../api/weather")
 const genshinService = require("../api/genshin")
 const pokedexService = require("../api/pokedex")
 const criptoService = require("../api/cripto")
+const nasaService = require("../api/nasa")
 
 const availableTools = {
   browseUrl: browserService.browseUrl,
@@ -16,6 +17,7 @@ const availableTools = {
   getPlayerBuild: genshinService.getPlayerBuild,
   getPokemonDetails: pokedexService.getPokemonDetails,
   getCoinQuote: criptoService.getCoinQuote,
+  nasaDailyPicture: nasaService.nasaDailyPicture,
 }
 
 const tools = [
@@ -27,6 +29,7 @@ const tools = [
   genshinService.genshinTool,
   pokedexService.pokedexTool,
   criptoService.criptoTool,
+  nasaService.nasaTool,
 ]
 
 module.exports = { availableTools, tools }
