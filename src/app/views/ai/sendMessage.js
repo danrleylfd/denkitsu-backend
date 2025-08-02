@@ -72,6 +72,7 @@ const sendMessage = async (req, res) => {
       AUTHENTICATION_FAILED: { status: 401, message: "Chave de API inválida. Verifique suas credenciais." },
       RATE_LIMIT_EXCEEDED: { status: 429, message: "Limite de requisições excedido. Tente novamente mais tarde." },
       API_REQUEST_FAILED: { status: 502, message: "Falha na comunicação com o serviço de IA. Tente novamente." },
+      TOOL_ERROR: { status: 500, message: "Falha ao executar ferramentas." }
     }
     const { status, message } = errorMessages[error.message] || defaultError
     return res.status(status).json({ error: { code: error.message, message } })
