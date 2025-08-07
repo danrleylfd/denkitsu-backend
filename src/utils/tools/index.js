@@ -36,7 +36,7 @@ const tools = [
   weatherService.weatherTool,
   wikipediaService.wikipediaTool,
 
-  cinemaService.mediaTool,
+  cinemaService.cinemaTool,
   genshinService.genshinTool,
   pokedexService.pokedexTool,
 ]
