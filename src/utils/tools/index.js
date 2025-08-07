@@ -7,6 +7,7 @@ const newsService = require("../api/news")
 const weatherService = require("../api/weather")
 const wikipediaService = require("../api/wikipedia")
 
+const cinemaService = require("../api/tmdb")
 const genshinService = require("../api/genshin")
 const pokedexService = require("../api/pokedex")
 
@@ -20,6 +21,7 @@ const availableTools = {
   weatherTool: weatherService.getWeatherByLocation,
   wikipediaTool: wikipediaService.searchWikipedia,
 
+  cinemaTool: cinemaService.searchMedia,
   genshinTool: genshinService.getPlayerBuild,
   pokedexTool: pokedexService.getPokemonDetails,
 }
@@ -34,6 +36,7 @@ const tools = [
   weatherService.weatherTool,
   wikipediaService.wikipediaTool,
 
+  cinemaService.mediaTool,
   genshinService.genshinTool,
   pokedexService.pokedexTool,
 ]
