@@ -46,10 +46,10 @@ const getMediaDetails = async (type, id) => {
   }
 }
 
-const mediaTool = {
+const cinemaTool = {
   type: "function",
   function: {
-    name: "mediaTool",
+    name: "cinemaTool",
     description: "Busca informações sobre filmes, séries, doramas e animes. Retorna uma lista de resultados correspondentes à consulta.",
     parameters: {
       type: "object",
@@ -64,4 +64,4 @@ const mediaTool = {
   }
 }
 
-module.exports = { searchMedia, getMediaDetails, mediaTool }
+module.exports = { searchMedia, getMediaDetails, cinemaTool }
