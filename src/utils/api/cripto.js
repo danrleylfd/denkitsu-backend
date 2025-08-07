@@ -34,7 +34,7 @@ const criptoTool = {
   type: "function",
   function: {
     name: "criptoTool",
-    description: "Busca a cotação (ticker) de um ou mais pares de criptomoedas simultaneamente na exchange Mercado Bitcoin. As cotações são em Reais (BRL).",
+    description: "Use essa tool para buscar a cotação (ticker) de um ou mais pares de criptomoedas simultaneamente na exchange Mercado Bitcoin. As cotações são em Reais (BRL).",
     parameters: {
       type: "object",
       properties: {

@@ -24,7 +24,7 @@ const wikipediaTool = {
   function: {
     name: "wikipediaTool",
     description:
-      "Busca um resumo sobre um tópico, conceito, pessoa ou lugar na Wikipedia. Use para perguntas que buscam definições ou conhecimento geral, como 'O que é um buraco negro?' ou 'Quem foi Santos Dumont?'.",
+      "Use essa tool para buscar um resumo sobre um tópico, conceito, pessoa ou lugar na Wikipedia. Use para perguntas que buscam definições ou conhecimento geral, como 'O que é um buraco negro?' ou 'Quem foi Santos Dumont?'.",
     parameters: {
       type: "object",
       properties: {

@@ -19,7 +19,7 @@ const nasaTool = {
   type: "function",
   function: {
     name: "nasaTool",
-    description: "Busca a 'Foto Astronômica do Dia' (APOD) da NASA de hoje.",
+    description: "Use essa tool para buscar a 'Foto Astronômica do Dia' (APOD) da NASA de hoje.",
     parameters: {
       type: "object",
       properties: {},

@@ -21,7 +21,7 @@ const httpTool = {
   type: "function",
   function: {
     name: "httpTool",
-    description: "Executa requisições HTTP pré-configuradas e retorna respostas brutas",
+    description: "Use essa tool para executar requisições HTTP pré-configuradas e retorna respostas brutas",
     parameters: {
       type: "object",
       properties: {

@@ -15,7 +15,7 @@ const newsTool = {
   type: "function",
   function: {
     name: "newsTool",
-    description: "Busca a notícia mais recentes sobre um tópico específico. Ideal para perguntas sobre eventos atuais, política, esportes, finanças, etc.",
+    description: "Use essa tool para buscar a notícia mais recentes sobre um tópico específico. Ideal para perguntas sobre eventos atuais, política, esportes, finanças, etc.",
     parameters: {
       type: "object",
       properties: {

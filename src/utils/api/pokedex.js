@@ -55,7 +55,7 @@ const pokedexTool = {
   type: "function",
   function: {
     name: "pokedexTool",
-    description: "Busca informações detalhadas sobre um Pokémon específico usando seu nome ou número da Pokédex.",
+    description: "Use essa tool para buscar informações detalhadas sobre um Pokémon específico usando seu nome ou número da Pokédex.",
     parameters: {
       type: "object",
       properties: {
