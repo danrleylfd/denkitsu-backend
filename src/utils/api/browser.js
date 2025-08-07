@@ -33,8 +33,7 @@ const browserTool = {
   type: "function",
   function: {
     name: "browserTool",
-    description:
-      "Acessa e lê o conteúdo de uma URL específica fornecida pelo usuário. Use esta ferramenta quando o usuário fornecer um link e pedir para acessar, resumir, analisar, ou extrair informações daquela página.",
+    description: "Use essa tool para acessar e ler o conteúdo de uma URL específica fornecida pelo usuário. Use esta ferramenta quando o usuário fornecer um link e pedir para acessar, resumir, analisar, ou extrair informações daquela página.",
     parameters: {
       type: "object",
       properties: {
