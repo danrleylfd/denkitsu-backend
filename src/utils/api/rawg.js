@@ -1,7 +1,7 @@
 const axios = require("axios")
 
 const rawgAPI = axios.create({
-  baseURL: process.env.RAWG_API_KEY,
+  baseURL: process.env.RAWG_API_URL,
   params: {
     key: process.env.RAWG_API_KEY
   }
