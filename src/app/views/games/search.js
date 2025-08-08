@@ -1,4 +1,4 @@
-const { searchGames } = require("../../../utils/api/games")
+const { searchGames } = require("../../../utils/api/rawg")
 
 const search = async (req, res) => {
   try {
