@@ -1,6 +1,6 @@
 const { Router } = require("express")
 const validate = require("../middlewares/validator")
-const { searchRules } = require("../validators/games")
+const { searchRules } = require("../validators/rawg")
 
 const searchView = require("../views/games/search")
 
