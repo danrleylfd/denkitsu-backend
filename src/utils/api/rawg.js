@@ -25,10 +25,9 @@ const searchGames = async (query) => {
     const { data } = await rawgAPI.get("/games", {
       params: {
         search: query,
-        page_size: 5
+        page_size: 1
       }
     })
-
     const results = data.results.map(formatGame)
     return { status: 200, data: results }
   } catch (error) {
