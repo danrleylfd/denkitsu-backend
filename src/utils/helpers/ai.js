@@ -1,3 +1,5 @@
+const { encoding_for_model } = require("@dqbd/tiktoken")
+
 const cleanMessageHistory = (messages = [], limit = 20) => {
   if (!Array.isArray(messages) || messages.length <= limit) return messages
   return messages.slice(-limit)
@@ -13,7 +15,23 @@ const sanitizeMessages = (messages = []) => {
   })
 }
 
+const calculateTokens = (text, model) => {
+  const fallbackModel = "text-davinci-003"
+  let encoder
+  try {
+    const modeloSeguro = model || fallbackModel
+    encoder = encoding_for_model(modeloSeguro)
+  } catch {
+    console.warn(`Modelo "${model}" não suportado. Usando fallback: ${fallbackModel}`)
+    encoder = encoding_for_model(fallbackModel)
+  }
+  const tokens = encoder.encode(text || "").length
+  encoder.free()
+  return tokens
+}
+
 module.exports = {
   cleanMessageHistory,
   sanitizeMessages,
+  calculateTokens,
 }
