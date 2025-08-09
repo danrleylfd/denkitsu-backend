@@ -1,12 +1,10 @@
-const { sanitizeMessages, calculateTokens } = require("../../utils/helpers/ai")
+const { sanitizeMessages } = require("../../utils/helpers/ai")
 
 const aiMiddleware = (req, res, next) => {
   try {
     // const limitedMessages = cleanMessageHistory(req.body.messages, 15)
-    const sanitizedMessages = sanitizeMessages(req.body.messages)
-    const totalTokens = sanitizedMessages.reduce((acc, msg) => acc + calculateTokens(msg.content.text, req.body.model), 0)
-    req.body.messages = sanitizedMessages
-    req.body.totalTokens = totalTokens
+    const finalMessages = sanitizeMessages(req.body.messages)
+    req.body.messages = finalMessages
     return next()
   } catch (error) {
     console.error(`[AI_MIDDLEWARE] ${new Date().toISOString()} - `, { error: error.message, stack: error.stack })
