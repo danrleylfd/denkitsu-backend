@@ -6,7 +6,7 @@ const aiMiddleware = (req, res, next) => {
     const sanitizedMessages = sanitizeMessages(req.body.messages)
     const messagesWithTokens = sanitizedMessages.map(msg => ({
       ...msg,
-      tokens: calculateTokens(msg.content, req.body.model)
+      tokens: calculateTokens(msg.content.text, req.body.model)
     }))
     req.body.messages = messagesWithTokens
     req.body.totalTokens = messagesWithTokens.reduce((acc, msg) => acc + (msg.tokens || 0), 0)
