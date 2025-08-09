@@ -4,12 +4,11 @@ const aiMiddleware = (req, res, next) => {
   try {
     // const limitedMessages = cleanMessageHistory(req.body.messages, 15)
     const sanitizedMessages = sanitizeMessages(req.body.messages)
-    const messagesWithTokens = sanitizedMessages.map(msg => ({
-      ...msg,
+    const totalTokens = sanitizedMessages.map(msg => ({
       tokens: calculateTokens(msg.content.text, req.body.model)
-    }))
-    req.body.messages = messagesWithTokens
-    req.body.totalTokens = messagesWithTokens.reduce((acc, msg) => acc + (msg.tokens || 0), 0)
+    })).reduce((acc, msg) => acc + (msg.tokens || 0), 0)
+    req.body.messages = sanitizedMessages
+    req.body.totalTokens = totalTokens
     return next()
   } catch (error) {
     console.error(`[AI_MIDDLEWARE] ${new Date().toISOString()} - `, { error: error.message, stack: error.stack })
