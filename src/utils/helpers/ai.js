@@ -16,10 +16,10 @@ const sanitizeMessages = (messages = []) => {
 }
 
 const calculateTokens = (text, model) => {
-  const fallbackModel = "text-davinci-003"
+  const fallbackModel = "text-ada-001"
   let encoder
   try {
-    const modeloSeguro = model || fallbackModel
+    const modeloSeguro = model.split("/")[1] || fallbackModel
     encoder = encoding_for_model(modeloSeguro)
   } catch {
     console.warn(`Modelo "${model}" não suportado. Usando fallback: ${fallbackModel}`)

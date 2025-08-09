@@ -5,7 +5,7 @@ const { sanitizeMessages } = require("../../../utils/helpers/ai")
 
 const sendMessage = async (req, res) => {
   try {
-    const { aiProvider = "groq", model, messages: userPrompts, aiKey, plugins, use_tools, stream = false, mode = "Padrão" } = req.body
+    const { aiProvider = "groq", model, messages: userPrompts, aiKey, plugins, use_tools, stream = false, mode = "Padrão", totalTokens } = req.body
     let systemPrompt = allPrompts.find(p => p.content.trim().startsWith(`Modo ${mode}`))
     if (!systemPrompt) systemPrompt = allPrompts[0]
     const messages = [systemPrompt, ...userPrompts]
@@ -57,9 +57,9 @@ const sendMessage = async (req, res) => {
       }
       const sanitizedMessages = sanitizeMessages(messages)
       const finalResponse = await ask(aiProvider, aiKey, sanitizedMessages, { model })
-      return res.status(finalResponse.status).json(finalResponse.data)
+      return res.status(finalResponse.status).json({...finalResponse.data, totalTokens })
     }
-    return res.status(status).json(data)
+    return res.status(status).json({...data, totalTokens })
   } catch (error) {
     console.error(`[SEND_MESSAGE] ${new Date().toISOString()} -`, {
       error: error.message,
