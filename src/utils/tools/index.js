@@ -1,4 +1,5 @@
 const browserService = require("../api/browser")
+const duckduckgoService = require("../api/duckduckgo")
 const httpService = require("../api/http")
 
 const criptoService = require("../api/cripto")
@@ -14,6 +15,7 @@ const pokedexService = require("../api/pokedex")
 
 const availableTools = {
   browserTool: browserService.browseUrl,
+  duckduckgoTool: duckduckgoService.searchDuckDuckGo,
   httpTool: httpService.executeHttpRequest,
 
   criptoTool: criptoService.getCoinQuote,
@@ -30,6 +32,7 @@ const availableTools = {
 
 const tools = [
   browserService.browserTool,
+  duckduckgoService.duckduckgoTool,
   httpService.httpTool,
 
   criptoService.criptoTool,
