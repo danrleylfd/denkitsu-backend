@@ -21,7 +21,7 @@ const ask = async (aiProvider, aiKey, prompts, options = {}) => {
   const openai = new OpenAI({ apiKey, baseURL: config.apiUrl })
   const { model, stream, ...props } = options
   const finalModel = model || config.defaultModel
-  const timestampsMsg = { role: "system", content: `A data atual ${new Date().toISOString()} deve ser manuseada internamente com o fuso horário de Brasília, mas apenas exibida sob solicitação explícita`}
+  const timestampsMsg = { role: "system", content: `O sistema informa a data atual em formato ISO: ${new Date().toISOString()}, quando for preciso converta para horário de Brasília`}
   try {
     if (stream) {
       const streamResponse = await openai.chat.completions.create({
