@@ -1,33 +1,42 @@
 const axios = require("axios")
+const cheerio = require("cheerio")
 
 const searchDuckDuckGo = async (query) => {
   try {
-    console.log(`[TOOL_CALL] Buscando no DuckDuckGo por: ${query}`)
-    const { data } = await axios.get("https://api.duckduckgo.com/", {
-      params: {
-        q: query,
-        format: "json",
-        no_html: 1,
-        skip_disambig: 1
+    console.log(`[TOOL_CALL] Buscando no DuckDuckGo (Híbrido) por: ${query}`)
+    // 1. Prepara as duas requisições em paralelo
+    const apiRequest = axios.get("https://api.duckduckgo.com/", {
+      params: { q: query, format: "json", no_html: 1 }
+    })
+    const htmlRequest = axios.get("https://html.duckduckgo.com/html/", {
+      params: { q: query },
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
       }
     })
-    const formatResponse = (responseData) => {
-      const summary = responseData.AbstractText || "Nenhum resumo direto encontrado."
-      const source = {
-        name: responseData.AbstractSource || "N/A",
-        url: responseData.AbstractURL || "N/A"
+    const [apiResponse, htmlResponse] = await axios.all([apiRequest, htmlRequest])
+    const summary = apiResponse.data?.AbstractText || null
+    const $ = cheerio.load(htmlResponse.data)
+    const results = []
+    $(".result").each((i, element) => {
+      const titleElement = $(element).find(".result__a")
+      const url = titleElement.attr("href")
+      const title = titleElement.text().trim()
+      if (title && url) {
+        results.push({ title, url })
       }
-      const results = (responseData.RelatedTopics || [])
-        .filter(item => item.Text && item.FirstURL)
-        .map(item => ({
-          title: item.Text,
-          url: item.FirstURL
-        }))
-        .slice(0, 5)
-      return { summary, source, results }
+    })
+    if (results.length === 0 && !summary) {
+      return {
+        status: 404,
+        data: { message: "Nenhum resultado encontrado para a busca." }
+      }
     }
-    const formattedData = formatResponse(data)
-    return { status: 200, data: formattedData }
+    const finalData = {
+      summary,
+      results: results.slice(0, 10)
+    }
+    return { status: 200, data: finalData }
   } catch (error) {
     console.error(`[DUCKDUCKGO_SERVICE] Erro ao buscar por "${query}":`, error.message)
     throw new Error("TOOL_ERROR")
@@ -38,7 +47,7 @@ const duckduckgoTool = {
   type: "function",
   function: {
     name: "duckduckgoTool",
-    description: "Use essa tool para fazer uma pesquisa no buscador Duckduckgo. Sua resposta DEVE ser uma lista numerada de resultados no formato `1. [Título do Site](URL)`. Após apresentar a lista, você DEVE perguntar ao usuário: 'Qual destes resultados você gostaria que eu acessasse para obter mais detalhes?'.",
+    description: "Use essa tool para fazer uma pesquisa no buscador Duckduckgo. Se um resumo direto (summary) for retornado, apresente-o primeiro. Sua resposta DEVE ser uma lista numerada de resultados no formato `1. [Título do Site](URL)`. Após apresentar a lista, você DEVE perguntar ao usuário: 'Qual destes resultados você gostaria que eu acessasse para obter mais detalhes?'.",
     parameters: {
       type: "object",
       properties: {
