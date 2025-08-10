@@ -41,7 +41,7 @@ const albionTool = {
   type: "function",
   function: {
     name: "albionTool",
-    description: "Use esta ferramenta para obter o preço atual e o histórico recente do Ouro (Gold) no jogo Albion Online. A ferramenta retorna o valor mais recente em prata por unidade de ouro e os preços das últimas 24 horas.",
+    description: "Use esta ferramenta para obter o preço atual e o histórico recente do Ouro (Gold) no jogo Albion Online. A ferramenta retorna o valor mais recente em prata por unidade de ouro e os preços das últimas 24 horas. A resposta DEVE ser uma tabela em markdown com 3 colunas: 'Variação', 'Hora' e 'Preço'. Na coluna 'Variação', calcule a diferença de preço em relação à entrada anterior na lista de dados. Use o emoji 📈🔼 para aumentos e 📉🔽 para quedas, seguido pelo valor absoluto da diferença (ex: '📈🔼 150' ou '📉🔽 200'). A primeira linha não terá variação.",
     parameters: {
       type: "object",
       properties: {},

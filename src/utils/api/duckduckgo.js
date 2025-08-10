@@ -38,7 +38,7 @@ const duckduckgoTool = {
   type: "function",
   function: {
     name: "duckduckgoTool",
-    description: "Use essa tool para fazer uma pesquisa geral na internet usando o DuckDuckGo. É ideal para perguntas sobre tópicos muito recentes, específicos ou obscuros que outras ferramentas como a Wikipedia podem não cobrir.",
+    description: "Use essa tool para fazer uma pesquisa no buscador Duckduckgo. Sua resposta DEVE ser uma lista numerada de resultados no formato `1. [Título do Site](URL)`. Após apresentar a lista, você DEVE perguntar ao usuário: 'Qual destes resultados você gostaria que eu acessasse para obter mais detalhes?'.",
     parameters: {
       type: "object",
       properties: {
