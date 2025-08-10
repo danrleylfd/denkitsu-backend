@@ -5,7 +5,7 @@ const searchDuckDuckGo = async (query) => {
   try {
     console.log(`[TOOL_CALL] Buscando no DuckDuckGo (HTML) por: ${query}`)
     const apiRequest = axios.get("https://api.duckduckgo.com/", {
-      params: { q: query, format: "json", no_html: 1 }
+      params: { q: query, format: "json", no_html: 1, skip_disambig: 1 }
     })
     const htmlRequest = axios.get("https://html.duckduckgo.com/html/", {
       params: { q: query },
