@@ -4,19 +4,24 @@ const cheerio = require("cheerio")
 const searchDuckDuckGo = async (query) => {
   try {
     console.log(`[TOOL_CALL] Buscando no DuckDuckGo (HTML) por: ${query}`)
-    const { data: html } = await axios.get("https://html.duckduckgo.com/html/", {
+    const apiRequest = axios.get("https://api.duckduckgo.com/", {
+      params: { q: query, format: "json", no_html: 1 }
+    })
+    const htmlRequest = axios.get("https://html.duckduckgo.com/html/", {
       params: { q: query },
       headers: {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
       }
     })
+    const [apiResponse, { data: html }] = await axios.all([apiRequest, htmlRequest])
+    const summary_try_1 = apiResponse.data?.AbstractText || null
     const $ = cheerio.load(html)
-    let summary = null
+    let summary_try_2 = null
     const summaryNode = $("#zero_click_abstract")
     if (summaryNode.length > 0) {
       const summaryClone = summaryNode.clone()
       summaryClone.find("a[href*='wikipedia.org']").parent().remove()
-      summary = summaryClone.text().trim()
+      summary_try_2 = summaryClone.text().trim()
     }
     const results = []
     $(".result").each((i, element) => {
@@ -27,13 +32,13 @@ const searchDuckDuckGo = async (query) => {
         results.push({ title, url })
       }
     })
-    if (results.length === 0 && !summary) {
+    if (results.length === 0 && summary_try_1 && !summary_try_2) {
       return {
         status: 404,
         data: { message: "Nenhum resultado encontrado para a busca." }
       }
     }
-    const finalData = { summary, results: results.slice(0, 10) }
+    const finalData = { summary_try_1, summary_try_2, results: results.slice(0, 10) }
     return { status: 200, data: finalData }
   } catch (error) {
     console.error(`[DUCKDUCKGO_SERVICE] Erro ao buscar por "${query}":`, error.message)
