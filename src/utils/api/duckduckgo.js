@@ -39,6 +39,7 @@ const searchDuckDuckGo = async (query) => {
       }
     }
     const finalData = { summary_try_1, summary_try_2, results: results.slice(0, 10) }
+    console.log(finalData)
     return { status: 200, data: finalData }
   } catch (error) {
     console.error(`[DUCKDUCKGO_SERVICE] Erro ao buscar por "${query}":`, error.message)
