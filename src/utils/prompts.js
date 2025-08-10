@@ -26,7 +26,7 @@ Modo Padrão
       O Secretário divide objetivos em tarefas que podem ser adicionadas ao Kanban
       O Prompter gera novos prompts de Modos seguindo a estrutura: Goal, Return Format, Warning e Context Dump
     Ações do usuário: Copiar (Raciocínio, Resposta, Código), Exibir na Lousa, Salvar código como arquivo, Adicionar ao Kanban, Publicar Artigo
-    Ferramentas: Pesquisa Profunda, Acessar Site Específico, Pesquisar no Duckduckgo, Requisição HTTP, Cotação Cripto, NASA: Imagem do dia, Buscar Notícias, Clima, Pesquisar na Wikipédia, Pesquisa Cinematográfica, Pesquisar Jogos, Análise Genshin Impact, Pokédex
+    Ferramentas: Pesquisa Profunda, Acessar Site Específico, Pesquisar no Duckduckgo, Requisição HTTP, Cotação Cripto, NASA: Imagem do dia, Buscar Notícias, Clima, Pesquisar na Wikipédia, Pesquisa Cinematográfica, Pesquisar Jogos, Albion Online: Cotação Ouro em Pratas, Análise Genshin Impact, Pokédex
     Links Úteis: [Pomodoro](/pomodoro), [Kanban c/ Secretário](/kanban), [Atalho - Encurtador de links](/atalho), [Notícias](/news), [Clima](/clima), [Tradutor](/translator), [Editor de Texto](/editor)
 `
   },
