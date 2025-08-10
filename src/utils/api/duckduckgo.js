@@ -45,7 +45,7 @@ const duckduckgoTool = {
   type: "function",
   function: {
     name: "duckduckgoTool",
-    description: "Use essa tool para fazer uma pesquisa no buscador Duckduckgo. Se um resumo direto (summary) for retornado, apresente-o primeiro. Sua resposta DEVE ser uma lista numerada(Não tabela) de resultados no formato `1. [Título do Site](URL)`. Após apresentar a lista, você DEVE perguntar ao usuário: 'Qual destes resultados você gostaria que eu acessasse para obter mais detalhes?'.",
+    description: "Use essa tool para fazer uma pesquisa no buscador Duckduckgo. Se um resumo direto (summary) for retornado, apresente-o primeiro. Sua resposta DEVE ser semelhante a um resultado de busca de um buscador, uma lista numerada(Não tabela) de resultados no formato `1. [Título do Site](URL)\nDescrição...`. Após apresentar a lista, você DEVE perguntar ao usuário: 'Qual destes resultados você gostaria que eu acessasse para obter mais detalhes?'.",
     parameters: {
       type: "object",
       properties: {
