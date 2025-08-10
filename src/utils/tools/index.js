@@ -10,6 +10,7 @@ const wikipediaService = require("../api/wikipedia")
 
 const cinemaService = require("../api/tmdb")
 const gamesService = require("../api/rawg")
+const albionService = require("../api/albion")
 const genshinService = require("../api/genshin")
 const pokedexService = require("../api/pokedex")
 
@@ -26,6 +27,7 @@ const availableTools = {
 
   cinemaTool: cinemaService.searchMedia,
   gamesTool: gamesService.searchGames,
+  albionTool: albionService.getGoldPrice,
   genshinTool: genshinService.getPlayerBuild,
   pokedexTool: pokedexService.getPokemonDetails,
 }
@@ -43,6 +45,7 @@ const tools = [
 
   cinemaService.cinemaTool,
   gamesService.gamesTool,
+  albionService.albionTool,
   genshinService.genshinTool,
   pokedexService.pokedexTool,
 ]
