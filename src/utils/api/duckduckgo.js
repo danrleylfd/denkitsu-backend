@@ -45,13 +45,13 @@ const duckduckgoTool = {
   type: "function",
   function: {
     name: "duckduckgoTool",
-    description: "Use essa tool para fazer uma pesquisa geral na web. Se um resumo direto (summary) for retornado, apresente-o primeiro. Em seguida, SEMPRE apresente uma lista numerada de resultados no formato `1. [Título do Site](URL)`. Após a lista, você DEVE perguntar ao usuário: 'Qual destes resultados você gostaria que eu acessasse para obter mais detalhes?'.",
+    description: "Use essa tool para fazer uma pesquisa no buscador Duckduckgo. Se um resumo direto (summary) for retornado, apresente-o primeiro. Sua resposta DEVE ser uma lista numerada de resultados no formato `1. [Título do Site](URL)`. Após apresentar a lista, você DEVE perguntar ao usuário: 'Qual destes resultados você gostaria que eu acessasse para obter mais detalhes?'.",
     parameters: {
       type: "object",
       properties: {
         query: {
           type: "string",
-          description: "A sua pergunta ou termo de pesquisa. Seja o mais específico possível."
+          description: "A sua pergunta ou termo de pesquisa. Seja o mais específico possível. Exemplo: 'últimos avanços em computação quântica' ou 'qual a altura do Monte Roraima?'."
         }
       },
       required: ["query"]
