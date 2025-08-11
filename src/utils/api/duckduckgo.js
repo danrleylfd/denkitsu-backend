@@ -47,11 +47,26 @@ const searchDuckDuckGo = async (query) => {
   }
 }
 
+const duckduckgoPrompt = `
+Modo Duckduckgo
+  Goal
+    Use essa tool para fazer uma pesquisa no buscador Duckduckgo
+  Return Format
+    Summary (Se houver)
+    [title](url)\ndescription
+  Warning
+    Sua resposta DEVE ser semelhante a um resultado de busca de um buscador, uma lista numerada de sites
+    Não incluir os rótulos "Summary", "title", "url" e "description"
+    No final perguntar se o usuário quer que o assistente acesse algum dos sites listados.
+  Context Dump
+    Termo de busca fornecido pelo usuário
+`
+
 const duckduckgoTool = {
   type: "function",
   function: {
     name: "duckduckgoTool",
-    description: "Use essa tool para fazer uma pesquisa no buscador Duckduckgo. Se um resumo direto (summary) for retornado, apresente-o primeiro. Sua resposta DEVE ser semelhante a um resultado de busca de um buscador, uma lista numerada(Não tabela) de resultados no formato markdown `1. [Título do resultado 1](URL do resultado 1)\nDescrição do resultado 1...`. Após apresentar a lista, você DEVE perguntar ao usuário: 'Qual destes resultados você gostaria que eu acessasse para obter mais detalhes?'.",
+    description: duckduckgoPrompt, // "Use essa tool para fazer uma pesquisa no buscador Duckduckgo. Se um resumo direto (summary) for retornado, apresente-o primeiro. Sua resposta DEVE ser semelhante a um resultado de busca de um buscador, uma lista numerada(Não tabela) de resultados no formato markdown `1. [Título do resultado 1](URL do resultado 1)\nDescrição do resultado 1...`. Após apresentar a lista, você DEVE perguntar ao usuário: 'Qual destes resultados você gostaria que eu acessasse para obter mais detalhes?'.",
     parameters: {
       type: "object",
       properties: {
