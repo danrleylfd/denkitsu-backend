@@ -53,16 +53,17 @@ const duckduckgoPrompt = `
 Modo Duckduckgo
   Goal
     Use essa tool para fazer uma pesquisa no buscador Duckduckgo
-  Return Format
+  Return Format (Template)
     summary
-    [title](url)\ndescription
+    1. [title](url)\ndescription
+    Quer que eu acesse algum desses sites?
   Warning
-    Sua resposta deve ser semelhante a um resultado de busca de um buscador: um summary (se houver) seguido de uma lista numerada de sites
-    A lista de resultados de busca estão em markdown [title](url)
+    Sua resposta deve ser semelhante ao resultado de um buscador: um summary (se houver) seguido de uma lista numerada de sites
     Não incluir os rótulos "summary", "title", "url" e "description"
-    No final perguntar se o usuário quer que o assistente acesse algum dos sites listados
-    Proibido exibir resultados de busca em formato tabela, use o formato markdown [title](url)
-    Proibido separar title de url, use o formato markdown [title](url)
+    A lista de resultados de busca está em markdown 1. [title](url)
+    Proibido tabelas
+    Proibido separar title de url, title e url devem ser um texto que quando clicaco acesse um site [title](url)
+    No final perguntar se o usuário quer que o assistente acesse algum dos sites
   Context Dump
     Termo de busca fornecido pelo usuário
 `
