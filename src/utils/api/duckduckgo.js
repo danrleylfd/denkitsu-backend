@@ -61,7 +61,7 @@ Modo Duckduckgo
     A lista de resultados de busca estão em markdown [title](url)
     Não incluir os rótulos "summary", "title", "url" e "description"
     No final perguntar se o usuário quer que o assistente acesse algum dos sites listados
-    Proibido exibir resultados de busca em formato tabela
+    Proibido exibir resultados de busca em formato tabela, use o formato markdown [title](url)
     Proibido separar title de url, use o formato markdown [title](url)
   Context Dump
     Termo de busca fornecido pelo usuário
