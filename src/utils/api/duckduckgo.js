@@ -62,7 +62,7 @@ Modo Duckduckgo
     Não incluir os rótulos "summary", "title", "url" e "description"
     A lista de resultados de busca está em markdown 1. [title](url)
     Proibido tabelas
-    Proibido separar title de url, title e url devem ser um texto que quando clicaco acesse um site [title](url)
+    Proibido separar title de url, title e url devem ser um texto que quando clicado acesse um site [title](url)
     No final perguntar se o usuário quer que o assistente acesse algum dos sites
   Context Dump
     Termo de busca fornecido pelo usuário
