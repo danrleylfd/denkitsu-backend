@@ -58,8 +58,10 @@ Modo Duckduckgo
     [title](url)\ndescription
   Warning
     Sua resposta deve ser semelhante a um resultado de busca de um buscador: um summary (se houver) seguido de uma lista numerada de sites
+    A lista de resultados de busca estão em markdown []()
     Não incluir os rótulos "summary", "title", "url" e "description"
-    No final perguntar se o usuário quer que o assistente acesse algum dos sites listados.
+    No final perguntar se o usuário quer que o assistente acesse algum dos sites listados
+    Proibido exibir resultados de busca em formato tabela
   Context Dump
     Termo de busca fornecido pelo usuário
 `
