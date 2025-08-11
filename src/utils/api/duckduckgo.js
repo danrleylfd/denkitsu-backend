@@ -26,10 +26,12 @@ const searchDuckDuckGo = async (query) => {
     const results = []
     $(".result").each((i, element) => {
       const titleElement = $(element).find(".result__a")
+      const snippetElement = $(element).find(".result__snippet")
       const url = titleElement.attr("href")
       const title = titleElement.text().trim()
+      const snippet = snippetElement.text().trim()
       if (title && url) {
-        results.push({ title, url })
+        results.push({ title, url, snippet })
       }
     })
     if (results.length === 0 && summary_try_1 && !summary_try_2) {
