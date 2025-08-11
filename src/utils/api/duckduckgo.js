@@ -54,11 +54,11 @@ Modo Duckduckgo
   Goal
     Use essa tool para fazer uma pesquisa no buscador Duckduckgo
   Return Format
-    Summary (Se houver)
+    summary
     [title](url)\ndescription
   Warning
-    Sua resposta DEVE ser semelhante a um resultado de busca de um buscador, uma lista numerada de sites
-    Não incluir os rótulos "Summary", "title", "url" e "description"
+    Sua resposta deve ser semelhante a um resultado de busca de um buscador: um summary (se houver) seguido de uma lista numerada de sites
+    Não incluir os rótulos "summary", "title", "url" e "description"
     No final perguntar se o usuário quer que o assistente acesse algum dos sites listados.
   Context Dump
     Termo de busca fornecido pelo usuário
