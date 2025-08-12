@@ -1,3 +1,16 @@
+const extractModeName = (modeString) => {
+  const match = modeString.match(/^Modo\s+(.+)$/m)
+  return match ? match[1] : modeString
+}
+
+const getModeNames = () => {
+  return prompt.map((p) => {
+    const content = p.content.trim()
+    const firstLine = content.split("\n")[0].trim()
+    return extractModeName(firstLine)
+  })
+}
+
 const prompt = [
   {
     role: "system",
@@ -321,4 +334,4 @@ Modo Secretário
   }
 ]
 
-module.exports = prompt
+module.exports = { getModeNames, prompt }

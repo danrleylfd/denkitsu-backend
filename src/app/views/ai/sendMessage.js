@@ -1,6 +1,6 @@
 const { ask } = require("../../../utils/api/ai")
 const { availableTools, tools } = require("../../../utils/tools")
-const allPrompts = require("../../../utils/prompts")
+const { prompts: allPrompts } = require("../../../utils/prompts")
 const { sanitizeMessages } = require("../../../utils/helpers/ai")
 
 const sendMessage = async (req, res) => {
