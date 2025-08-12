@@ -1,8 +1,8 @@
-const { prompts, getModeNames } = require("../../../utils/prompts")
+const prompts = require("../../../utils/prompts")
 
 const getPrompt = async (req, res) => {
   try {
-    return res.status(200).json(getModeNames(prompts))
+    return res.status(200).json(prompts)
   } catch (error) {
     console.error(`[READ_PROMPT] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
     const defaultError = { status: 500, message: `[READ_PROMPT] ${new Date().toISOString()} - Internal server error` }

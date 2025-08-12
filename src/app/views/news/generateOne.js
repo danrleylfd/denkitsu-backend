@@ -1,7 +1,7 @@
 const News = require("../../models/news")
 const { searchNews } = require("../../../utils/api/news")
 const { ask } = require("../../../utils/api/ai")
-const { prompts } = require("../../../utils/prompts")
+const prompts = require("../../../utils/prompts")
 
 const cleanAiOutput = (text = "") => {
   const cleanedText = text.replace(/(<think>.*?<\/think>|<thinking>.*?<\/thinking>|◁think▷.*?◁\/think▷)/gs, "")
