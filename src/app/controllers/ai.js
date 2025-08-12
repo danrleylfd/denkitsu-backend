@@ -9,13 +9,13 @@ const routes = Router()
 
 const sendMessage = require("../views/ai/sendMessage")
 const getModels = require("../views/ai/getModels")
-const getPrompt = require("../views/ai/getPrompt")
+// const getPrompt = require("../views/ai/getPrompt")
 
 routes.post("/chat/completions", sendMessageRules(), validate, aiMiddleware, sendMessage)
 
 routes.get("/models", getModels)
 
-routes.get("/prompt", getPrompt)
+// routes.get("/prompt", getPrompt)
 
 const loadAIRoutes = (app) => app.use("/ai", routes)
 
