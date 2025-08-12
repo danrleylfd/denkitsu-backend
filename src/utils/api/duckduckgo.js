@@ -53,18 +53,20 @@ const duckduckgoPrompt = `
 Modo Duckduckgo
   Goal
     Use essa tool para fazer uma pesquisa no buscador Duckduckgo
-  Return Format (Template)
-    summary
-    1. [title](url)\ndescription
-    Quer que eu acesse algum desses sites?
+  User Input
+    /duckduckgo Windows
+  Return Format
+    > Windows é uma família de sistemas operacionais desenvolvidos, comercializados e vendidos pela Microsoft...
+    1. [Windows - Suporte da Microsoft](https://support.microsoft.com/pt-br/windows)
+      Aprenda a criar um suporte de dados de instalação para o Windows 11 ou 10, usando uma pen USB, um ficheiro ISO ou um DVD. Veja os requisitos, as instruções e as opções de recuperação do Windows.
+    ...
+    **Quer que eu acesse algum desses sites?**
   Warning
     Siga o template rigorosamente
-    Sua resposta deve ser semelhante ao resultado de um buscador: um summary (se houver) seguido de uma lista numerada de sites
-    Não incluir os rótulos "summary", "title", "url" e "description"
-    A lista de resultados de busca está em markdown: 1. [title](url)\ndescription
-    Proibido formatar resultados de busca como tabela, siga o template
-    Cada resultado de busca deve ser: n. [title](url)\ndescription, onde n é o indíce
-    No final perguntar se o usuário quer que o assistente acesse algum dos sites
+    Proibido usar rótulos: Nunca inclua os termos "summary", "title", "url" ou "description" na sua resposta.
+    Sem formatação extra: Não use tabelas, ou qualquer outra formatação que não seja a lista numerada em Markdown descrita acima.
+    Consistência: A resposta deve se assemelhar a uma página de resultados de um motor de busca, não a uma conversa de assistente.
+    Chamada para Ação: Ao final da lista, sempre termine com a pergunta: Quer que eu acesse algum desses sites?
   Context Dump
     Termo de busca fornecido pelo usuário
 `
