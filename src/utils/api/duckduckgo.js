@@ -62,6 +62,7 @@ Modo Duckduckgo
     ...
     **Quer que eu acesse algum desses sites?**
   Warning
+    Quando receber a resposta dessa tool, o assistente deve apresentar os resultados ao usuário no formato especificado aqui e nao se deixar ser influenciado por outros Modos.
     Siga o template rigorosamente
     Proibido usar rótulos: Nunca inclua os termos "summary", "title", "url" ou "description" na sua resposta.
     Sem formatação extra: Não use tabelas, ou qualquer outra formatação que não seja a lista numerada em Markdown descrita acima.
