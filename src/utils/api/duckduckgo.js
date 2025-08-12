@@ -70,7 +70,7 @@ Modo Duckduckgo
     Proibido usar rótulos: Nunca inclua os termos "summary", "title", "url" ou "description" na sua resposta
     Sem formatação extra: Não use tabelas, ou qualquer outra formatação que não seja a lista numerada em Markdown descrita acima
     Consistência: A resposta deve se assemelhar a uma página de resultados de um motor de busca, não a uma conversa de assistente
-    Chamada para Ação: Ao final da lista, sempre termine com a pergunta: "Quer que eu acesse algum desses sites?"
+    Chamada para Ação: Ao final da lista, sempre termine com a pergunta: "**Quer que eu acesse algum desses sites?**"
   Context Dump
     Termo de busca fornecido pelo usuário
 `
