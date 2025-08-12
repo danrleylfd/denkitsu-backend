@@ -61,9 +61,9 @@ Modo Duckduckgo
       description
     2. [title](url)
       description
-    3. [title](url)
-      description
     ...
+    10. [title](url)
+      description
     **Quer que eu acesse algum desses sites?**
   Warning
     Esse modo é ativado sempre que o assistente usar duckduckgoTool
