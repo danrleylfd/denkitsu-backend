@@ -35,7 +35,7 @@ const availableTools = {
   marsWeatherTool: marsWeatherService.getMarsWeather,
   newsTool: newsService.searchNews,
   weatherTool: weatherService.getWeatherByLocation,
-  wikipediaTool: wikipediaService.searchWikipedia,
+  wikiTool: wikipediaService.searchWikipedia,
 
   cinemaTool: cinemaService.searchMedia,
   gamesTool: gamesService.searchGames,
@@ -60,7 +60,7 @@ const tools = [
 
   newsService.newsTool,
   weatherService.weatherTool,
-  wikipediaService.wikipediaTool,
+  wikipediaService.wikiTool,
 
   cinemaService.cinemaTool,
   gamesService.gamesTool,
