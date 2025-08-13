@@ -4,6 +4,7 @@ const httpService = require("../api/http")
 
 const criptoService = require("../api/cripto")
 const nasaService = require("../api/nasa")
+const marsRoverService = require("../api/marsRover")
 const newsService = require("../api/news")
 const weatherService = require("../api/weather")
 const wikipediaService = require("../api/wikipedia")
@@ -21,6 +22,7 @@ const availableTools = {
 
   criptoTool: criptoService.getCoinQuote,
   nasaTool: nasaService.nasaDailyPicture,
+  marsRoverTool: marsRoverService.getMarsRoverLatestPhotos,
   newsTool: newsService.searchNews,
   weatherTool: weatherService.getWeatherByLocation,
   wikipediaTool: wikipediaService.searchWikipedia,
@@ -39,6 +41,7 @@ const tools = [
 
   criptoService.criptoTool,
   nasaService.nasaTool,
+  marsRoverService.marsRoverTool,
   newsService.newsTool,
   weatherService.weatherTool,
   wikipediaService.wikipediaTool,
