@@ -7,6 +7,7 @@ const nasaService = require("../api/nasa")
 const nasaLibraryService = require("../api/nasaLibrary")
 const earthService = require("../api/earth")
 const marsRoverService = require("../api/marsRover")
+const asteroidsService = require("../api/asteroids")
 const newsService = require("../api/news")
 const weatherService = require("../api/weather")
 const wikipediaService = require("../api/wikipedia")
@@ -27,6 +28,7 @@ const availableTools = {
   nasaLibraryTool: nasaLibraryService.searchNasaLibrary,
   earthTool: earthService.getEarthImages,
   marsRoverTool: marsRoverService.getMarsRoverLatestPhotos,
+  asteroidsTool: asteroidsService.getNearEarthObjects,
   newsTool: newsService.searchNews,
   weatherTool: weatherService.getWeatherByLocation,
   wikipediaTool: wikipediaService.searchWikipedia,
@@ -48,6 +50,8 @@ const tools = [
   nasaLibraryService.nasaLibraryTool,
   earthService.earthTool,
   marsRoverService.marsRoverTool,
+  asteroidsService.asteroidsTool,
+
   newsService.newsTool,
   weatherService.weatherTool,
   wikipediaService.wikipediaTool,
