@@ -9,6 +9,7 @@ const earthService = require("../api/earth")
 const marsRoverService = require("../api/marsRover")
 const asteroidsService = require("../api/asteroids")
 const spaceWeatherService = require("../api/spaceWeather")
+const marsWeatherService = require("../api/marsWeather")
 const newsService = require("../api/news")
 const weatherService = require("../api/weather")
 const wikipediaService = require("../api/wikipedia")
@@ -31,6 +32,7 @@ const availableTools = {
   marsRoverTool: marsRoverService.getMarsRoverLatestPhotos,
   asteroidsTool: asteroidsService.getNearEarthObjects,
   spaceWeatherTool: spaceWeatherService.getSpaceWeatherEvents,
+  marsWeatherTool: marsWeatherService.getMarsWeather,
   newsTool: newsService.searchNews,
   weatherTool: weatherService.getWeatherByLocation,
   wikipediaTool: wikipediaService.searchWikipedia,
@@ -54,6 +56,7 @@ const tools = [
   marsRoverService.marsRoverTool,
   asteroidsService.asteroidsTool,
   spaceWeatherService.spaceWeatherTool,
+  marsWeatherService.marsWeatherTool,
 
   newsService.newsTool,
   weatherService.weatherTool,
