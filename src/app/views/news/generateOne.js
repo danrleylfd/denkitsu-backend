@@ -34,7 +34,7 @@ const generateOne = async (req, res) => {
       role: "user",
       content: `Agente Redator Tema:\n\n### ${article.title}\n\n![${article.title}](${article.urlToImage})\n\n${article.description}\n\n${article.content}\n\n**Fonte(s):** [${article.source.name}](${article.url})`
     }
-    const { data: aiData } = await ask(aiProvider, aiKey, [prompts[8], userPrompt])
+    const { data: aiData } = await ask(aiProvider, aiKey, [prompts[6], userPrompt])
     if (!aiData || !aiData.choices || aiData.choices.length === 0) throw new Error("AI_ERROR")
     const cleanContent = cleanAiOutput(aiData.choices[0].message.content)
     const news = await News.create({ content: cleanContent, source: article.url, })
