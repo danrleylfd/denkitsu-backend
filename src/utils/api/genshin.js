@@ -233,16 +233,16 @@ const genshinTool = {
     parameters: {
       type: "object",
       properties: {
-        characterName: {
-          type: "string",
-          description: "O nome do personagem de interesse para focar a resposta. Exemplo: 'Nahida'."
-        },
         uid: {
           type: "string",
           description: "O UID (Identificador de Usuário) da conta do jogador no Genshin Impact. Exemplo: '123456789'."
+        },
+        characterName: {
+          type: "string",
+          description: "O nome do personagem de interesse para focar a resposta. Exemplo: 'Nahida'."
         }
       },
-      required: ["characterName", "uid"]
+      required: ["uid", "characterName"]
     }
   }
 }

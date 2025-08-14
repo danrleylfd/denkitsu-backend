@@ -1,8 +1,8 @@
 const axios = require("axios")
 
-const searchWikipedia = async (topic) => {
+const searchWikipedia = async (query) => {
   try {
-    const encodedTopic = encodeURIComponent(topic.replace(/ /g, "_"))
+    const encodedTopic = encodeURIComponent(query.replace(/ /g, "_"))
     const url = `https://pt.wikipedia.org/api/rest_v1/page/summary/${encodedTopic}`
     const { data } = await axios.get(url, {
       headers: { "User-Agent": "DenkitsuAI/1.0 (https://denkitsu.vercel.app/chat)" }
@@ -14,7 +14,7 @@ const searchWikipedia = async (topic) => {
     }
     return { status: 200, data: summary }
   } catch (error) {
-    console.error(`[WIKIPEDIA_SERVICE] Erro ao buscar o tópico "${topic}":`, error.response?.data || error.message)
+    console.error(`[WIKIPEDIA_SERVICE] Erro ao buscar o tópico "${query}":`, error.response?.data || error.message)
     throw new Error("TOOL_ERROR")
   }
 }
@@ -28,12 +28,12 @@ const wikiTool = {
     parameters: {
       type: "object",
       properties: {
-        topic: {
+        query: {
           type: "string",
           description: "O tópico ou termo a ser pesquisado. Por exemplo: 'Inteligência artificial'."
         }
       },
-      required: ["topic"]
+      required: ["query"]
     }
   }
 }
