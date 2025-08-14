@@ -50,7 +50,7 @@ const searchDuckDuckGo = async (query) => {
 }
 
 const duckduckgoPrompt = `
-Modo Duckduckgo
+Agente Duckduckgo
   Goal
     Use essa tool para fazer uma pesquisa no buscador Duckduckgo
   User Input (Template)

@@ -32,7 +32,7 @@ const generateOne = async (req, res) => {
     if (articleExists) throw new Error("ARTICLE_EXISTS")
     const userPrompt = {
       role: "user",
-      content: `Modo Redator Tema:\n\n### ${article.title}\n\n![${article.title}](${article.urlToImage})\n\n${article.description}\n\n${article.content}\n\n**Fonte(s):** [${article.source.name}](${article.url})`
+      content: `Agente Redator Tema:\n\n### ${article.title}\n\n![${article.title}](${article.urlToImage})\n\n${article.description}\n\n${article.content}\n\n**Fonte(s):** [${article.source.name}](${article.url})`
     }
     const { data: aiData } = await ask(aiProvider, aiKey, [prompts[8], userPrompt])
     if (!aiData || !aiData.choices || aiData.choices.length === 0) throw new Error("AI_ERROR")
