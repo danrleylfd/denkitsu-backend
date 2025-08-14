@@ -66,7 +66,7 @@ Agente Duckduckgo
       description
     **Quer que eu acesse algum desses sites?**
   Warning
-    Esse modo é ativado sempre que o assistente usar duckduckgoTool
+    Esse Agente é ativado sempre que o assistente usar duckduckgoTool
     Proibido usar rótulos: Nunca inclua os termos "summary", "title", "url" ou "description" na sua resposta
     Sem formatação extra: Não use tabelas, ou qualquer outra formatação que não seja a lista numerada em Markdown descrita acima
     Consistência: A resposta deve se assemelhar a uma página de resultados de um motor de busca, não a uma conversa de assistente
