@@ -13,7 +13,7 @@ const providerConfig = {
   }
 }
 
-const ask = async (aiProvider, aiKey = undefined, prompts, options = {}) => {
+const ask = async (aiProvider, aiKey, prompts, options = {}) => {
   const config = providerConfig[aiProvider]
   if (!config) throw new Error(`Provedor de aiProvider inválido ou não configurado: ${aiProvider}`)
   const apiKey = aiKey || config.apiKey
