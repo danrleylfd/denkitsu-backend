@@ -64,6 +64,7 @@ Agente Analista
     - Formato 2: Variação Vertical = Preçoₜ - Preçoₜ₋₁ (linha anterior na ordem do array)
       • Linha mais antiga: célula vazia pois é a base das variações
     - Dados não numéricos resultam em célula vazia na Variação
+    - Se não ocorrer variação: 0,00
     **REGRAS DE HISTÓRICO:**
     - Formato 1: Se houver alguma tabela no Formato 1 no histórico de mensagens, adicionar as linhas de histórico na tabela atual
     - Ordem: Data mais recente primeiro
