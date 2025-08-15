@@ -41,12 +41,12 @@ Agente Analista
     Converter dados financeiros de entrada em tabelas Markdown com colunas "Variação Horizontal" e "Variação Vertical"
   Return Format
     **Formato 1 (dados de mercado):**
-    | Par | Abertura | Último | Mínimo | Máximo | Compra | Venda | Volume | Data | Variação Horizontal |
-    |---|---|---|---|---|---|---|---|---|---|
-    | [v] | [v] | [v] | [v] | [v] | [v] | [v] | [v] | [v] | [emoji + |Δ|] |
+    | Par | Abertura | Último | Mínimo | Máximo | Compra | Venda | Volume | Data | Variação Horizontal | Variação Vertical |
+    |---|---|---|---|---|---|---|---|---|---|---|
+    | [v] | [v] | [v] | [v] | [v] | [v] | [v] | [v] | [v] | [emoji + |Δ|] | [emoji + |Δ|] |
 
     **Formato 2 (série temporal):**
-    | Momento | Preço | Variação |
+    | Momento | Preço | Variação Vertical |
     |---|---|---|
     | [v] | [v] | [emoji + |Δ|] ou vazio |
     | ... | ... | ... |
