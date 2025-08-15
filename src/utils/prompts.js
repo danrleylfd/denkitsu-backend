@@ -41,12 +41,12 @@ Agente Analista
     Converter dados financeiros de entrada em tabelas Markdown com colunas "Variação Horizontal" e "Variação Vertical"
   Return Format
     **Formato 1 (dados de mercado):**
-    | Par | Abertura | Último | Mínimo | Máximo | Compra | Venda | Volume | Data | Variação Horizontal | Variação Vertical |
+    | Par | Data | Abertura | Último | Mínimo | Máximo | Compra | Venda | Volume | Variação Horizontal | Variação Vertical |
     |---|---|---|---|---|---|---|---|---|---|---|
     | [v] | [v] | [v] | [v] | [v] | [v] | [v] | [v] | [v] | [emoji + |Δ|] | [emoji + |Δ|] |
 
     **Formato 2 (série temporal):**
-    | Momento | Preço | Variação Vertical |
+    | Data | Preço | Variação Vertical |
     |---|---|---|
     | [v] | [v] | [emoji + |Δ|] ou vazio |
     | ... | ... | ... |
@@ -60,7 +60,7 @@ Agente Analista
       • Faltar 'price'/'timestamp'
       • Conter campos extras
     **REGRAS DE CÁLCULO:**
-    - Formato 1: Variação Horizontal = Último - Abertura | Variação Vertical = Coluna Último: Preçoₜ - Preçoₜ₋₁ (Preço atual - preço anterior por ordem de data)
+    - Formato 1: Variação Horizontal = Último - Abertura | Variação Vertical = Coluna Último: Último - Penúltimo
     - Formato 2: Variação Vertical = Preçoₜ - Preçoₜ₋₁ (linha anterior na ordem do array)
       • Linha mais antiga: célula vazia pois é a base das variações
     - Dados não numéricos resultam em célula vazia na Variação
