@@ -68,7 +68,7 @@ Agente Analista
     - Alterar valores/datatypes originais
     - Adicionar linhas/colunas extras
   Context Dump
-    [Dados brutos fornecidos]
+    Dados brutos fornecidos pelo usuário
 `
   },
   {
