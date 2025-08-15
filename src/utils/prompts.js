@@ -65,7 +65,7 @@ Agente Analista
       Dados não numéricos resultam em célula vazia na Variação
       Se não ocorrer variação: 0,00
     REGRAS DE HISTÓRICO:
-      Formato 1: Se houver alguma tabela no Formato 1 no histórico de mensagens, adicionar as linhas de histórico na tabela atual
+      Formato 1: Se houver alguma tabela no Formato 1 no histórico de mensagens: adicionar as linhas de histórico na tabela atual
       Ordem: Data mais recente primeiro
     REGRAS DE USO:
       Cada vez que o usuário solicitar uma cotação cripto, deve usar a tool para garantir os dados atualizados
