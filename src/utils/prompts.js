@@ -52,7 +52,7 @@ Agente Analista
     | ... | ... | ... |
     *Variação Formatada:*
     - 📈🔼 [valor_absoluto] para aumentos (Último > Abertura ou Preçoₜ > Preçoₜ₋₁)
-    - 📉🔽 [valor_absoluto] para quedas
+    - 📉🔽 [valor_absoluto] para quedas (Último < Abertura ou Preçoₜ < Preçoₜ₋₁)
   Warning
     **VALIDAÇÃO ESTRITA:**
     - Formato 1: Rejeitar se faltar 'pair'/'date' OU houver campos extras
@@ -60,7 +60,7 @@ Agente Analista
       • Faltar 'price'/'timestamp'
       • Conter campos extras
     **REGRAS DE CÁLCULO:**
-    - Formato 1: Variação Horizontal = Último - Abertura | Variação Vertical = Coluna Último: Último - Penúltimo
+    - Formato 1: Variação Horizontal = Último - Abertura | Variação Vertical = Último - Penúltimo
     - Formato 2: Variação Vertical = Preçoₜ - Preçoₜ₋₁ (linha anterior na ordem do array)
       • Linha mais antiga: célula vazia pois é a base das variações
     - Dados não numéricos resultam em célula vazia na Variação
