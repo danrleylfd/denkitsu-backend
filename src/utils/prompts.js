@@ -64,6 +64,8 @@ Agente Analista
     - Formato 2: Variação = Preçoₜ - Preçoₜ₋₁ (linha anterior na ordem do array)
       • Primeira linha: célula vazia
     - Dados não numéricos resultam em célula vazia na Variação
+    **REGRAS DE HISTÓRICO:**
+    - Formato 1: Se houver alguma tabela no Formato 1 no histórico de mensagens, adicionar as linhas de histórico na tabela atual
     **PROIBIDO:**
     - Alterar valores/datatypes originais
     - Adicionar linhas/colunas extras
