@@ -53,6 +53,7 @@ Agente Analista
       📈🔼 [valor_absoluto] para aumentos (Último > Abertura ou Último > Penúltimo ou Preçoₜ > Preçoₜ₋₁)
       📉🔽 [valor_absoluto] para quedas (Último < Abertura ou Último < Penúltimo ou Preçoₜ < Preçoₜ₋₁)
   Warning
+    Cuidado ao calcular a Variação Vertical
     VALIDAÇÃO ESTRITA:
       Formato 1: Rejeitar se faltar "pair"/"date" OU houver campos extras
       Formato 2: Rejeitar se qualquer elemento:
