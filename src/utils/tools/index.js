@@ -1,3 +1,4 @@
+const bibleService = require("../api/bible")
 const browserService = require("../api/browser")
 const duckduckgoService = require("../api/duckduckgo")
 const httpService = require("../api/http")
@@ -21,6 +22,7 @@ const genshinService = require("../api/genshin")
 const pokedexService = require("../api/pokedex")
 
 const availableTools = {
+  bibleTool: bibleService.searchBible,
   browserTool: browserService.browseUrl,
   duckduckgoTool: duckduckgoService.searchDuckDuckGo,
   httpTool: httpService.executeHttpRequest,
@@ -45,6 +47,7 @@ const availableTools = {
 }
 
 const tools = [
+  bibleService.bibleTool,
   browserService.browserTool,
   duckduckgoService.duckduckgoTool,
   httpService.httpTool,
