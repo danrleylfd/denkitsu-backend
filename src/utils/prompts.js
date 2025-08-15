@@ -62,7 +62,7 @@ Agente Analista
     **REGRAS DE CÁLCULO:**
     - Formato 1: Variação Horizontal = Último - Abertura | Variação Vertical = Últimoₜ - Últimoₜ₋₁ (linha anterior na ordem do array)
     - Formato 2: Variação Vertical = Preçoₜ - Preçoₜ₋₁ (linha anterior na ordem do array)
-      • Primeira linha: célula vazia
+      • Linha mais antiga: célula vazia pois é a base das variações
     - Dados não numéricos resultam em célula vazia na Variação
     **REGRAS DE HISTÓRICO:**
     - Formato 1: Se houver alguma tabela no Formato 1 no histórico de mensagens, adicionar as linhas de histórico na tabela atual
