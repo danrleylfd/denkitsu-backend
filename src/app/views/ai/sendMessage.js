@@ -5,7 +5,6 @@ const { sanitizeMessages } = require("../../../utils/helpers/ai")
 
 const sendMessage = async (req, res) => {
   try {
-    console.log(prompts.length)
     const { aiProvider = "groq", model, messages: userPrompts, aiKey, plugins, use_tools, stream = false, mode = "Padrão" } = req.body
     let systemPrompt = prompts.find(p => p.content.trim().startsWith(`Agente ${mode}`))
     if (!systemPrompt) systemPrompt = prompts[0]
