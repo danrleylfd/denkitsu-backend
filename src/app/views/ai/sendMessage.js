@@ -5,13 +5,10 @@ const { sanitizeMessages } = require("../../../utils/helpers/ai")
 
 const sendMessage = async (req, res) => {
   try {
+    console.log(prompts.length)
     const { aiProvider = "groq", model, messages: userPrompts, aiKey, plugins, use_tools, stream = false, mode = "Padrão" } = req.body
-    let systemPrompt = prompts.find(p => typeof p.content === "string" && p.content.trim().startsWith(`Agente ${mode}`))
+    let systemPrompt = prompts.find(p => p.content.trim().startsWith(`Agente ${mode}`))
     if (!systemPrompt) systemPrompt = prompts[0]
-    const lastUserMessage = userPrompts[userPrompts.length - 1]?.content || ""
-    console.log(lastUserMessage)
-    if (lastUserMessage.startsWith("Transcrição de Áudio:")) systemPrompt = prompts.find(p => typeof p.content === "string" && p.content.trim().startsWith("Agente Transcritor"))
-    console.log("Transcrição de Áudio:", lastUserMessage.startsWith("Transcrição de Áudio:"), systemPrompt)
     const messages = [systemPrompt, ...userPrompts]
     const requestOptions = { model, stream, plugins: plugins ? plugins : undefined }
     if (stream) {
