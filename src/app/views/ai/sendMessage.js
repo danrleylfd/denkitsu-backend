@@ -1,13 +1,13 @@
 const { ask } = require("../../../utils/api/ai")
 const { availableTools, tools } = require("../../../utils/tools")
-const allPrompts = require("../../../utils/prompts")
+const prompts = require("../../../utils/prompts")
 const { sanitizeMessages } = require("../../../utils/helpers/ai")
 
 const sendMessage = async (req, res) => {
   try {
     const { aiProvider = "groq", model, messages: userPrompts, aiKey, plugins, use_tools, stream = false, mode = "Padrão" } = req.body
-    let systemPrompt = allPrompts.find(p => p.content.trim().startsWith(`Agente ${mode}`))
-    if (!systemPrompt) systemPrompt = allPrompts[0]
+    let systemPrompt = prompts.find(p => p.content.trim().startsWith(`Agente ${mode}`))
+    if (!systemPrompt) systemPrompt = prompts[0]
     const messages = [systemPrompt, ...userPrompts]
     const requestOptions = { model, stream, plugins: plugins ? plugins : undefined }
     if (stream) {
