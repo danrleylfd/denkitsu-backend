@@ -8,8 +8,9 @@ const sendMessage = async (req, res) => {
     const { aiProvider = "groq", model, messages: userPrompts, aiKey, plugins, use_tools, stream = false, mode = "Padrão" } = req.body
     let systemPrompt = prompts.find(p => typeof p.content === "string" && p.content.trim().startsWith(`Agente ${mode}`))
     const lastUserMessage = userPrompts[userPrompts.length - 1]?.content || ""
-    if (lastUserMessage.startsWith("Transcrição de Áudio:")) prompts.find(p => typeof p.content === "string" && p.content.trim().startsWith("Agente Transcritor"))
+    if (lastUserMessage.startsWith("Transcrição de Áudio:")) systemPrompt = prompts.find(p => typeof p.content === "string" && p.content.trim().startsWith("Agente Transcritor"))
     if (!systemPrompt) systemPrompt = prompts[0]
+    console.log()
     const messages = [systemPrompt, ...userPrompts]
     const requestOptions = { model, stream, plugins: plugins ? plugins : undefined }
     if (stream) {
