@@ -9,6 +9,7 @@ const sendMessage = async (req, res) => {
     let systemPrompt = prompts.find(p => typeof p.content === "string" && p.content.trim().startsWith(`Agente ${mode}`))
     if (!systemPrompt) systemPrompt = prompts[0]
     const lastUserMessage = userPrompts[userPrompts.length - 1]?.content || ""
+    console.log(lastUserMessage)
     if (lastUserMessage.startsWith("Transcrição de Áudio:")) systemPrompt = prompts.find(p => typeof p.content === "string" && p.content.trim().startsWith("Agente Transcritor"))
     console.log("Transcrição de Áudio:", lastUserMessage.startsWith("Transcrição de Áudio:"), systemPrompt)
     const messages = [systemPrompt, ...userPrompts]
