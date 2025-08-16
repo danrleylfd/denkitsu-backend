@@ -1,5 +1,5 @@
+const { toFile } = require("openai/uploads")
 const OpenAI = require("openai")
-const { Readable } = require("stream")
 
 const groq = new OpenAI({
   apiKey: process.env.GROQ_API_KEY,
@@ -8,22 +8,13 @@ const groq = new OpenAI({
 
 const transcribeAudio = async (req, res) => {
   try {
-    if (!req.file) {
-      throw new Error("NO_AUDIO_FILE")
-    }
-
-    const fileStream = Readable.from(req.file.buffer)
-    const fileObject = {
-        file: fileStream,
-        name: req.file.originalname,
-    }
-
+    if (!req.file) throw new Error("NO_AUDIO_FILE")
+    const file = await toFile(req.file.buffer, req.file.originalname)
     const transcription = await groq.audio.transcriptions.create({
-      file: fileObject.file,
+      file: file,
       model: "whisper-large-v3-turbo",
       language: "pt",
     })
-
     return res.status(200).json({ transcription: transcription.text })
   } catch (error) {
     console.error(`[TRANSCRIBE_AUDIO] ${new Date().toISOString()} - `, { error: error.message, stack: error.stack })
