@@ -50,7 +50,7 @@ Agente Analista
       |---|---|---|---|---|---|---|---|---|---|---|
       | [v] | [v] | [v] | [v] | [v] | [v] | [v] | [v] | [v] | [emoji + R$ + |Δ|] | [emoji + R$ + |Δ|] |
     Formato Clima:
-      | Propiedadade | Valor |
+      | Propriedadade | Valor |
       |---|---|
       | [v] | [v] |
       | ... | ... |
@@ -59,6 +59,7 @@ Agente Analista
       📉🔽 [valor_absoluto] para quedas (Último < Abertura ou Último < Penúltimo ou Preçoₜ < Preçoₜ₋₁)
   Warning
     REGRAS DE USO:
+      Quando o usuário solicitar o clima, use o Formato Clima
       Cada vez que o usuário solicitar uma cotação cripto, deve usar a tool para garantir os dados atualizados
       Cuidado ao calcular a Variação Vertical
       Ordem: Data mais recente primeiro
