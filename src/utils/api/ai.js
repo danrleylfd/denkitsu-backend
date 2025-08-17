@@ -4,7 +4,7 @@ const providerConfig = {
   groq: {
     apiUrl: process.env.GROQ_API_URL,
     apiKey: process.env.GROQ_API_KEY,
-    defaultModel: "deepseek-r1-distill-llama-70b"
+    defaultModel: "openai/gpt-oss-120b"
   },
   openrouter: {
     apiUrl: process.env.OPENROUTER_API_URL,
