@@ -19,6 +19,10 @@ const createToolRules = () => {
       .trim()
       .isLength({ max: 50 })
       .withMessage("O apelido não pode ter mais de 50 caracteres."),
+    body("icon")
+      .trim()
+      .notEmpty()
+      .withMessage("O ícone da ferramenta é obrigatório."),
     body("parameters")
       .optional()
       .isObject()
