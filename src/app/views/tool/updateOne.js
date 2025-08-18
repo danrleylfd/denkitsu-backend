@@ -4,11 +4,11 @@ const updateOne = async (req, res) => {
   try {
     const { userID } = req
     const { toolId } = req.params
-    const { name, description, alias, parameters, httpConfig } = req.body
+    const { name, description, alias, icon, parameters, httpConfig } = req.body
 
     const tool = await Tool.findOneAndUpdate(
       { _id: toolId, user: userID },
-      { $set: { name, description, alias, parameters, httpConfig } },
+      { $set: { name, description, alias, icon, parameters, httpConfig } },
       { new: true }
     )
 

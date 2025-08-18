@@ -5,13 +5,14 @@ const createOne = async (req, res) => {
     const { userID } = req
     const userToolCount = await Tool.countDocuments({ user: userID })
     if (userToolCount >= 6) throw new Error("TOOL_LIMIT_REACHED")
-    const { name, description, alias, parameters, httpConfig } = req.body
+    const { name, description, alias, icon, parameters, httpConfig } = req.body
 
     const tool = await Tool.create({
       user: userID,
       name,
       description,
       alias,
+      icon,
       parameters,
       httpConfig,
     })
