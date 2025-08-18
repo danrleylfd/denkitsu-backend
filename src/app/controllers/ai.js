@@ -1,11 +1,11 @@
 const { Router } = require("express")
-// const authMiddleware = require("../middlewares/auth")
+const authMiddleware = require("../middlewares/auth")
 const aiMiddleware = require("../middlewares/ai")
 const validate = require("../middlewares/validator")
 const { sendMessageRules } = require("../validators/ai")
 
 const routes = Router()
-// routes.use(authMiddleware)
+routes.use(authMiddleware)
 
 // const sendMessage = require("../views/ai/sendMessage")
 const sendMsg = require("../views/ai/sendMsg")
