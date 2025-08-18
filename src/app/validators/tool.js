@@ -32,6 +32,10 @@ const createToolRules = () => {
       .withMessage("A URL da API é obrigatória.")
       .isURL()
       .withMessage("A URL fornecida é inválida."),
+    body("httpConfig.queryParams")
+      .optional()
+      .isObject()
+      .withMessage("Os parâmetros de query devem ser um objeto JSON válido."),
     body("httpConfig.headers")
       .optional()
       .isObject()

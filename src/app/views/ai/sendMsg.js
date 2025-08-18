@@ -7,13 +7,10 @@ const Tool = require("../../models/tool")
 const sendMessage = async (req, res) => {
   try {
     const { aiProvider = "groq", model, messages: userPrompts, aiKey, plugins, use_tools, stream = false, mode = "Padrão" } = req.body
-
     let systemPrompt = prompts.find(p => p.content.trim().startsWith(`Agente ${mode}`))
     if (!systemPrompt) systemPrompt = prompts[0]
-
     const messages = [systemPrompt, ...userPrompts]
     const requestOptions = { model, stream, plugins: plugins ? plugins : undefined }
-
     if (stream) {
       const streamResponse = await ask(aiProvider, aiKey, messages, requestOptions)
       res.setHeader("Content-Type", "text/event-stream")
@@ -24,19 +21,13 @@ const sendMessage = async (req, res) => {
       }
       return res.end()
     }
-
     if (use_tools && Array.isArray(use_tools) && use_tools.length > 0) {
-      // 1. Filtrar as ferramentas NATIVAS selecionadas
       const filteredBuiltInTools = builtInTools.filter((tool) => use_tools.includes(tool.function.name))
-
-      // 2. Buscar e formatar as ferramentas do USUÁRIO que estão ativas
       const userCustomTools = await Tool.find({ user: req.userID, name: { $in: use_tools } })
       const customToolSchemas = userCustomTools.map(tool => ({
         type: "function",
         function: { name: tool.name, description: tool.description, parameters: tool.parameters }
       }))
-
-      // 3. Juntar tudo
       const finalTools = [...filteredBuiltInTools, ...customToolSchemas]
       if (finalTools.length > 0) {
         requestOptions.tools = finalTools
@@ -44,29 +35,18 @@ const sendMessage = async (req, res) => {
         console.log(`[TOOL CONTROL] Usando as seguintes ferramentas: ${use_tools.join(", ")}`)
       }
     }
-
     const { status, data } = await ask(aiProvider, aiKey, messages, requestOptions)
     const resMsg = data.choices[0].message
-
     if (resMsg.tool_calls) {
       messages.push(resMsg)
-
-      // Carregar todas as ferramentas customizadas do usuário UMA VEZ para evitar múltiplas buscas no DB
       const allUserCustomTools = await Tool.find({ user: req.userID })
-
       for (const toolCall of resMsg.tool_calls) {
         const functionName = toolCall.function.name
         const functionArgs = JSON.parse(toolCall.function.arguments)
-
-        // 4. Lógica de execução da ferramenta: Primeiro checa se é customizada
         const customTool = allUserCustomTools.find(t => t.name === functionName)
-
         if (customTool) {
           console.log(`[CUSTOM TOOL CALL] Executing: ${functionName}(${JSON.stringify(functionArgs)})`)
-
-          let { url, headers, body } = customTool.httpConfig
-
-          // Template engine simples para substituir placeholders
+          let { url, queryParams, headers, body } = customTool.httpConfig
           const replacePlaceholders = (template) => {
             if (!template) return template
             let processed = JSON.stringify(template)
@@ -76,41 +56,41 @@ const sendMessage = async (req, res) => {
             })
             return JSON.parse(processed)
           }
-
+          let finalUrl = new URL(replacePlaceholders(url))
+          if (queryParams) {
+            const processedQueryParams = replacePlaceholders(queryParams)
+            const searchParams = new URLSearchParams(finalUrl.search)
+            for (const key in processedQueryParams) {
+              searchParams.set(key, processedQueryParams[key])
+            }
+            finalUrl.search = searchParams.toString()
+          }
           const httpConfig = {
             method: customTool.httpConfig.method,
-            url: replacePlaceholders(url),
+            url: finalUrl.toString(),
             headers: replacePlaceholders(headers),
             body: replacePlaceholders(body)
           }
-
-          // Reutiliza a sua httpTool nativa e segura
           const functionResponse = await availableTools.httpTool(httpConfig)
-
           messages.push({
             tool_call_id: toolCall.id,
             role: "tool",
             name: functionName,
             content: JSON.stringify(functionResponse.data)
           })
-          continue // Pula para a próxima iteração do loop
-
+          continue
         } else if (availableTools[functionName]) {
-          // Lógica existente para ferramentas NATIVAS
           console.log(`[TOOL CALL] Executing: ${functionName}(${JSON.stringify(functionArgs)})`)
-
-          // Tratamento especial para httpTool nativa, caso seja chamada diretamente
           if (functionName === "httpTool") {
-             const functionResponse = await availableTools.httpTool(functionArgs)
-             messages.push({
-                tool_call_id: toolCall.id,
-                role: "tool",
-                name: functionName,
-                content: JSON.stringify(functionResponse.data)
-             })
-             continue
+            const functionResponse = await availableTools.httpTool(functionArgs)
+            messages.push({
+              tool_call_id: toolCall.id,
+              role: "tool",
+              name: functionName,
+              content: JSON.stringify(functionResponse.data)
+            })
+            continue
           }
-
           const functionToCall = availableTools[functionName]
           const functionResponse = await functionToCall(...Object.values(functionArgs))
           messages.push({
@@ -119,23 +99,20 @@ const sendMessage = async (req, res) => {
             name: functionName,
             content: JSON.stringify(functionResponse.data)
           })
-
         } else {
-            console.warn(`[TOOL WARNING] Function ${functionName} not found.`)
-             messages.push({
-                tool_call_id: toolCall.id,
-                role: "tool",
-                name: functionName,
-                content: JSON.stringify({ error: `A ferramenta "${functionName}" não foi encontrada ou não está ativa.`})
-             })
+          console.warn(`[TOOL WARNING] Function ${functionName} not found.`)
+          messages.push({
+            tool_call_id: toolCall.id,
+            role: "tool",
+            name: functionName,
+            content: JSON.stringify({ error: `A ferramenta "${functionName}" não foi encontrada ou não está ativa.` })
+          })
         }
       }
-
       const sanitizedMessages = sanitizeMessages(messages)
       const finalResponse = await ask(aiProvider, aiKey, sanitizedMessages, { model })
       return res.status(finalResponse.status).json(finalResponse.data)
     }
-
     return res.status(status).json(data)
   } catch (error) {
     console.error(`[SEND_MESSAGE] ${new Date().toISOString()} -`, {

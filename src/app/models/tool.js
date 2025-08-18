@@ -32,6 +32,9 @@ const ToolSchema = new mongoose.Schema(
         type: String,
         required: true,
       },
+      queryParams: {
+        type: mongoose.Schema.Types.Mixed,
+      },
       headers: {
         type: mongoose.Schema.Types.Mixed,
       },
