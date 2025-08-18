@@ -10,6 +10,10 @@ const ToolSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    alias: {
+      type: String,
+      trim: true,
+    },
     parameters: {
       type: mongoose.Schema.Types.Mixed,
       required: true,
