@@ -17,7 +17,7 @@ const ToolSchema = new mongoose.Schema(
     icon: {
       type: String,
       required: true,
-      default: "Wrench",
+      default: "PocketKnife",
     },
     parameters: {
       type: mongoose.Schema.Types.Mixed,
