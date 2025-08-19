@@ -8,8 +8,6 @@ const sendMessage = async (req, res) => {
   try {
     const { aiProvider = "groq", model, messages: userPrompts, aiKey, plugins, use_tools, stream = false, mode = "Padrão" } = req.body
 
-    console.log("--- INÍCIO DA REQUISIÇÃO ---", { stream, use_tools })
-
     let systemPrompt = prompts.find(p => p.content.trim().startsWith(`Agente ${mode}`))
     if (!systemPrompt) systemPrompt = prompts[0]
     let messages = [systemPrompt, ...userPrompts]
@@ -58,94 +56,107 @@ const sendMessage = async (req, res) => {
 
     if (stream) {
       res.setHeader("Content-Type", "text/event-stream")
-      for (const toolCall of resMsg.tool_calls) {
-        const statusUpdate = { choices: [{ delta: { tool_calls: [{ index: toolCall.index, function: { name: toolCall.function.name, arguments: "" } }] } }] }
-        res.write(`data: ${JSON.stringify(statusUpdate)}\n\n`)
-      }
+      const decisionUpdate = { custom_event: "tool_decision", tools: resMsg.tool_calls.map(t => t.function.name) }
+      res.write(`data: ${JSON.stringify(decisionUpdate)}\n\n`)
     }
 
     const allUserCustomTools = await Tool.find({ user: req.userID })
 
-    console.log(`--- PASSO 1: INICIANDO EXECUÇÃO DE ${resMsg.tool_calls.length} FERRAMENTAS ---`)
+    try {
+      if (stream) {
+        const executionStartUpdate = { custom_event: "tool_execution_start", tools: resMsg.tool_calls.map(t => t.function.name) }
+        res.write(`data: ${JSON.stringify(executionStartUpdate)}\n\n`)
+      }
 
-    const toolPromises = resMsg.tool_calls.map(async (toolCall) => {
-      const functionName = toolCall.function.name
-      const functionArgs = JSON.parse(toolCall.function.arguments)
-      let functionResponseContent = ""
+      const toolPromises = resMsg.tool_calls.map(async (toolCall) => {
+        const functionName = toolCall.function.name
+        const functionArgs = JSON.parse(toolCall.function.arguments)
+        let rawResponseData = null
 
-      const customTool = allUserCustomTools.find(t => t.name === functionName)
-      const builtInTool = availableTools[functionName]
+        const customTool = allUserCustomTools.find(t => t.name === functionName)
+        const builtInTool = availableTools[functionName]
 
-      if (customTool) {
-        console.log(`[EXECUTANDO] Ferramenta customizada: ${functionName}`)
-        let { url, queryParams, headers, body } = customTool.httpConfig
-        const replacePlaceholders = (template) => {
-          if (!template) return template
-          let processed = JSON.stringify(template)
-          Object.keys(functionArgs).forEach(key => {
-            const regex = new RegExp(`{{${key}}}`, "g")
-            processed = processed.replace(regex, functionArgs[key])
-          })
-          return JSON.parse(processed)
-        }
-        let finalUrl = new URL(replacePlaceholders(url))
-        if (queryParams) {
-          const processedQueryParams = replacePlaceholders(queryParams)
-          for (const key in processedQueryParams) {
-            finalUrl.searchParams.set(key, processedQueryParams[key])
+        if (customTool) {
+          console.log(`[CUSTOM TOOL CALL] Executing: ${functionName}(${JSON.stringify(functionArgs)})`)
+          let { url, queryParams, headers, body } = customTool.httpConfig
+          const replacePlaceholders = (template) => {
+            if (!template) return template
+            let processed = JSON.stringify(template)
+            Object.keys(functionArgs).forEach(key => {
+              const regex = new RegExp(`{{${key}}}`, "g")
+              processed = processed.replace(regex, functionArgs[key])
+            })
+            return JSON.parse(processed)
           }
+          let finalUrl = new URL(replacePlaceholders(url))
+          if (queryParams) {
+            const processedQueryParams = replacePlaceholders(queryParams)
+            for (const key in processedQueryParams) {
+              finalUrl.searchParams.set(key, processedQueryParams[key])
+            }
+          }
+          const httpConfig = {
+            method: customTool.httpConfig.method,
+            url: finalUrl.toString(),
+            headers: replacePlaceholders(headers),
+            body: replacePlaceholders(body)
+          }
+          const functionResponse = await availableTools.httpTool(httpConfig)
+          rawResponseData = functionResponse.data
+        } else if (builtInTool) {
+          console.log(`[TOOL CALL] Executing: ${functionName}(${JSON.stringify(functionArgs)})`)
+          const functionResponse = await builtInTool(...Object.values(functionArgs))
+          rawResponseData = functionResponse.data !== undefined ? functionResponse.data : functionResponse
+        } else {
+          console.warn(`[TOOL WARNING] Function ${functionName} not found.`)
+          rawResponseData = { error: `A ferramenta "${functionName}" não foi encontrada ou não está ativa.` }
         }
-        const httpConfig = {
-          method: customTool.httpConfig.method,
-          url: finalUrl.toString(),
-          headers: replacePlaceholders(headers),
-          body: replacePlaceholders(body)
+
+        return {
+          tool_call_id: toolCall.id,
+          role: "tool",
+          name: functionName,
+          content: JSON.stringify(rawResponseData) // ** VOLTAMOS A ENVIAR O RESULTADO BRUTO **
         }
-        const functionResponse = await availableTools.httpTool(httpConfig)
-        functionResponseContent = JSON.stringify(functionResponse.data)
-      } else if (builtInTool) {
-        console.log(`[EXECUTANDO] Ferramenta nativa: ${functionName}`)
-        const functionResponse = await builtInTool(...Object.values(functionArgs))
-        const responseData = functionResponse.data !== undefined ? functionResponse.data : functionResponse
-        functionResponseContent = JSON.stringify(responseData)
+      })
+
+      const toolResults = await Promise.all(toolPromises)
+      messages.push(...toolResults)
+
+      if (stream) {
+        const processingUpdate = { custom_event: "tool_processing_start", message: "Resultados recebidos, a processar a resposta final..." }
+        res.write(`data: ${JSON.stringify(processingUpdate)}\n\n`)
+      }
+
+      const secondCallOptions = { model, stream }
+      const finalResponse = await ask(aiProvider, aiKey, sanitizeMessages(messages), secondCallOptions)
+
+      if (stream) {
+        for await (const finalChunk of finalResponse) {
+          res.write(`data: ${JSON.stringify(finalChunk)}\n\n`)
+        }
+        return res.end()
       } else {
-        console.warn(`[TOOL WARNING] Function ${functionName} not found.`)
-        functionResponseContent = JSON.stringify({ error: `A ferramenta "${functionName}" não foi encontrada ou não está ativa.` })
+        return res.status(finalResponse.status).json(finalResponse.data)
       }
-
-      return {
-        tool_call_id: toolCall.id,
-        role: "tool",
-        name: functionName,
-        content: functionResponseContent
+    } catch (toolError) {
+      console.error("--- ERRO NA EXECUÇÃO DA FERRAMENTA ---", toolError)
+      if (stream) {
+        const errorUpdate = { custom_event: "tool_execution_error", error: toolError.message || "Uma das ferramentas falhou ao ser executada." }
+        res.write(`data: ${JSON.stringify(errorUpdate)}\n\n`)
+        return res.end()
+      } else {
+        return res.status(500).json({ error: { message: "Falha ao executar a ferramenta." } })
       }
-    })
-
-    const toolResults = await Promise.all(toolPromises)
-    console.log("--- PASSO 2: EXECUÇÃO DAS FERRAMENTAS CONCLUÍDA ---", toolResults)
-
-    messages.push(...toolResults)
-
-    const sanitized = sanitizeMessages(messages)
-    console.log("--- PASSO 3: ENVIANDO RESULTADOS PARA A IA ---", JSON.stringify(sanitized, null, 2))
-
-    const secondCallOptions = { model, stream }
-    const finalResponse = await ask(aiProvider, aiKey, sanitized, secondCallOptions)
-
-    console.log("--- PASSO 4: RESPOSTA FINAL DA IA RECEBIDA ---")
-
-    if (stream) {
-      for await (const finalChunk of finalResponse) {
-        console.log("--- PASSO 5: ENVIANDO CHUNK FINAL PARA O FRONTEND ---", finalChunk.choices[0]?.delta)
-        res.write(`data: ${JSON.stringify(finalChunk)}\n\n`)
-      }
-      return res.end()
-    } else {
-      return res.status(finalResponse.status).json(finalResponse.data)
     }
 
   } catch (error) {
-    console.error("--- ERRO NO CONTROLLER ---", error)
+    console.error(`[SEND_MESSAGE] ${new Date().toISOString()} -`, {
+      error: error.message,
+      stack: error.stack,
+      aiProvider: req.body.aiProvider,
+      model: req.body.model
+    })
     const defaultError = { status: 500, message: "Ocorreu um erro interno no servidor." }
     const errorMessages = {
       AUTHENTICATION_FAILED: { status: 401, message: "Chave de API inválida. Verifique suas credenciais." },
