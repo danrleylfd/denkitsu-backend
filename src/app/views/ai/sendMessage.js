@@ -7,13 +7,10 @@ const Tool = require("../../models/tool")
 const sendMessage = async (req, res) => {
   try {
     const { aiProvider = "groq", model, messages: userPrompts, aiKey, plugins, use_tools, stream = false, mode = "Padrão" } = req.body
-    // 1. Preparação inicial das mensagens e ferramentas
     let systemPrompt = prompts.filter(p => p.role === "system").find(p => p.content.trim().startsWith(`Agente ${mode}`))
     if (!systemPrompt) systemPrompt = prompts[0]
     const messages = [systemPrompt, ...userPrompts]
-
-    const requestOptions = { model, stream: true, plugins: plugins ? plugins : undefined } // Sempre iniciamos com stream para checar por ferramentas
-
+    const requestOptions = { model, stream: true, plugins: plugins ? plugins : undefined }
     if (use_tools && Array.isArray(use_tools) && use_tools.length > 0) {
       const filteredBuiltInTools = builtInTools.filter((tool) => use_tools.includes(tool.function.name))
       const userCustomTools = await Tool.find({ user: req.userID, name: { $in: use_tools } })
@@ -27,29 +24,21 @@ const sendMessage = async (req, res) => {
         requestOptions.tool_choice = "auto"
       }
     }
-
-    // 2. Primeira chamada para a IA (sempre em modo stream)
     const streamResponse = await ask(aiProvider, aiKey, messages, requestOptions)
-
     if (stream) {
       res.setHeader("Content-Type", "text/event-stream")
       res.setHeader("Cache-Control", "no-cache")
       res.setHeader("Connection", "keep-alive")
     }
-
     let aggregatedToolCalls = []
     let hasToolCall = false
     let firstChunk = null
     let hasSentContent = false
-
-    // 3. Processar o stream inicial da IA
     for await (const chunk of streamResponse) {
       if (!firstChunk) firstChunk = chunk
-
       const delta = chunk.choices[0]?.delta
       if (delta && delta.tool_calls) {
         hasToolCall = true
-        // Agrega os "pedaços" da chamada de ferramenta que chegam no stream
         delta.tool_calls.forEach(toolCallChunk => {
           const existingCall = aggregatedToolCalls[toolCallChunk.index]
           if (!existingCall) {
@@ -61,25 +50,15 @@ const sendMessage = async (req, res) => {
           }
         })
       }
-
-      // Se o modo stream estiver ligado e o chunk for de conteúdo, envie para o frontend
       if (stream && delta && delta.content) {
         hasSentContent = true
         res.write(`data: ${JSON.stringify(chunk)}\n\n`)
       }
     }
-
-    // 4. Se não houve chamada de ferramenta, a conversa termina aqui
     if (!hasToolCall) {
-      if (stream) {
-        return res.end() // Finaliza o stream se só houve texto
-      } else {
-        // Se o stream estava desligado, retorna a primeira (e única) resposta completa
-        return res.status(200).json(firstChunk)
-      }
+      if (stream) return res.end()
+      else return res.status(200).json(firstChunk)
     }
-
-    // 5. Se HOUVE uma chamada de ferramenta, continue o processo
     const finalToolCalls = aggregatedToolCalls.map(call => ({
       id: call.id,
       type: "function",
@@ -88,10 +67,7 @@ const sendMessage = async (req, res) => {
         arguments: call.arguments
       }
     }))
-
     messages.push({ role: "assistant", tool_calls: finalToolCalls })
-
-    // Envia o status para o frontend via stream (se aplicável)
     if (stream) {
       for (const toolCall of finalToolCalls) {
         const statusUpdate = {
@@ -100,14 +76,11 @@ const sendMessage = async (req, res) => {
         res.write(`data: ${JSON.stringify(statusUpdate)}\n\n`)
       }
     }
-
     const allUserCustomTools = await Tool.find({ user: req.userID })
-    // Executa todas as ferramentas que a IA solicitou
     for (const toolCall of finalToolCalls) {
       const functionName = toolCall.function.name
       const functionArgs = JSON.parse(toolCall.function.arguments)
       let functionResponseContent = ""
-
       const customTool = allUserCustomTools.find(t => t.name === functionName)
       if (customTool) {
         console.log(`[CUSTOM TOOL CALL] Executing: ${functionName}(${JSON.stringify(functionArgs)})`)
@@ -147,7 +120,6 @@ const sendMessage = async (req, res) => {
         console.warn(`[TOOL WARNING] Function ${functionName} not found.`)
         functionResponseContent = JSON.stringify({ error: `A ferramenta "${functionName}" não foi encontrada ou não está ativa.` })
       }
-
       messages.push({
         tool_call_id: toolCall.id,
         role: "tool",
@@ -155,12 +127,8 @@ const sendMessage = async (req, res) => {
         content: functionResponseContent
       })
     }
-
-    // 6. Chame a IA novamente com o resultado das ferramentas
     const secondCallOptions = { model, stream: stream }
     const finalResponse = await ask(aiProvider, aiKey, sanitizeMessages(messages), secondCallOptions)
-
-    // 7. Envie a resposta final para o frontend
     if (stream) {
       for await (const finalChunk of finalResponse) {
         res.write(`data: ${JSON.stringify(finalChunk)}\n\n`)
@@ -169,7 +137,6 @@ const sendMessage = async (req, res) => {
     } else {
       return res.status(finalResponse.status).json(finalResponse.data)
     }
-
   } catch (error) {
     console.error(`[SEND_MESSAGE] ${new Date().toISOString()} -`, {
       error: error.message,
