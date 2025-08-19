@@ -50,7 +50,8 @@ const sendMessage = async (req, res) => {
       const delta = chunk.choices[0]?.delta
 
       if (delta && delta.content) {
-        writeStreamData(res, { type: "delta", delta: { content: delta.content } })
+        const formattedDelta = { content: [{ type: "text", text: delta.content }] }
+        writeStreamData(res, { type: "delta", delta: formattedDelta })
       }
 
       if (delta && delta.tool_calls) {
@@ -156,7 +157,8 @@ const sendMessage = async (req, res) => {
     for await (const finalChunk of finalResponseStream) {
       const delta = finalChunk.choices[0]?.delta
       if (delta && delta.content) {
-        writeStreamData(res, { type: "delta", delta: { content: delta.content } })
+        const formattedDelta = { content: [{ type: "text", text: delta.content }] }
+        writeStreamData(res, { type: "delta", delta: formattedDelta })
       }
     }
 
