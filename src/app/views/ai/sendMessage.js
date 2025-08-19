@@ -7,9 +7,8 @@ const Tool = require("../../models/tool")
 const sendMessage = async (req, res) => {
   try {
     const { aiProvider = "groq", model, messages: userPrompts, aiKey, plugins, use_tools, stream = false, mode = "Padrão" } = req.body
-
     // 1. Preparação inicial das mensagens e ferramentas
-    let systemPrompt = prompts.find(p => p.content.trim().startsWith(`Agente ${mode}`))
+    let systemPrompt = prompts.filter(p => p.role === "system").find(p => p.content.trim().startsWith(`Agente ${mode}`))
     if (!systemPrompt) systemPrompt = prompts[0]
     const messages = [systemPrompt, ...userPrompts]
 
