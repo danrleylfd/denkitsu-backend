@@ -183,7 +183,11 @@ const sendMessage = async (req, res) => {
         })
       }
       const finalResponse = await ask(aiProvider, aiKey, sanitizeMessages(messages), { model, stream: false })
-      return res.status(200).json(finalResponse.data)
+      // return res.status(200).json(finalResponse.data)
+      return res.status(200).json({
+        ...finalResponse.data,
+        tool_calls: responseMessage.tool_calls || []
+      })
     }
   } catch (error) {
     console.error(`[SEND_MESSAGE] ${new Date().toISOString()} -`, {
