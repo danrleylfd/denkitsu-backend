@@ -34,7 +34,7 @@ const ask = async (aiProvider, aiKey, prompts, options = {}) => {
     }
     const response = await openai.chat.completions.create({
       model: finalModel,
-      messages: prompts,
+      messages: [timestampsMsg, ...prompts],
       stream: false,
       ...props
     })
