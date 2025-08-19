@@ -7,11 +7,13 @@ const Tool = require("../../models/tool")
 const sendMessage = async (req, res) => {
   try {
     const { aiProvider = "groq", model, messages: userPrompts, aiKey, plugins, use_tools, stream = false, mode = "Padrão" } = req.body
+
     let systemPrompt = prompts.find(p => p.content.trim().startsWith(`Agente ${mode}`))
     if (!systemPrompt) systemPrompt = prompts[0]
     let messages = [systemPrompt, ...userPrompts]
+
     const toolsAreActive = use_tools && Array.isArray(use_tools) && use_tools.length > 0
-    // Cenário 1: Nenhuma ferramenta está em uso
+
     if (!toolsAreActive) {
       const requestOptions = { model, stream, plugins: plugins ? plugins : undefined }
       if (stream) {
@@ -26,7 +28,7 @@ const sendMessage = async (req, res) => {
         return res.status(status).json(data)
       }
     }
-    // Cenário 2: Ferramentas estão ATIVAS
+
     const requestOptions = { model, stream: false } // Força a primeira chamada a ser sem stream
     const filteredBuiltInTools = builtInTools.filter((tool) => use_tools.includes(tool.function.name))
     const userCustomTools = await Tool.find({ user: req.userID, name: { $in: use_tools } })
@@ -36,8 +38,10 @@ const sendMessage = async (req, res) => {
     }))
     requestOptions.tools = [...filteredBuiltInTools, ...customToolSchemas]
     requestOptions.tool_choice = "auto"
+
     const { data } = await ask(aiProvider, aiKey, messages, requestOptions)
     const resMsg = data.choices[0].message
+
     if (!resMsg.tool_calls) {
       if (stream) {
         res.setHeader("Content-Type", "text/event-stream")
@@ -47,7 +51,9 @@ const sendMessage = async (req, res) => {
       }
       return res.status(200).json(data)
     }
+
     messages.push(resMsg)
+
     if (stream) {
       res.setHeader("Content-Type", "text/event-stream")
       for (const toolCall of resMsg.tool_calls) {
@@ -55,13 +61,18 @@ const sendMessage = async (req, res) => {
         res.write(`data: ${JSON.stringify(statusUpdate)}\n\n`)
       }
     }
+
     // ** INÍCIO DA LÓGICA CORRIGIDA E OTIMIZADA **
     const allUserCustomTools = await Tool.find({ user: req.userID })
+
     const toolPromises = resMsg.tool_calls.map(async (toolCall) => {
       const functionName = toolCall.function.name
       const functionArgs = JSON.parse(toolCall.function.arguments)
       let functionResponseContent = ""
+
       const customTool = allUserCustomTools.find(t => t.name === functionName)
+      const builtInTool = availableTools[functionName]
+
       if (customTool) {
         console.log(`[CUSTOM TOOL CALL] Executing: ${functionName}(${JSON.stringify(functionArgs)})`)
         let { url, queryParams, headers, body } = customTool.httpConfig
@@ -89,15 +100,15 @@ const sendMessage = async (req, res) => {
         }
         const functionResponse = await availableTools.httpTool(httpConfig)
         functionResponseContent = JSON.stringify(functionResponse.data)
-      } else if (availableTools[functionName]) {
+      } else if (builtInTool) {
         console.log(`[TOOL CALL] Executing: ${functionName}(${JSON.stringify(functionArgs)})`)
-        const functionToCall = availableTools[functionName]
-        const functionResponse = await functionToCall(...Object.values(functionArgs))
+        const functionResponse = await builtInTool(...Object.values(functionArgs))
         functionResponseContent = JSON.stringify(functionResponse.data)
       } else {
         console.warn(`[TOOL WARNING] Function ${functionName} not found.`)
         functionResponseContent = JSON.stringify({ error: `A ferramenta "${functionName}" não foi encontrada ou não está ativa.` })
       }
+
       return {
         tool_call_id: toolCall.id,
         role: "tool",
@@ -105,11 +116,14 @@ const sendMessage = async (req, res) => {
         content: functionResponseContent
       }
     })
+
     const toolResults = await Promise.all(toolPromises)
     messages.push(...toolResults)
     // ** FIM DA LÓGICA CORRIGIDA E OTIMIZADA **
+
     const secondCallOptions = { model, stream }
     const finalResponse = await ask(aiProvider, aiKey, sanitizeMessages(messages), secondCallOptions)
+
     if (stream) {
       for await (const finalChunk of finalResponse) {
         res.write(`data: ${JSON.stringify(finalChunk)}\n\n`)
@@ -118,6 +132,7 @@ const sendMessage = async (req, res) => {
     } else {
       return res.status(finalResponse.status).json(finalResponse.data)
     }
+
   } catch (error) {
     console.error(`[SEND_MESSAGE] ${new Date().toISOString()} -`, {
       error: error.message,
