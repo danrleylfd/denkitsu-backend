@@ -8,6 +8,8 @@ const sendMessage = async (req, res) => {
   try {
     const { aiProvider = "groq", model, messages: userPrompts, aiKey, plugins, use_tools, stream = false, mode = "Padrão" } = req.body
 
+    console.log("--- INÍCIO DA REQUISIÇÃO ---", { stream, use_tools })
+
     let systemPrompt = prompts.find(p => p.content.trim().startsWith(`Agente ${mode}`))
     if (!systemPrompt) systemPrompt = prompts[0]
     let messages = [systemPrompt, ...userPrompts]
@@ -64,6 +66,8 @@ const sendMessage = async (req, res) => {
 
     const allUserCustomTools = await Tool.find({ user: req.userID })
 
+    console.log(`--- PASSO 1: INICIANDO EXECUÇÃO DE ${resMsg.tool_calls.length} FERRAMENTAS ---`)
+
     const toolPromises = resMsg.tool_calls.map(async (toolCall) => {
       const functionName = toolCall.function.name
       const functionArgs = JSON.parse(toolCall.function.arguments)
@@ -73,7 +77,7 @@ const sendMessage = async (req, res) => {
       const builtInTool = availableTools[functionName]
 
       if (customTool) {
-        console.log(`[CUSTOM TOOL CALL] Executing: ${functionName}(${JSON.stringify(functionArgs)})`)
+        console.log(`[EXECUTANDO] Ferramenta customizada: ${functionName}`)
         let { url, queryParams, headers, body } = customTool.httpConfig
         const replacePlaceholders = (template) => {
           if (!template) return template
@@ -100,7 +104,7 @@ const sendMessage = async (req, res) => {
         const functionResponse = await availableTools.httpTool(httpConfig)
         functionResponseContent = JSON.stringify(functionResponse.data)
       } else if (builtInTool) {
-        console.log(`[TOOL CALL] Executing: ${functionName}(${JSON.stringify(functionArgs)})`)
+        console.log(`[EXECUTANDO] Ferramenta nativa: ${functionName}`)
         const functionResponse = await builtInTool(...Object.values(functionArgs))
         const responseData = functionResponse.data !== undefined ? functionResponse.data : functionResponse
         functionResponseContent = JSON.stringify(responseData)
@@ -118,13 +122,21 @@ const sendMessage = async (req, res) => {
     })
 
     const toolResults = await Promise.all(toolPromises)
+    console.log("--- PASSO 2: EXECUÇÃO DAS FERRAMENTAS CONCLUÍDA ---", toolResults)
+
     messages.push(...toolResults)
 
+    const sanitized = sanitizeMessages(messages)
+    console.log("--- PASSO 3: ENVIANDO RESULTADOS PARA A IA ---", JSON.stringify(sanitized, null, 2))
+
     const secondCallOptions = { model, stream }
-    const finalResponse = await ask(aiProvider, aiKey, sanitizeMessages(messages), secondCallOptions)
+    const finalResponse = await ask(aiProvider, aiKey, sanitized, secondCallOptions)
+
+    console.log("--- PASSO 4: RESPOSTA FINAL DA IA RECEBIDA ---")
 
     if (stream) {
       for await (const finalChunk of finalResponse) {
+        console.log("--- PASSO 5: ENVIANDO CHUNK FINAL PARA O FRONTEND ---", finalChunk.choices[0]?.delta)
         res.write(`data: ${JSON.stringify(finalChunk)}\n\n`)
       }
       return res.end()
@@ -133,12 +145,7 @@ const sendMessage = async (req, res) => {
     }
 
   } catch (error) {
-    console.error(`[SEND_MESSAGE] ${new Date().toISOString()} -`, {
-      error: error.message,
-      stack: error.stack,
-      aiProvider: req.body.aiProvider,
-      model: req.body.model
-    })
+    console.error("--- ERRO NO CONTROLLER ---", error)
     const defaultError = { status: 500, message: "Ocorreu um erro interno no servidor." }
     const errorMessages = {
       AUTHENTICATION_FAILED: { status: 401, message: "Chave de API inválida. Verifique suas credenciais." },
