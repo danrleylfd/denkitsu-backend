@@ -29,7 +29,7 @@ const sendMessage = async (req, res) => {
       }
     }
 
-    const requestOptions = { model, stream: false } // Força a primeira chamada a ser sem stream
+    const requestOptions = { model, stream: false }
     const filteredBuiltInTools = builtInTools.filter((tool) => use_tools.includes(tool.function.name))
     const userCustomTools = await Tool.find({ user: req.userID, name: { $in: use_tools } })
     const customToolSchemas = userCustomTools.map(tool => ({
@@ -62,7 +62,6 @@ const sendMessage = async (req, res) => {
       }
     }
 
-    // ** INÍCIO DA LÓGICA CORRIGIDA E OTIMIZADA **
     const allUserCustomTools = await Tool.find({ user: req.userID })
 
     const toolPromises = resMsg.tool_calls.map(async (toolCall) => {
@@ -103,7 +102,8 @@ const sendMessage = async (req, res) => {
       } else if (builtInTool) {
         console.log(`[TOOL CALL] Executing: ${functionName}(${JSON.stringify(functionArgs)})`)
         const functionResponse = await builtInTool(...Object.values(functionArgs))
-        functionResponseContent = JSON.stringify(functionResponse.data)
+        const responseData = functionResponse.data !== undefined ? functionResponse.data : functionResponse
+        functionResponseContent = JSON.stringify(responseData)
       } else {
         console.warn(`[TOOL WARNING] Function ${functionName} not found.`)
         functionResponseContent = JSON.stringify({ error: `A ferramenta "${functionName}" não foi encontrada ou não está ativa.` })
@@ -119,7 +119,6 @@ const sendMessage = async (req, res) => {
 
     const toolResults = await Promise.all(toolPromises)
     messages.push(...toolResults)
-    // ** FIM DA LÓGICA CORRIGIDA E OTIMIZADA **
 
     const secondCallOptions = { model, stream }
     const finalResponse = await ask(aiProvider, aiKey, sanitizeMessages(messages), secondCallOptions)
