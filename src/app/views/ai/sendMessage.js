@@ -152,7 +152,7 @@ const sendMessage = async (req, res) => {
 
     const secondCallOptions = { model, stream: true }
     const finalResponseStream = await ask(aiProvider, aiKey, sanitizeMessages(messages), secondCallOptions)
-
+    writeStreamData(res, { type: "status", status: "TOOL_PROCESSING_COMPLETE", tool: null })
     for await (const finalChunk of finalResponseStream) {
       const delta = finalChunk.choices[0]?.delta
       if (delta && delta.content) {
