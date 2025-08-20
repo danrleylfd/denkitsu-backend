@@ -4,8 +4,7 @@ const locationRules = () => {
   return [
     param("location")
       .isLength({ min: 3 })
-      .withMessage("O local precisa ter no mínimo 3 caracteres.")
-      .escape()
+      .withMessage("O local precisa ter no mínimo 3 caracteres."),
   ]
 }
 
@@ -20,7 +19,7 @@ const coordinatesRules = () => {
       .notEmpty()
       .withMessage("A longitude é obrigatória.")
       .isFloat()
-      .withMessage("A longitude deve ser um número.")
+      .withMessage("A longitude deve ser um número."),
   ]
 }
 

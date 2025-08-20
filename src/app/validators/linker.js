@@ -12,8 +12,7 @@ const createLinkerRules = () => {
       .notEmpty()
       .withMessage("O link de destino é obrigatório.")
       .isURL()
-      .withMessage("O link de destino deve ser uma URL válida.")
-      .escape(),
+      .withMessage("O link de destino deve ser uma URL válida."),
   ]
 }
 
@@ -33,8 +32,7 @@ const updateLinkerRules = () => {
       .notEmpty()
       .withMessage("O novo link de destino é obrigatório.")
       .isURL()
-      .withMessage("O novo link de destino deve ser uma URL válida.")
-      .escape(),
+      .withMessage("O novo link de destino deve ser uma URL válida."),
   ]
 }
 

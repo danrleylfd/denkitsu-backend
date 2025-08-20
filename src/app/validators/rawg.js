@@ -5,8 +5,7 @@ const searchRules = () => {
     query("query")
       .trim()
       .notEmpty()
-      .withMessage("O parâmetro 'query' da busca não pode estar vazio.")
-      .escape()
+      .withMessage("O parâmetro 'query' da busca não pode estar vazio."),
   ]
 }
 

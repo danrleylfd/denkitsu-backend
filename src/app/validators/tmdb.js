@@ -5,8 +5,7 @@ const searchRules = () => {
     query("query")
       .trim()
       .notEmpty()
-      .withMessage("O parâmetro 'query' da busca não pode estar vazio.")
-      .escape()
+      .withMessage("O parâmetro 'query' da busca não pode estar vazio."),
   ]
 }
 
@@ -14,8 +13,7 @@ const detailsRules = () => {
   return [
     param("type")
       .isIn(["movie", "tv"])
-      .withMessage("O tipo de mídia deve ser 'movie' ou 'tv'.")
-      .escape(),
+      .withMessage("O tipo de mídia deve ser 'movie' ou 'tv'."),
     param("id")
       .isNumeric()
       .withMessage("O ID da mídia deve ser um número.")

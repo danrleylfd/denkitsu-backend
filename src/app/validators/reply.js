@@ -4,8 +4,7 @@ const commentIdInParams = () => {
   return [
     param("comment")
       .isMongoId()
-      .withMessage("O ID do comentário na URL é inválido.")
-      .escape(),
+      .withMessage("O ID do comentário na URL é inválido."),
   ]
 }
 

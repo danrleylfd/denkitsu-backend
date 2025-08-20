@@ -6,38 +6,39 @@ const createToolRules = () => {
       .trim()
       .notEmpty()
       .withMessage("O nome da ferramenta é obrigatório.")
-      .isLength({ max: 50 })
-      .withMessage("O nome não pode ter mais de 50 caracteres.")
-      .matches(/^[a-zA-Z0-9_-]+$/)
-      .withMessage("O nome só pode conter letras, números, _ e -.")
-      .escape(),
+      .isLength({ max: 32 })
+      .withMessage("O nome não pode ter mais de 32 caracteres.")
+      .matches(/^[a-zA-Z0-9_]+$/)
+      .withMessage("O nome só pode conter letras, números e _."),
     body("description")
       .trim()
       .notEmpty()
       .withMessage("A descrição da ferramenta é obrigatória.")
-      .escape(),
+      .isLength({ max: 256 })
+      .withMessage("A descrição não pode ter mais de 256 caracteres."),
     body("alias")
       .optional()
       .trim()
-      .isLength({ max: 50 })
-      .withMessage("O apelido não pode ter mais de 50 caracteres.")
+      .isLength({ max: 32 })
+      .withMessage("O apelido não pode ter mais de 32 caracteres.")
       .escape(),
     body("icon")
       .trim()
       .notEmpty()
       .withMessage("O ícone da ferramenta é obrigatório.")
-      .escape(),
+      .isLength({ max: 32 })
+      .withMessage("O ícone não pode ter mais de 32 caracteres.")
+      .matches(/^[a-zA-Z0-9]+$/)
+      .withMessage("O ícone só pode conter letras e números."),
     body("httpConfig.method")
       .isIn(["GET", "POST", "PUT", "PATCH", "DELETE"])
-      .withMessage("Método HTTP inválido.")
-      .escape(),
+      .withMessage("Método HTTP inválido."),
     body("httpConfig.url")
       .trim()
       .notEmpty()
       .withMessage("A URL da API é obrigatória.")
       .isURL()
-      .withMessage("A URL fornecida é inválida.")
-      .escape(),
+      .withMessage("A URL fornecida é inválida."),
     body("parameters")
       .optional()
       .isObject()

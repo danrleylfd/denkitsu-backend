@@ -8,12 +8,10 @@ const signUpRules = () => {
       .escape(),
     body("email")
       .isEmail()
-      .withMessage("O e-mail fornecido é inválido.")
-      .escape(),
+      .withMessage("O e-mail fornecido é inválido."),
     body("password")
       .isLength({ min: 8 })
-      .withMessage("A senha deve ter no mínimo 8 caracteres.")
-      .escape(),
+      .withMessage("A senha deve ter no mínimo 8 caracteres."),
   ]
 }
 
@@ -21,12 +19,10 @@ const signInRules = () => {
   return [
     body("email")
       .isEmail()
-      .withMessage("O e-mail fornecido é inválido.")
-      .escape(),
+      .withMessage("O e-mail fornecido é inválido."),
     body("password")
       .notEmpty()
-      .withMessage("A senha é obrigatória.")
-      .escape(),
+      .withMessage("A senha é obrigatória."),
   ]
 }
 
@@ -34,8 +30,7 @@ const forgotPasswordRules = () => {
   return [
     body("email")
       .isEmail()
-      .withMessage("O e-mail fornecido é inválido.")
-      .escape(),
+      .withMessage("O e-mail fornecido é inválido."),
   ]
 }
 
@@ -43,16 +38,13 @@ const resetPasswordRules = () => {
   return [
     body("token")
       .notEmpty()
-      .withMessage("O token é obrigatório.")
-      .escape(),
+      .withMessage("O token é obrigatório."),
     body("email")
       .isEmail()
-      .withMessage("O e-mail fornecido é inválido.")
-      .escape(),
+      .withMessage("O e-mail fornecido é inválido."),
     body("password")
       .isLength({ min: 8 })
-      .withMessage("A nova senha deve ter no mínimo 8 caracteres.")
-      .escape(),
+      .withMessage("A nova senha deve ter no mínimo 8 caracteres."),
   ]
 }
 
@@ -63,7 +55,6 @@ const refreshTokenRules = () => {
       .withMessage("O refresh token é obrigatório.")
       .matches(/^Bearer\s.+$/)
       .withMessage("O refresh token está mal formatado. O formato esperado é 'Bearer <token>'.")
-      .escape(),
   ]
 }
 

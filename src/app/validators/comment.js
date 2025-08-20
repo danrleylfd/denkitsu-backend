@@ -6,8 +6,7 @@ const videoIdInParams = () => {
       .notEmpty()
       .withMessage("O ID do vídeo é obrigatório na URL.")
       .isMongoId()
-      .withMessage("O ID do vídeo na URL é inválido.")
-      .escape(),
+      .withMessage("O ID do vídeo na URL é inválido."),
   ]
 }
 
@@ -17,8 +16,7 @@ const commentIdInParams = () => {
       .notEmpty()
       .withMessage("O ID do comentário é obrigatório na URL.")
       .isMongoId()
-      .withMessage("O ID do comentário na URL é inválido.")
-      .escape(),
+      .withMessage("O ID do comentário na URL é inválido."),
   ]
 }
 

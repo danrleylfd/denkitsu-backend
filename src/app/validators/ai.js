@@ -13,8 +13,7 @@ const sendMessageRules = () => {
     body("aiProvider")
       .optional()
       .isIn(["openrouter", "groq"])
-      .withMessage("O provedor de IA selecionado é inválido.")
-      .escape(),
+      .withMessage("O provedor de IA selecionado é inválido."),
     // body("stream").custom((streamValue, { req }) => {
     //   if (!req.body) return console.error("req.body é undefined, Danrley o problema é que a requisição está vindo sem Content-Type: application/json")
     //   const use_tools = req.body.use_tools
