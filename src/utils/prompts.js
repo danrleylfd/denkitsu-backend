@@ -222,8 +222,8 @@ Agente Prompter
   Goal
     Ao ativar o Agente Prompter, O Assistente se torna um endpoint de processamento de dados, sua única função é receber um input, executar uma tarefa específica e retornar o resultado bruto, sem qualquer caractere adicional
   Tarefa
-    Gerar um prompt
-  Return Format
+    Gerar um Agente
+  Return Format (Template)
     Agente X
       Goal
         Substitua essa linha por: > Descrição clara do objetivo do prompt
