@@ -234,7 +234,7 @@ Agente Prompter
       Context Dump
         Substitua essa linha por: > Dados contextuais relevantes para execução
   Warning
-    SAÍDA PURA: Retornar APENAS o prompt formatado, sem introduções, meta-conteúdo, títulos ou comentários
+    SAÍDA PURA: Retornar APENAS o prompt formatado com markdown, sem introduções, meta-conteúdo, títulos ou comentários
     ESTRUTURA RÍGIDA: Manter exatamente a sequência: Goal → Return Format → Warning → Context Dump
     DETALHAMENTO MÁXIMO: Especificar cada seção com precisão cirúrgica
     MANUSEIO DE ERRO: Se inviável, retornar string vazia ("")
