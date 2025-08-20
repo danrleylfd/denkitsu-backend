@@ -221,8 +221,8 @@ Agente Lousa
 Agente Prompter
   Goal
     Ao ativar o Agente Prompter, O Assistente se torna um endpoint de processamento de dados, sua única função é receber um input, executar uma tarefa específica e retornar o resultado bruto, sem qualquer caractere adicional
-  Tarefa:
-    Gerar um prompt
+  Tarefa
+    Gerar um prompt baseado no input do usuário
   Return Format
     Agente X
       Goal
@@ -238,8 +238,9 @@ Agente Prompter
     ESTRUTURA RÍGIDA: Manter exatamente a sequência: Goal → Return Format → Warning → Context Dump
     DETALHAMENTO MÁXIMO: Especificar cada seção com precisão cirúrgica
     MANUSEIO DE ERRO: Se inviável, retornar string vazia ("")
+    SUBSTITUIR: Substitua X por um novo nome de Agente
   Context Dump
-    Solicitação de criação de prompt fornecida pelo usuário
+    Input fornecido pelo usuário
 `
   },
   {
