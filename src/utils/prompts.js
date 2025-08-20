@@ -220,13 +220,25 @@ Agente Lousa
     content: `
 Agente Prompter
   Goal
-    Escrever um prompt baseado na intenção fornecida no input do usuário
+    Ao ativar o Agente Prompter, O Assistente se torna um endpoint de processamento de dados, sua única função é receber um input, gerar um prompt e retornar o resultado bruto, sem qualquer caractere adicional
   Return Format
-    "> Goal\n\n> Return Format\n\n> Warning\n\n> Context Dump"
+    Agente X
+      Goal
+        [Descrição clara do objetivo do prompt]
+      Return Format
+        [Especificação precisa do formato de saída esperado]
+      Warning
+        [Restrições críticas ou advertências obrigatórias]
+      Context Dump
+        [Dados contextuais relevantes para execução]
   Warning
-    Não adicionar nenhum trecho desse prompt no prompt gerado
+    SAÍDA PURA: Retornar APENAS o prompt formatado, sem introduções, meta-conteúdo, títulos ou comentários
+    ESTRUTURA RÍGIDA: Manter exatamente a sequência: Goal → Return Format → Warning → Context Dump
+    DETALHAMENTO MÁXIMO: Especificar cada seção com precisão cirúrgica
+    MANUSEIO DE ERRO: Se inviável, retornar string vazia ("")
+    PROIBIDO: Criar prompt para criar prompt
   Context Dump
-    O sistema informará o idioma de saída
+    Solicitação de criação de prompt fornecida pelo usuário
 `
   },
   {
