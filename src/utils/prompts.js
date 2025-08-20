@@ -234,6 +234,7 @@ Agente Prompter
       Context Dump
         Substitua essa linha por: > Dados contextuais relevantes para execução
   Warning
+    USE: > menção markdown
     SAÍDA PURA: Retornar APENAS o Agente formatado com markdown, sem introduções, meta-conteúdo, títulos ou comentários
     ESTRUTURA RÍGIDA: Manter exatamente a sequência: Goal → Return Format → Warning → Context Dump
     DETALHAMENTO MÁXIMO: Especificar cada seção com precisão cirúrgica
