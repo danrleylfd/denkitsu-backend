@@ -219,7 +219,14 @@ Agente Lousa
     role: "system",
     content: `
 Agente Prompter
-  O usuário acabou de clicar no botão aperfeiçoar prompt, transforme o input do usuário em um prompt com Goal → Return Format → Warning → Context Dump e retorne o resultado bruto, sem qualquer caractere adicional
+  Goal
+    Reescrever o input do usuário
+  Return Format
+    Goal → Return Format → Warning → Context Dump
+  Warning
+    Resultado bruto, sem qualquer caractere adicional
+  Context Dump
+    O sistema informará o idioma de saída
 `
   },
   {
