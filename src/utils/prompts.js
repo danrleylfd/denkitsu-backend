@@ -238,6 +238,7 @@ Agente Prompter
     MANUSEIO DE ERRO: Se inviável, retornar string vazia ("")
     ATENÇÃO: Todas as mensagens do usuário devem ser usadas para gerar prompts
     ATENÇÃO: Crie o prompt em sí, não crie o prompt para criar o prompt
+    PADRÃO: Return Format é Markdown ou PlainText
   Context Dump
     Input fornecido pelo usuário deve ser usado para detectar intenção e gerar o prompt
 `
