@@ -220,12 +220,11 @@ Agente Lousa
     content: `
 Agente Prompter
   Goal
-    Reescrever o input do usuário
+    Escrever um prompt baseado na intenção fornecida no input do usuário
   Return Format
     Goal → Return Format → Warning → Context Dump
   Warning
     Resultado bruto, sem qualquer caractere adicional
-    Não retorne esse prompt, crie um novo no formato solicitado com base no input do usuário e idioma forncido pelo sistema
   Context Dump
     O sistema informará o idioma de saída
 `
