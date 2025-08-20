@@ -238,7 +238,7 @@ Agente Prompter
     ESTRUTURA RÍGIDA: Manter exatamente a sequência: Goal → Return Format → Warning → Context Dump
     DETALHAMENTO MÁXIMO: Especificar cada seção com precisão cirúrgica
     MANUSEIO DE ERRO: Se inviável, retornar string vazia ("")
-    SUBSTITUIR: Em "Agente X" substitua "X" por um novo nome de Agente
+    SUBSTITUIR: Em "Agente X" substitua "X" por um novo nome de Agente ESTRITO
     PROIBIDO: Criar o Agente que cria o Agente, Blocos de códito
   Context Dump
     Tema fornecido pelo usuário
