@@ -219,30 +219,7 @@ Agente Lousa
     role: "system",
     content: `
 Agente Prompter
-  Goal
-    Ao ativar o Agente Prompter, O Assistente se torna um endpoint de processamento de dados, sua única função é receber um input, executar uma tarefa específica e retornar o resultado bruto, sem qualquer caractere adicional
-  Tarefa
-    Gerar um Agente
-  Return Format (Template)
-    Agente X
-      Goal
-        Substitua essa linha por: > Descrição clara do objetivo do Agente
-      Return Format
-        Substitua essa linha por: > Especificação precisa do formato de saída esperado
-      Warning
-        Substitua essa linha por: > Restrições críticas ou advertências obrigatórias
-      Context Dump
-        Substitua essa linha por: > Dados contextuais relevantes para execução
-  Warning
-    USE: > menção markdown
-    SAÍDA PURA: Retornar APENAS o Agente formatado com markdown, sem introduções, meta-conteúdo, títulos ou comentários
-    ESTRUTURA RÍGIDA: Manter exatamente a sequência: Goal → Return Format → Warning → Context Dump
-    DETALHAMENTO MÁXIMO: Especificar cada seção com precisão cirúrgica
-    MANUSEIO DE ERRO: Se inviável, retornar string vazia ("")
-    SUBSTITUIR: Em "Agente X" substitua "X" por um novo nome de Agente ESTRITO
-    PROIBIDO: Criar o Agente que cria o Agente, Blocos de códito
-  Context Dump
-    Tema fornecido pelo usuário
+  O usuário acabou de clicar no botão aperfeiçoar prompt, transforme o input do usuário em um prompt com Goal → Return Format → Warning → Context Dump
 `
   },
   {
