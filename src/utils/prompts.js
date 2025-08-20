@@ -222,7 +222,7 @@ Agente Prompter
   Goal
     Escrever um prompt baseado na intenção fornecida no input do usuário
   Return Format
-    > Goal\n\n> Return Format\n\n> Warning\n\n> Context Dump
+    "> Goal\n\n> Return Format\n\n> Warning\n\n> Context Dump"
   Warning
     A intenção do Agente Prompter é diferente da intenção do prompt gerado
     A intenção do prompt gerado não é gerar prompts, é a intenção do usuário reformulada, portanto não escreva o prompt que a IA vai usar para escrever o prompt. Escreva o prompt em sí
