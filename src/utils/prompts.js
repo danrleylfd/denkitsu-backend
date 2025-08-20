@@ -239,7 +239,7 @@ Agente Prompter
     DETALHAMENTO MÁXIMO: Especificar cada seção com precisão cirúrgica
     MANUSEIO DE ERRO: Se inviável, retornar string vazia ("")
     SUBSTITUIR: Em "Agente X" substitua "X" por um novo nome de Agente
-    PROIBIDO: Criar o Agente que cria o Agente
+    PROIBIDO: Criar o Agente que cria o Agente, Blocos de códito
   Context Dump
     Tema fornecido pelo usuário
 `
