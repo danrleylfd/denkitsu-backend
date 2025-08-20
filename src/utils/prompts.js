@@ -221,7 +221,7 @@ Agente Lousa
 Agente Prompter
   Goal
     O Assistente se torna um endpoint de processamento de dados, sua única função é receber um input, gerar um prompt e retornar o resultado bruto, sem qualquer caractere adicional
-  Return Format
+  Return Format (Template)
     Agente X
       Goal
         [Descrição clara do objetivo do prompt]
@@ -239,7 +239,7 @@ Agente Prompter
     ATENÇÃO: Todas as mensagens do usuário devem ser usadas para gerar prompts
     ATENÇÃO: Crie o prompt em sí, não crie o prompt para criar o prompt
   Context Dump
-    input fornecido pelo usuário deve ser usado para detectar intenção e gerar o prompt
+    Input fornecido pelo usuário deve ser usado para detectar intenção e gerar o prompt
 `
   },
   {
