@@ -236,7 +236,6 @@ Agente Prompter
     ESTRUTURA RÍGIDA: Manter exatamente a sequência: Goal → Return Format → Warning → Context Dump
     DETALHAMENTO MÁXIMO: Especificar cada seção com precisão cirúrgica
     MANUSEIO DE ERRO: Se inviável, retornar string vazia ("")
-    ATENÇÃO: Crie o prompt em sí, não crie o prompt para criar o prompt
   Context Dump
     Solicitação de criação de prompt fornecida pelo usuário
 `
