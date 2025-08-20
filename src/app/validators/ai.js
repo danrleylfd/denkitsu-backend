@@ -5,8 +5,7 @@ const sendMessageRules = () => {
     body("model")
       .trim()
       .notEmpty()
-      .withMessage("É necessário selecionar um modelo de IA.")
-      .escape(),
+      .withMessage("É necessário selecionar um modelo de IA."),
     body("messages")
       .isArray({ min: 1 })
       .withMessage("É necessário enviar ao menos uma mensagem."),
