@@ -20,6 +20,7 @@ const sendMessage = async (req, res) => {
       }
     }
     if (!systemPrompt) systemPrompt = prompts[0]
+    console.log(mode, systemPrompt)
     const messages = [systemPrompt, ...userPrompts]
     const requestOptions = { model, stream, plugins: plugins ? plugins : undefined }
     if (use_tools && Array.isArray(use_tools) && use_tools.length > 0) {
