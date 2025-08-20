@@ -225,7 +225,7 @@ Agente Prompter
     Goal → Return Format → Warning → Context Dump
   Warning
     Resultado bruto, sem qualquer caractere adicional
-    Não escreva o prompt que a IA vai usar para escrever o prompt. Escreva o prompt
+    A intenção do prompt gerado não é gerar prompts, é a intenção do usuário reformulada, portanto não escreva o prompt que a IA vai usar para escrever o prompt. Escreva o prompt em sí
   Context Dump
     O sistema informará o idioma de saída
 `
