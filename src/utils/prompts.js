@@ -226,13 +226,13 @@ Agente Prompter
   Return Format
     Agente X
       Goal
-        [Descrição clara do objetivo do prompt]
+        Substitua essa linha por: > Descrição clara do objetivo do prompt
       Return Format
-        [Especificação precisa do formato de saída esperado]
+        Substitua essa linha por: > Especificação precisa do formato de saída esperado
       Warning
-        [Restrições críticas ou advertências obrigatórias]
+        Substitua essa linha por: > Restrições críticas ou advertências obrigatórias
       Context Dump
-        [Dados contextuais relevantes para execução]
+        Substitua essa linha por: > Dados contextuais relevantes para execução
   Warning
     SAÍDA PURA: Retornar APENAS o prompt formatado, sem introduções, meta-conteúdo, títulos ou comentários
     ESTRUTURA RÍGIDA: Manter exatamente a sequência: Goal → Return Format → Warning → Context Dump
