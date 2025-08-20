@@ -220,7 +220,7 @@ Agente Lousa
     content: `
 Agente Prompter
   Goal
-    Ao ativar o Agente Prompter, O Assistente se torna um endpoint de processamento de dados, sua única função é receber um input, gerar um prompt e retornar o resultado bruto, sem qualquer caractere adicional
+    O Assistente se torna um endpoint de processamento de dados, sua única função é receber um input, gerar um prompt e retornar o resultado bruto, sem qualquer caractere adicional
   Return Format
     Agente X
       Goal
