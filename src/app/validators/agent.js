@@ -4,7 +4,8 @@ const agentIdInParams = () => {
   return [
     param("agentId")
       .isMongoId()
-      .withMessage("O ID do agente na URL é inválido."),
+      .withMessage("O ID do agente na URL é inválido.")
+      .escape(),
   ]
 }
 
@@ -14,18 +15,20 @@ const createOrUpdateAgentRules = () => {
       .trim()
       .notEmpty()
       .withMessage("O nome do agente é obrigatório.")
-      .isLength({ max: 30 })
-      .withMessage("O nome não pode ter mais de 30 caracteres."),
+      .isLength({ max: 32 })
+      .withMessage("O nome não pode ter mais de 32 caracteres.")
+      .escape(),
     body("icon")
       .trim()
       .notEmpty()
-      .withMessage("O ícone do agente é obrigatório."),
+      .withMessage("O ícone do agente é obrigatório.")
+      .escape(),
     body("description")
       .trim()
       .notEmpty()
       .withMessage("A descrição do agente é obrigatória.")
-      .isLength({ max: 100 })
-      .withMessage("A descrição não pode ter mais de 100 caracteres."),
+      .isLength({ max: 128 })
+      .withMessage("A descrição não pode ter mais de 128 caracteres."),
     body("prompt.goal")
       .trim()
       .notEmpty()

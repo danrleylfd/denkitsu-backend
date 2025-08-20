@@ -5,14 +5,16 @@ const sendMessageRules = () => {
     body("model")
       .trim()
       .notEmpty()
-      .withMessage("É necessário selecionar um modelo de IA."),
+      .withMessage("É necessário selecionar um modelo de IA.")
+      .escape(),
     body("messages")
       .isArray({ min: 1 })
       .withMessage("É necessário enviar ao menos uma mensagem."),
     body("aiProvider")
       .optional()
       .isIn(["openrouter", "groq"])
-      .withMessage("O provedor de IA selecionado é inválido."),
+      .withMessage("O provedor de IA selecionado é inválido.")
+      .escape(),
     // body("stream").custom((streamValue, { req }) => {
     //   if (!req.body) return console.error("req.body é undefined, Danrley o problema é que a requisição está vindo sem Content-Type: application/json")
     //   const use_tools = req.body.use_tools

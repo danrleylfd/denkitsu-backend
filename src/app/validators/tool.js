@@ -9,33 +9,39 @@ const createToolRules = () => {
       .isLength({ max: 50 })
       .withMessage("O nome não pode ter mais de 50 caracteres.")
       .matches(/^[a-zA-Z0-9_-]+$/)
-      .withMessage("O nome só pode conter letras, números, _ e -."),
+      .withMessage("O nome só pode conter letras, números, _ e -.")
+      .escape(),
     body("description")
       .trim()
       .notEmpty()
-      .withMessage("A descrição da ferramenta é obrigatória."),
+      .withMessage("A descrição da ferramenta é obrigatória.")
+      .escape(),
     body("alias")
       .optional()
       .trim()
       .isLength({ max: 50 })
-      .withMessage("O apelido não pode ter mais de 50 caracteres."),
+      .withMessage("O apelido não pode ter mais de 50 caracteres.")
+      .escape(),
     body("icon")
       .trim()
       .notEmpty()
-      .withMessage("O ícone da ferramenta é obrigatório."),
-    body("parameters")
-      .optional()
-      .isObject()
-      .withMessage("O esquema de parâmetros deve ser um objeto JSON válido."),
+      .withMessage("O ícone da ferramenta é obrigatório.")
+      .escape(),
     body("httpConfig.method")
       .isIn(["GET", "POST", "PUT", "PATCH", "DELETE"])
-      .withMessage("Método HTTP inválido."),
+      .withMessage("Método HTTP inválido.")
+      .escape(),
     body("httpConfig.url")
       .trim()
       .notEmpty()
       .withMessage("A URL da API é obrigatória.")
       .isURL()
-      .withMessage("A URL fornecida é inválida."),
+      .withMessage("A URL fornecida é inválida.")
+      .escape(),
+    body("parameters")
+      .optional()
+      .isObject()
+      .withMessage("O esquema de parâmetros deve ser um objeto JSON válido."),
     body("httpConfig.queryParams")
       .optional()
       .isObject()

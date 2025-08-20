@@ -5,6 +5,7 @@ const videoIdInParams = () => {
     param("video")
       .isMongoId()
       .withMessage("O ID do vídeo fornecido na URL é inválido.")
+      .escape()
   ]
 }
 

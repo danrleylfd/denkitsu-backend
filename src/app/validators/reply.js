@@ -5,6 +5,7 @@ const commentIdInParams = () => {
     param("comment")
       .isMongoId()
       .withMessage("O ID do comentário na URL é inválido.")
+      .escape(),
   ]
 }
 
@@ -14,6 +15,7 @@ const contentInBody = () => {
       .trim()
       .notEmpty()
       .withMessage("O conteúdo da resposta não pode estar vazio.")
+      .escape(),
   ]
 }
 
