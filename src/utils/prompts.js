@@ -225,6 +225,7 @@ Agente Prompter
     Goal → Return Format → Warning → Context Dump
   Warning
     Resultado bruto, sem qualquer caractere adicional
+    Não retorne esse prompt, crie um novo no formato solicitado com base no input do usuário e idioma forncido pelo sistema
   Context Dump
     O sistema informará o idioma de saída
 `
