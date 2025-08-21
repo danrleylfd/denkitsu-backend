@@ -3,10 +3,7 @@ const Tool = require("../../models/tool")
 const createOne = async (req, res) => {
   try {
     const { userID } = req
-    const userToolCount = await Tool.countDocuments({ user: userID })
-    if (userToolCount >= 6) throw new Error("TOOL_LIMIT_REACHED")
     const { name, description, alias, icon, parameters, httpConfig } = req.body
-
     const tool = await Tool.create({
       user: userID,
       name,
@@ -16,7 +13,6 @@ const createOne = async (req, res) => {
       parameters,
       httpConfig,
     })
-
     return res.status(201).json(tool)
   } catch (error) {
     console.error(`[CREATE_TOOL] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })

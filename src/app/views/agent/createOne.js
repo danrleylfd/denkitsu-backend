@@ -3,14 +3,8 @@ const Agent = require("../../models/agent")
 const createOne = async (req, res) => {
   try {
     const { userID } = req
-    const userAgentCount = await Agent.countDocuments({ user: userID })
-    if (userAgentCount >= 7) {
-      throw new Error("AGENT_LIMIT_REACHED")
-    }
-
     const agentData = { ...req.body, user: userID }
     const agent = await Agent.create(agentData)
-
     return res.status(201).json(agent)
   } catch (error) {
     console.error(`[CREATE_AGENT] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
