@@ -1,5 +1,3 @@
-// src/app/views/ai/sendMessage.js
-
 const { ask } = require("../../../utils/api/ai")
 const { availableTools, tools: builtInTools } = require("../../../utils/tools")
 const prompts = require("../../../utils/prompts")
