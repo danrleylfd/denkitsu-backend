@@ -7,7 +7,7 @@ const Tool = require("../../models/tool")
 
 const extractReasoning = (rawContent = "") => {
   let reasoning = ""
-  const content = rawContent.replace(/(<think>.*?<\/think>|<thinking>.*?<\/thinking>|◁think▷.*?◁\/think▷)/gs, (match) => {
+  const content = rawContent.replace(/(<think>[\s\S]*?<\/think>|<thinking>[\s\S]*?<\/thinking>|◁think▷[\s\S]*?◁\/think▷)/gs, (match) => {
     reasoning += match
     return ""
   }).trim()
