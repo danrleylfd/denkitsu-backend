@@ -5,6 +5,15 @@ const Agent = require("../../models/agent")
 const { sanitizeMessages } = require("../../../utils/helpers/ai")
 const Tool = require("../../models/tool")
 
+const extractReasoning = (rawContent = "") => {
+  let reasoning = ""
+  const content = rawContent.replace(/(<think>.*?<\/think>|<thinking>.*?<\/thinking>|◁think▷.*?◁\/think▷)/gs, (match) => {
+    reasoning += match
+    return ""
+  }).trim()
+  return { content, reasoning }
+}
+
 const sendMessage = async (req, res) => {
   try {
     const { aiProvider = "groq", model, messages: userPrompts, aiKey, plugins, use_tools = [], stream = false, mode = "Padrão" } = req.body
@@ -199,7 +208,10 @@ const sendMessage = async (req, res) => {
             content: functionResponseContent
           })
         }
-        const finalResponse = await ask(aiProvider, aiKey, sanitizeMessages(messages), { model, stream: false })
+        const finalResponse = await ask(aiProvider, aiKey, sanitizeMessages(messages), { model, stream })
+        const { content, reasoning } = extractReasoning(finalResponse.data.choices[0].message.content)
+        finalResponse.data.choices[0].message.content = content
+        finalResponse.data.choices[0].message.reasoning = reasoning
         return res.status(200).json({
           ...finalResponse.data,
           tool_calls: responseMessage.tool_calls || []
