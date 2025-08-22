@@ -95,6 +95,7 @@ const sendMessage = async (req, res) => {
       const { data: initialResponseData } = await ask(aiProvider, aiKey, initialMessages, { ...requestOptions, stream: false })
       const responseMessage = initialResponseData.choices[0].message
       initialReasoning = extractReasoning(responseMessage).reasoning
+      if (mode === "Roteador") tool_calls.push("promptTool")
       if (responseMessage.tool_calls && responseMessage.tool_calls[0]?.function.name === "promptTool") {
         const toolCall = responseMessage.tool_calls[0]
         const agentName = JSON.parse(toolCall.function.arguments).nomeDoAgente
