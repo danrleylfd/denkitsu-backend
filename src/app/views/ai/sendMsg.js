@@ -31,7 +31,7 @@ const sendMessage = async (req, res) => {
       type: "function",
       function: { name: tool.name, description: tool.description, parameters: tool.parameters }
     }))
-
+    use_tools.push("promptTool")
     if (use_tools && Array.isArray(use_tools) && use_tools.length > 0) {
       const filteredBuiltInTools = builtInTools.filter((tool) => use_tools.includes(tool.function.name))
       const filteredCustomTools = customToolSchemas.filter(tool => use_tools.includes(tool.function.name))
