@@ -7,7 +7,7 @@ const { sendMessageRules } = require("../validators/ai")
 const routes = Router()
 routes.use(authMiddleware)
 
-const sendMessage = require("../views/ai/sendMessage")
+const sendMessage = require("../views/ai/sendMsg")
 const getModels = require("../views/ai/getModels")
 
 routes.post("/chat/completions", sendMessageRules(), validate, aiMiddleware, sendMessage)
