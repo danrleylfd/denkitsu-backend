@@ -64,12 +64,14 @@ const sendMessage = async (req, res) => {
       res.setHeader("Content-Type", "text/event-stream")
       res.setHeader("Cache-Control", "no-cache")
       res.setHeader("Connection", "keep-alive")
+
       let aggregatedToolCalls = []
       let hasToolCall = false
-      let firstChunk = null
+      let streamBuffer = ""
+
       for await (const chunk of streamResponse) {
-        if (!firstChunk) firstChunk = chunk
         const delta = chunk.choices[0]?.delta
+
         if (delta && delta.tool_calls) {
           hasToolCall = true
           delta.tool_calls.forEach(toolCallChunk => {
@@ -78,7 +80,21 @@ const sendMessage = async (req, res) => {
             else if (toolCallChunk.function?.arguments) existingCall.arguments += toolCallChunk.function.arguments
           })
         }
-        if (delta && delta.content) res.write(`data: ${JSON.stringify(chunk)}\n\n`)
+        if (delta && delta.content) {
+          streamBuffer += delta.content
+          const { content, reasoning } = extractReasoning(streamBuffer)
+          if (reasoning) {
+            const reasoningChunk = { choices: [{ delta: { reasoning } }] }
+            res.write(`data: ${JSON.stringify(reasoningChunk)}\n\n`)
+            streamBuffer = content
+          }
+        } else if (delta && !delta.content) {
+          res.write(`data: ${JSON.stringify(chunk)}\n\n`)
+        }
+      }
+      if (streamBuffer) {
+        const contentChunk = { choices: [{ delta: { content: streamBuffer } }] }
+        res.write(`data: ${JSON.stringify(contentChunk)}\n\n`)
       }
       if (!hasToolCall) return res.end()
       const finalToolCalls = aggregatedToolCalls.map(call => ({
