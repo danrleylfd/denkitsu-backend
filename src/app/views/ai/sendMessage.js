@@ -48,7 +48,6 @@ const sendMessage = async (req, res) => {
       for await (const chunk of streamResponse) {
         if (!firstChunk) firstChunk = chunk
         const delta = chunk.choices[0]?.delta
-
         if (delta && delta.tool_calls) {
           hasToolCall = true
           delta.tool_calls.forEach(toolCallChunk => {
