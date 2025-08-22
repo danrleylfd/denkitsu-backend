@@ -14,6 +14,35 @@ const extractReasoning = (rawContent = "") => {
   return { content, reasoning }
 }
 
+async function* processStreamAndExtractReasoning(streamResponse) {
+  let streamBuffer = ""
+  for await (const chunk of streamResponse) {
+    const delta = chunk.choices[0]?.delta
+
+    if (delta && delta.reasoning) {
+      yield { choices: [{ delta: { reasoning: delta.reasoning } }] }
+    }
+
+    if (delta && delta.content) {
+      streamBuffer += delta.content
+      const { content, reasoning } = extractReasoning(streamBuffer)
+
+      if (reasoning) {
+        yield { choices: [{ delta: { reasoning } }] }
+        streamBuffer = content
+      }
+    }
+
+    if (delta && !delta.content && !delta.reasoning) {
+      yield chunk
+    }
+  }
+
+  if (streamBuffer) {
+    yield { choices: [{ delta: { content: streamBuffer } }] }
+  }
+}
+
 const sendMessage = async (req, res) => {
   try {
     const { aiProvider = "groq", model, messages: userPrompts, aiKey, plugins, use_tools = [], stream = false, mode = "Padrão" } = req.body
@@ -67,11 +96,10 @@ const sendMessage = async (req, res) => {
 
       let aggregatedToolCalls = []
       let hasToolCall = false
-      let streamBuffer = ""
+      const processedStream = processStreamAndExtractReasoning(streamResponse)
 
-      for await (const chunk of streamResponse) {
+      for await (const chunk of processedStream) {
         const delta = chunk.choices[0]?.delta
-
         if (delta && delta.tool_calls) {
           hasToolCall = true
           delta.tool_calls.forEach(toolCallChunk => {
@@ -80,29 +108,18 @@ const sendMessage = async (req, res) => {
             else if (toolCallChunk.function?.arguments) existingCall.arguments += toolCallChunk.function.arguments
           })
         }
-        if (delta && delta.content) {
-          streamBuffer += delta.content
-          const { content, reasoning } = extractReasoning(streamBuffer)
-          if (reasoning) {
-            const reasoningChunk = { choices: [{ delta: { reasoning } }] }
-            res.write(`data: ${JSON.stringify(reasoningChunk)}\n\n`)
-            streamBuffer = content
-          }
-        } else if (delta && !delta.content) {
-          res.write(`data: ${JSON.stringify(chunk)}\n\n`)
-        }
+        res.write(`data: ${JSON.stringify(chunk)}\n\n`)
       }
-      if (streamBuffer) {
-        const contentChunk = { choices: [{ delta: { content: streamBuffer } }] }
-        res.write(`data: ${JSON.stringify(contentChunk)}\n\n`)
-      }
+
       if (!hasToolCall) return res.end()
+
       const finalToolCalls = aggregatedToolCalls.map(call => ({
         id: call.id,
         type: "function",
         function: { name: call.name, arguments: call.arguments }
       }))
       messages.push({ role: "assistant", tool_calls: finalToolCalls })
+
       for (const toolCall of finalToolCalls) {
         const statusUpdate = {
           choices: [{ delta: { tool_calls: [{ index: toolCall.index, function: { name: toolCall.function.name, arguments: "" } }] } }]
@@ -162,14 +179,15 @@ const sendMessage = async (req, res) => {
       }
       const secondCallOptions = { model, stream: true }
       const finalResponseStream = await ask(aiProvider, aiKey, sanitizeMessages(messages), secondCallOptions)
-      for await (const finalChunk of finalResponseStream) {
+      const finalProcessedStream = processStreamAndExtractReasoning(finalResponseStream)
+      for await (const finalChunk of finalProcessedStream) {
         res.write(`data: ${JSON.stringify(finalChunk)}\n\n`)
       }
       return res.end()
     } else {
       const { data } = await ask(aiProvider, aiKey, messages, requestOptions)
       const responseMessage = data.choices[0].message
-      const nativeToolsUsed = (requestOptions.tools || []).filter(t => typeof t.type === 'string' && t.type !== 'function')
+      const nativeToolsUsed = (requestOptions.tools || []).filter(t => typeof t.type === "string" && t.type !== "function")
       const nativeToolCalls = nativeToolsUsed.map(t => ({ function: { name: t.type, arguments: "{}" } }))
       if (responseMessage.tool_calls) {
         messages.push(responseMessage)
@@ -224,15 +242,21 @@ const sendMessage = async (req, res) => {
             content: functionResponseContent
           })
         }
-        const finalResponse = await ask(aiProvider, aiKey, sanitizeMessages(messages), { model, stream })
-        const { content, reasoning } = extractReasoning(finalResponse.data.choices[0].message.content)
-        finalResponse.data.choices[0].message.content = content
-        finalResponse.data.choices[0].message.reasoning = reasoning
+        const finalResponse = await ask(aiProvider, aiKey, sanitizeMessages(messages), { model, stream: false })
+        const finalMessage = finalResponse.data.choices[0].message
+        const existingReasoning = finalMessage.reasoning || ""
+        const { content, reasoning: extractedReasoning } = extractReasoning(finalMessage.content)
+        finalMessage.content = content
+        finalMessage.reasoning = existingReasoning && extractedReasoning ? `${existingReasoning}\n${extractedReasoning}` : (existingReasoning || extractedReasoning)
         return res.status(200).json({
           ...finalResponse.data,
           tool_calls: responseMessage.tool_calls || []
         })
       }
+      const existingReasoning = data.choices[0].message.reasoning || ""
+      const { content, reasoning: extractedReasoning } = extractReasoning(data.choices[0].message.content)
+      data.choices[0].message.content = content
+      data.choices[0].message.reasoning = existingReasoning && extractedReasoning ? `${existingReasoning}\n${extractedReasoning}` : (existingReasoning || extractedReasoning)
       return res.status(200).json({
         ...data,
         tool_calls: [...(responseMessage.tool_calls || []), ...nativeToolCalls]
