@@ -8,7 +8,6 @@ const Tool = require("../../models/tool")
 const sendMessage = async (req, res) => {
   try {
     const { aiProvider = "groq", model, messages: userPrompts, aiKey, plugins, use_tools, stream = false, mode = "Padrão" } = req.body
-
     let systemPrompt = prompts.find(p => p.content.trim().startsWith(`Agente ${mode}`))
     if (!systemPrompt) {
       const customAgent = await Agent.findOne({ user: req.userID, name: mode })
@@ -21,11 +20,9 @@ const sendMessage = async (req, res) => {
       }
     }
     if (!systemPrompt) systemPrompt = prompts[0]
-
     console.log(`[INITIATING_AGENT] ${mode}`)
     let messages = [systemPrompt, ...userPrompts]
     const requestOptions = { model, stream, plugins: plugins ? plugins : undefined }
-
     const allUserCustomTools = await Tool.find({ user: req.userID })
     const customToolSchemas = allUserCustomTools.map(tool => ({
       type: "function",
@@ -41,17 +38,14 @@ const sendMessage = async (req, res) => {
         requestOptions.tool_choice = "auto"
       }
     }
-
     const { data: initialResponseData } = await ask(aiProvider, aiKey, messages, { ...requestOptions, stream: false })
     const responseMessage = initialResponseData.choices[0].message
-
     if (responseMessage.tool_calls && responseMessage.tool_calls[0]?.function.name === "promptTool") {
       console.log("[AGENT_ROUTER] promptTool chamada. Trocando de agente...")
       const toolCall = responseMessage.tool_calls[0]
       const functionArgs = JSON.parse(toolCall.function.arguments)
       const functionToCall = availableTools.promptTool
       const { data: promptData } = await functionToCall(...Object.values(functionArgs))
-
       if (promptData.content) {
         const newSystemPrompt = { role: "system", content: promptData.content }
         console.log(`[AGENT_ROUTER] Carregando o agente: ${promptData.agente}`)
@@ -60,14 +54,12 @@ const sendMessage = async (req, res) => {
         return res.status(200).json(finalResponse.data)
       }
     }
-
     if (responseMessage.tool_calls) {
       messages.push(responseMessage)
       for (const toolCall of responseMessage.tool_calls) {
         const functionName = toolCall.function.name
         const functionArgs = JSON.parse(toolCall.function.arguments)
         let functionResponseContent = ""
-
         const customTool = allUserCustomTools.find(t => t.name === functionName)
         if (customTool) {
           console.log(`[CUSTOM_TOOL_CALL] Executing: ${functionName}(${JSON.stringify(functionArgs)})`)
@@ -117,9 +109,7 @@ const sendMessage = async (req, res) => {
       const finalResponse = await ask(aiProvider, aiKey, sanitizeMessages(messages), { model, stream: false })
       return res.status(200).json(finalResponse.data)
     }
-
     return res.status(200).json(initialResponseData)
-
   } catch (error) {
     console.error(`[SEND_MESSAGE] ${new Date().toISOString()} -`, {
       error: error.message,
