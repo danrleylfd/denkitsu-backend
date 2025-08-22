@@ -33,6 +33,7 @@ const sendMessage = async (req, res) => {
       }
       if (finalUseTools.includes("code_interpreter")) {
         nativeTools.push({ type: "code_interpreter" })
+        nativeTools.push({ type: "exec" })
         finalUseTools = finalUseTools.filter(t => t !== "code_interpreter")
       }
       if (nativeTools.length > 0) requestOptions.tools = nativeTools
