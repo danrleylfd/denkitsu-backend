@@ -1,3 +1,5 @@
+// src/app/views/ai/sendMessage.js
+
 const { ask } = require("../../../utils/api/ai")
 const { availableTools, tools: builtInTools } = require("../../../utils/tools")
 const prompts = require("../../../utils/prompts")
@@ -20,14 +22,13 @@ const sendMessage = async (req, res) => {
       }
     }
     if (!systemPrompt) systemPrompt = prompts[0]
-    console.log(`[INITIATING_AGENT] ${mode}`)
     let messages = [systemPrompt, ...userPrompts]
-    const requestOptions = { model, stream, plugins: plugins ? plugins : undefined }
     const allUserCustomTools = await Tool.find({ user: req.userID })
     const customToolSchemas = allUserCustomTools.map(tool => ({
       type: "function",
       function: { name: tool.name, description: tool.description, parameters: tool.parameters }
     }))
+    const requestOptions = { model, plugins: plugins ? plugins : undefined }
     use_tools.push("promptTool")
     if (use_tools && Array.isArray(use_tools) && use_tools.length > 0) {
       const filteredBuiltInTools = builtInTools.filter((tool) => use_tools.includes(tool.function.name))
@@ -40,21 +41,22 @@ const sendMessage = async (req, res) => {
     }
     const { data: initialResponseData } = await ask(aiProvider, aiKey, messages, { ...requestOptions, stream: false })
     const responseMessage = initialResponseData.choices[0].message
+    let finalMessages
+    let finalResponse
     if (responseMessage.tool_calls && responseMessage.tool_calls[0]?.function.name === "promptTool") {
       console.log("[AGENT_ROUTER] promptTool chamada. Trocando de agente...")
       const toolCall = responseMessage.tool_calls[0]
       const functionArgs = JSON.parse(toolCall.function.arguments)
-      const functionToCall = availableTools.promptTool
-      const { data: promptData } = await functionToCall(...Object.values(functionArgs))
+      const { data: promptData } = await availableTools.promptTool(...Object.values(functionArgs))
       if (promptData.content) {
         const newSystemPrompt = { role: "system", content: promptData.content }
         console.log(`[AGENT_ROUTER] Carregando o agente: ${promptData.agente}`)
-        const finalMessages = [newSystemPrompt, ...userPrompts]
-        const finalResponse = await ask(aiProvider, aiKey, sanitizeMessages(finalMessages), { ...requestOptions, stream: false })
-        return res.status(200).json(finalResponse.data)
+        finalMessages = [newSystemPrompt, ...userPrompts]
+        finalResponse = await ask(aiProvider, aiKey, sanitizeMessages(finalMessages), { ...requestOptions, stream })
       }
     }
-    if (responseMessage.tool_calls) {
+    else if (responseMessage.tool_calls) {
+      console.log("[TOOL_HANDLER] Ferramenta(s) chamada(s). Executando...")
       messages.push(responseMessage)
       for (const toolCall of responseMessage.tool_calls) {
         const functionName = toolCall.function.name
@@ -91,41 +93,51 @@ const sendMessage = async (req, res) => {
           const functionResponse = await availableTools.httpTool(httpConfig)
           functionResponseContent = JSON.stringify(functionResponse.data)
         } else if (availableTools[functionName]) {
-          console.log(`[TOOL_CALL] Executing: ${functionName}(${JSON.stringify(functionArgs)})`)
           const functionToCall = availableTools[functionName]
           const functionResponse = await functionToCall(...Object.values(functionArgs))
           functionResponseContent = JSON.stringify(functionResponse.data)
         } else {
-          console.warn(`[TOOL WARNING] Function ${functionName} not found.`)
           functionResponseContent = JSON.stringify({ error: `A ferramenta "${functionName}" não foi encontrada.` })
         }
-        messages.push({
-          tool_call_id: toolCall.id,
-          role: "tool",
-          name: functionName,
-          content: functionResponseContent
-        })
+        messages.push({ tool_call_id: toolCall.id, role: "tool", name: functionName, content: functionResponseContent })
       }
-      const finalResponse = await ask(aiProvider, aiKey, sanitizeMessages(messages), { model, stream: false })
+      finalMessages = messages
+      finalResponse = await ask(aiProvider, aiKey, sanitizeMessages(finalMessages), { ...requestOptions, stream })
+    }
+    else {
+      finalResponse = { data: initialResponseData }
+    }
+    if (stream) {
+      res.setHeader("Content-Type", "text/event-stream")
+      res.setHeader("Cache-Control", "no-cache")
+      res.setHeader("Connection", "keep-alive")
+      if (finalResponse[Symbol.asyncIterator]) {
+        for await (const chunk of finalResponse) {
+          res.write(`data: ${JSON.stringify(chunk)}\n\n`)
+        }
+      } else {
+        res.write(`data: ${JSON.stringify(finalResponse.data)}\n\n`)
+      }
+      return res.end()
+    } else {
       return res.status(200).json(finalResponse.data)
     }
-    return res.status(200).json(initialResponseData)
   } catch (error) {
-    console.error(`[SEND_MESSAGE] ${new Date().toISOString()} -`, {
-      error: error.message,
-      stack: error.stack,
-      aiProvider: req.body.aiProvider,
-      model: req.body.model
-    })
+    console.error(`[SEND_MESSAGE] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack, aiProvider: req.body.aiProvider, model: req.body.model })
     const defaultError = { status: 500, message: "Ocorreu um erro interno no servidor." }
     const errorMessages = {
-      AUTHENTICATION_FAILED: { status: 401, message: "Chave de API inválida. Verifique suas credenciais." },
-      RATE_LIMIT_EXCEEDED: { status: 429, message: "Limite de requisições excedido. Tente novamente mais tarde." },
-      API_REQUEST_FAILED: { status: 502, message: "Falha na comunicação com o serviço de IA. Tente novamente." },
+      AUTHENTICATION_FAILED: { status: 401, message: "Chave de API inválida." },
+      RATE_LIMIT_EXCEEDED: { status: 429, message: "Limite de requisições excedido." },
+      API_REQUEST_FAILED: { status: 502, message: "Falha na comunicação com a IA." },
       TOOL_ERROR: { status: 500, message: "Falha ao executar ferramentas." },
     }
     const { status, message } = errorMessages[error.message] || defaultError
-    return res.status(status).json({ error: { code: error.message, message } })
+    if (!res.headersSent) {
+      return res.status(status).json({ error: { code: error.message, message } })
+    } else {
+      res.write(`data: ${JSON.stringify({ error: { code: error.message, message } })}\n\n`)
+      res.end()
+    }
   }
 }
 
