@@ -33,7 +33,6 @@ async function* processStreamAndExtractReasoning(streamResponse) {
         streamBuffer = content
       }
     }
-    // Ignoramos explicitamente outros tipos de delta como tool_calls
   }
 
   if (streamBuffer) {
@@ -98,6 +97,7 @@ const sendMessage = async (req, res) => {
 
       for await (const chunk of streamResponse) {
         const delta = chunk.choices[0]?.delta
+
         if (delta && delta.tool_calls) {
           hasToolCall = true
           delta.tool_calls.forEach(toolCallChunk => {
@@ -105,12 +105,16 @@ const sendMessage = async (req, res) => {
             if (!existingCall) aggregatedToolCalls[toolCallChunk.index] = { ...toolCallChunk.function, id: toolCallChunk.id, index: toolCallChunk.index }
             else if (toolCallChunk.function?.arguments) existingCall.arguments += toolCallChunk.function.arguments
           })
+          res.write(`data: ${JSON.stringify(chunk)}\n\n`)
         }
-        for await (const processedChunk of processStreamAndExtractReasoning([chunk])) {
-          if (processedChunk.choices[0]?.delta?.reasoning) {
-            initialReasoningSent = true
+
+        if (delta && (delta.content || delta.reasoning)) {
+          for await (const processedChunk of processStreamAndExtractReasoning([chunk])) {
+            if (processedChunk.choices[0]?.delta?.reasoning) {
+              initialReasoningSent = true
+            }
+            res.write(`data: ${JSON.stringify(processedChunk)}\n\n`)
           }
-          res.write(`data: ${JSON.stringify(processedChunk)}\n\n`)
         }
       }
 
