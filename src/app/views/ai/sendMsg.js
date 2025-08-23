@@ -18,8 +18,11 @@ async function* processStreamAndExtractReasoning(streamResponse) {
   let streamBuffer = ""
   for await (const chunk of streamResponse) {
     const delta = chunk.choices[0]?.delta
-    if (delta && delta.reasoning) yield { choices: [{ delta: { reasoning: delta.reasoning } }] }
-    if (delta && delta.content) {
+    if (!delta) continue
+    if (delta.reasoning) {
+      yield { choices: [{ delta: { reasoning: delta.reasoning } }] }
+    }
+    if (delta.content) {
       streamBuffer += delta.content
       const { content, reasoning } = extractReasoning(streamBuffer)
       if (reasoning) {
@@ -27,9 +30,10 @@ async function* processStreamAndExtractReasoning(streamResponse) {
         streamBuffer = content
       }
     }
-    if (delta && !delta.content && !delta.reasoning) yield chunk
   }
-  if (streamBuffer) yield { choices: [{ delta: { content: streamBuffer } }] }
+  if (streamBuffer) {
+    yield { choices: [{ delta: { content: streamBuffer } }] }
+  }
 }
 
 const sendMessage = async (req, res) => {
@@ -85,8 +89,7 @@ const sendMessage = async (req, res) => {
       let aggregatedToolCalls = []
       let hasToolCall = false
       let initialReasoningSent = false
-      const processedStream = processStreamAndExtractReasoning(streamResponse)
-      for await (const chunk of processedStream) {
+      for await (const chunk of streamResponse) {
         const delta = chunk.choices[0]?.delta
         if (delta && delta.tool_calls) {
           hasToolCall = true
@@ -96,8 +99,12 @@ const sendMessage = async (req, res) => {
             else if (toolCallChunk.function?.arguments) existingCall.arguments += toolCallChunk.function.arguments
           })
         }
-        if (delta && delta.reasoning) initialReasoningSent = true
-        res.write(`data: ${JSON.stringify(chunk)}\n\n`)
+        for await (const processedChunk of processStreamAndExtractReasoning([chunk])) {
+          if (processedChunk.choices[0]?.delta?.reasoning) {
+            initialReasoningSent = true
+          }
+          res.write(`data: ${JSON.stringify(processedChunk)}\n\n`)
+        }
       }
       if (!hasToolCall) return res.end()
       const finalToolCalls = aggregatedToolCalls.map(call => ({
@@ -163,7 +170,9 @@ const sendMessage = async (req, res) => {
           content: functionResponseContent
         })
       }
-      if (initialReasoningSent) res.write(`data: ${JSON.stringify({ choices: [{ delta: { reasoning: "\n\n...\n\n" } }] })}\n\n`)
+      if (initialReasoningSent) {
+        res.write(`data: ${JSON.stringify({ choices: [{ delta: { reasoning: "\n\n...\n\n" } }] })}\n\n`)
+      }
       const secondCallOptions = { model, stream: true }
       const finalResponseStream = await ask(aiProvider, aiKey, sanitizeMessages(messages), secondCallOptions)
       const finalProcessedStream = processStreamAndExtractReasoning(finalResponseStream)
