@@ -96,7 +96,6 @@ const sendMessage = async (req, res) => {
       let hasToolCall = false
       let initialReasoningSent = false
 
-      // O primeiro stream pode conter tool_calls, então o processamos de forma diferente
       for await (const chunk of streamResponse) {
         const delta = chunk.choices[0]?.delta
         if (delta && delta.tool_calls) {
@@ -107,7 +106,6 @@ const sendMessage = async (req, res) => {
             else if (toolCallChunk.function?.arguments) existingCall.arguments += toolCallChunk.function.arguments
           })
         }
-        // Usamos o processador de stream aqui também para consistência
         for await (const processedChunk of processStreamAndExtractReasoning([chunk])) {
           if (processedChunk.choices[0]?.delta?.reasoning) {
             initialReasoningSent = true
