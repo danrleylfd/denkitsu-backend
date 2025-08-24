@@ -67,6 +67,7 @@ const getSystemPrompt = async (mode, userId) => {
 
 const buildToolOptions = async (aiProvider, use_tools = [], userId) => {
   let finalUseTools = [...use_tools]
+  if (mode === "Roteador") finalUseTools.push("selectAgentTool")
   let toolOptions = {}
   if (aiProvider === "groq") {
     if (finalUseTools.includes("web")) finalUseTools = finalUseTools.filter(t => t !== "web")
