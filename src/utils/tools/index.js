@@ -51,7 +51,7 @@ const availableTools = {
 }
 
 const tools = [
-  agentService.selectAgent,
+  agentService.selectAgentTool,
 
   bibleService.bibleTool,
   browserService.browserTool,
