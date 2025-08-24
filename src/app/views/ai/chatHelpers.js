@@ -39,7 +39,22 @@ async function* processStreamAndExtractReasoning(streamResponse) {
   }
 }
 
+const getRouterPrompt = async (userId) => {
+  const routerPromptTemplate = prompts.find(p => p.content.trim().startsWith("Agente Roteador"))
+  if (!routerPromptTemplate) return prompts[0]
+  const customAgents = await Agent.find({ user: userId }).select("name description")
+  let customAgentsContext = ""
+  if (customAgents && customAgents.length > 0) {
+    const agentList = customAgents.map(a => `- ${a.name}: ${a.description}`).join("\n    ")
+    customAgentsContext = `\n    Agentes Customizados do Usuário:\n    ${agentList}`
+  }
+  const dynamicRouterPrompt = JSON.parse(JSON.stringify(routerPromptTemplate))
+  dynamicRouterPrompt.content += customAgentsContext
+  return dynamicRouterPrompt
+}
+
 const getSystemPrompt = async (mode, userId) => {
+  if (mode === "Roteador") return getRouterPrompt(userId)
   let systemPrompt = prompts.find(p => p.role === "system" && p.content.trim().startsWith(`Agente ${mode}`))
   if (systemPrompt) return systemPrompt
   const customAgent = await Agent.findOne({ user: userId, name: mode })

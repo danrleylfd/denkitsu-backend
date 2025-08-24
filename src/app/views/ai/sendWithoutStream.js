@@ -15,7 +15,7 @@ const sendWithoutStream = async (req, res) => {
 
     const systemPrompt = await getSystemPrompt(mode, userID)
     let messages = [systemPrompt, ...userPrompts]
-    const toolOptions = await buildToolOptions(aiProvider, use_tools, userID)
+    const toolOptions = await buildToolOptions(aiProvider, use_tools, userID, mode)
     const requestOptions = { model, stream: false, ...toolOptions }
 
     const { data } = await ask(aiProvider, aiKey, messages, requestOptions)
