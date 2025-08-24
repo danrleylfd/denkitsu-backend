@@ -24,7 +24,7 @@ const genshinService = require("../api/genshin")
 const pokedexService = require("../api/pokedex")
 
 const availableTools = {
-  agentTool: agentService.selectAgent,
+  selectAgentTool: agentService.selectAgent,
 
   bibleTool: bibleService.searchBible,
   browserTool: browserService.browseUrl,
