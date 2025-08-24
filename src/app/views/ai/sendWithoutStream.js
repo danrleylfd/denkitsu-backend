@@ -23,6 +23,18 @@ const sendWithoutStream = async (req, res) => {
     responseMessage.content = cleanToolCallSyntax(responseMessage.content)
 
     if (responseMessage.tool_calls) {
+      const routerToolCall = responseMessage.tool_calls.find(tc => tc.function.name === "selectAgentTool")
+      if (routerToolCall) {
+        const args = JSON.parse(routerToolCall.function.arguments)
+        return res.status(200).json({
+          next_action: {
+            type: "SWITCH_AGENT",
+            agent: args.agentName
+          },
+          original_message: responseMessage
+        })
+      }
+
       const initialReasoning = responseMessage.reasoning || ""
       messages.push(responseMessage)
       const toolResultMessages = await processToolCalls(responseMessage.tool_calls, userID)
