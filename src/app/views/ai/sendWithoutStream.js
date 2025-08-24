@@ -10,7 +10,7 @@ const {
 
 const sendWithoutStream = async (req, res) => {
   try {
-    const { aiProvider, model, messages: userPrompts, aiKey, use_tools, mode } = req.body
+    const { aiProvider, model, messages: userPrompts, aiKey, use_tools = [], mode } = req.body
     const { userID } = req
 
     const systemPrompt = await getSystemPrompt(mode, userID)
