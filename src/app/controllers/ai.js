@@ -7,8 +7,16 @@ const { sendMessageRules } = require("../validators/ai")
 const routes = Router()
 routes.use(authMiddleware)
 
-const sendMessage = require("../views/ai/sendMsg")
+const sendWithStream = require("../views/ai/handlers/sendWithStream")
+const sendWithoutStream = require("../views/ai/handlers/sendWithoutStream")
+// const sendMessage = require("../views/ai/sendMsg")
 const getModels = require("../views/ai/getModels")
+
+const sendMessage = (req, res, next) => {
+  const { stream = false } = req.body
+  if (stream) return sendWithStream(req, res, next)
+  return sendWithoutStream(req, res, next)
+}
 
 routes.post("/chat/completions", sendMessageRules(), validate, aiMiddleware, sendMessage)
 
