@@ -7,8 +7,8 @@ const { sendMessageRules } = require("../validators/ai")
 const routes = Router()
 routes.use(authMiddleware)
 
-const sendWithStream = require("../views/ai/handlers/sendWithStream")
-const sendWithoutStream = require("../views/ai/handlers/sendWithoutStream")
+const sendWithStream = require("../views/ai/sendWithStream")
+const sendWithoutStream = require("../views/ai/sendWithoutStream")
 // const sendMessage = require("../views/ai/sendMsg")
 const getModels = require("../views/ai/getModels")
 
