@@ -82,7 +82,7 @@ const buildToolOptions = async (aiProvider, use_tools = [], userId) => {
     if (nativeTools.length > 0) toolOptions.tools = nativeTools
   }
   if (Array.isArray(finalUseTools) && finalUseTools.length > 0) {
-    const filteredBuiltInTools = builtInTools.filter(tool => finalUseTools.includes(tool.function.name))
+    const filteredBuiltInTools = builtInTools.filter(tool => tool && tool.function && finalUseTools.includes(tool.function.name))
     const userCustomTools = await Tool.find({ user: userId, name: { $in: finalUseTools } })
     const customToolSchemas = userCustomTools.map(tool => ({
       type: "function",
