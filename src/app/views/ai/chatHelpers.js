@@ -17,6 +17,28 @@ const extractReasoning = (rawContent = "") => {
   return { content, reasoning }
 }
 
+async function* processStreamAndExtractReasoning(streamResponse) {
+  let streamBuffer = ""
+  for await (const chunk of streamResponse) {
+    const delta = chunk.choices[0]?.delta
+    if (!delta) continue
+    if (delta.reasoning) {
+      yield { choices: [{ delta: { reasoning: delta.reasoning } }] }
+    }
+    if (delta.content) {
+      streamBuffer += delta.content
+      const { content, reasoning } = extractReasoning(streamBuffer)
+      if (reasoning) {
+        yield { choices: [{ delta: { reasoning } }] }
+        streamBuffer = content
+      }
+    }
+  }
+  if (streamBuffer) {
+    yield { choices: [{ delta: { content: streamBuffer } }] }
+  }
+}
+
 const getSystemPrompt = async (mode, userId) => {
   let systemPrompt = prompts.find(p => p.role === "system" && p.content.trim().startsWith(`Agente ${mode}`))
   if (systemPrompt) return systemPrompt
