@@ -50,7 +50,7 @@ const sendWithoutStream = async (req, res) => {
     const existingReasoning = responseMessage.reasoning || ""
     const { content, reasoning: extractedReasoning } = extractReasoning(responseMessage.content)
     responseMessage.content = content
-    responseMessage.reasoning = `${existingReasoning}\n\n...\n\n${extractedReasoning}`
+    responseMessage.reasoning = existingReasoning || extractedReasoning
     return res.status(200).json({ ...data, tool_calls: responseMessage.tool_calls || [] })
   } catch (error) {
     console.error(`[SEND_MESSAGE_NO_STREAM] ${new Date().toISOString()} -`, {
