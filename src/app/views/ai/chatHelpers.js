@@ -65,7 +65,7 @@ const getSystemPrompt = async (mode, userId) => {
   return prompts[0]
 }
 
-const buildToolOptions = async (aiProvider, use_tools = [], userId) => {
+const buildToolOptions = async (aiProvider, use_tools = [], userId, mode) => {
   let finalUseTools = [...use_tools]
   if (mode === "Roteador") finalUseTools.push("selectAgentTool")
   let toolOptions = {}
