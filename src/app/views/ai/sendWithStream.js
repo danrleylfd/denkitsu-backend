@@ -71,16 +71,16 @@ const sendWithStream = async (req, res) => {
     const routerToolCallResult = toolResultMessages.find(r => r.name === "selectAgentTool")
 
     if (routerToolCallResult) {
-      const resultData = JSON.parse(routerToolCallResult.content)
-      if (resultData.action === "SWITCH_AGENT" && resultData.agent) {
-        const newAgentName = resultData.agent
-        const newSystemPrompt = await getSystemPrompt(newAgentName, userID)
-        messages = [newSystemPrompt, ...userPrompts]
-
-        const switchEventData = JSON.stringify({ agent: newAgentName })
-        res.write(`event: SWITCH_AGENT\ndata: ${switchEventData}\n\n`)
-      }
-    } else {
+      const resultData = JSON.parse(routerToolCallResult.content)
+      if (resultData.action === "SWITCH_AGENT" && resultData.agent) {
+        const newAgentName = resultData.agent
+        const newSystemPrompt = await getSystemPrompt(newAgentName, userID)
+        const lastUserMessage = userPrompts.filter(m => m.role === "user").pop()
+        messages = [newSystemPrompt, lastUserMessage]
+        const switchEventData = JSON.stringify({ agent: newAgentName })
+        res.write(`event: SWITCH_AGENT\ndata: ${switchEventData}\n\n`)
+      }
+    } else {
       messages.push(...toolResultMessages)
     }
 
