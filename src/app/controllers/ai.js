@@ -11,8 +11,8 @@ const sendWithStream = require("../views/ai/sendWithStream")
 const sendWithoutStream = require("../views/ai/sendWithoutStream")
 // const sendMessage = require("../views/ai/sendMsg")
 const getModels = require("../views/ai/getModels")
-const listAgents = require("../views/public/listAgents")
-const listTools = require("../views/public/listTools")
+const listAgents = require("../views/ai/listAgents")
+const listTools = require("../views/ai/listTools")
 
 const sendMessage = (req, res, next) => {
   const { stream = false } = req.body
