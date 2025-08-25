@@ -10,11 +10,11 @@ const ToolSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    alias: {
+    title: {
       type: String,
       trim: true,
     },
-    icon: {
+    Icon: {
       type: String,
       required: true,
       default: "PocketKnife",

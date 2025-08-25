@@ -11,6 +11,8 @@ const sendWithStream = require("../views/ai/sendWithStream")
 const sendWithoutStream = require("../views/ai/sendWithoutStream")
 // const sendMessage = require("../views/ai/sendMsg")
 const getModels = require("../views/ai/getModels")
+const listAgents = require("../views/public/listAgents")
+const listTools = require("../views/public/listTools")
 
 const sendMessage = (req, res, next) => {
   const { stream = false } = req.body
@@ -21,6 +23,10 @@ const sendMessage = (req, res, next) => {
 routes.post("/chat/completions", sendMessageRules(), validate, aiMiddleware, sendMessage)
 
 routes.get("/models", getModels)
+
+routes.get("/agents", listAgents)
+
+routes.get("/tools", listTools)
 
 const loadAIRoutes = (app) => app.use("/ai", routes)
 

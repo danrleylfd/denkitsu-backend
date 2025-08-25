@@ -6,7 +6,7 @@ const AgentSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    icon: {
+    Icon: {
       type: String,
       required: true,
       default: "Bot",

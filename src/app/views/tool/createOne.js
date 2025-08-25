@@ -3,12 +3,12 @@ const Tool = require("../../models/tool")
 const createOne = async (req, res) => {
   try {
     const { userID } = req
-    const { name, description, alias, icon, parameters, httpConfig } = req.body
+    const { name, description, title, icon, parameters, httpConfig } = req.body
     const tool = await Tool.create({
       user: userID,
       name,
       description,
-      alias,
+      title,
       icon,
       parameters,
       httpConfig,

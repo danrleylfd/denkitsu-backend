@@ -16,13 +16,13 @@ const createToolRules = () => {
       .withMessage("A descrição da ferramenta é obrigatória.")
       .isLength({ max: 256 })
       .withMessage("A descrição não pode ter mais de 256 caracteres."),
-    body("alias")
+    body("title")
       .optional()
       .trim()
       .isLength({ max: 32 })
       .withMessage("O apelido não pode ter mais de 32 caracteres.")
       .escape(),
-    body("icon")
+    body("Icon")
       .trim()
       .notEmpty()
       .withMessage("O ícone da ferramenta é obrigatório.")

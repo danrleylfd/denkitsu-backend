@@ -24,7 +24,7 @@ const createOrUpdateAgentRules = () => {
       .isLength({ max: 256 })
       .withMessage("A descrição não pode ter mais de 256 caracteres.")
       .escape(),
-    body("icon")
+    body("Icon")
       .trim()
       .notEmpty()
       .withMessage("O ícone do agente é obrigatório.")
