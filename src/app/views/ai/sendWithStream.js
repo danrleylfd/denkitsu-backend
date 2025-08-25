@@ -55,7 +55,19 @@ const sendWithStream = async (req, res) => {
       res.write(`data: ${JSON.stringify(statusUpdate)}\n\n`)
     }
     const toolResultMessages = await processToolCalls(finalToolCalls, userID)
-    messages.push(...toolResultMessages)
+    const routerToolCallResult = toolResultMessages.find(r => r.name === "selectAgentTool")
+    if (routerToolCallResult) {
+      const resultData = JSON.parse(routerToolCallResult.content)
+      if (resultData.action === "SWITCH_AGENT" && resultData.agent) {
+        const newAgentName = resultData.agent
+        const newSystemPrompt = await getSystemPrompt(newAgentName, userID)
+        messages = [newSystemPrompt, ...userPrompts]
+        const switchNotification = {
+          choices: [{ delta: { reasoning: `<think>Roteador selecionou o Agente ${newAgentName}. Trocando contexto e continuando o fluxo.</think>` } }]
+        }
+        res.write(`data: ${JSON.stringify(switchNotification)}\n\n`)
+      }
+    } else messages.push(...toolResultMessages)
     if (initialReasoningSent) {
       res.write(`data: ${JSON.stringify({ choices: [{ delta: { reasoning: "\n\n...\n\n" } }] })}\n\n`)
     }
@@ -73,8 +85,6 @@ const sendWithStream = async (req, res) => {
       aiProvider: req.body.aiProvider,
       model: req.body.model
     })
-    // Em um stream, não podemos mais enviar um status JSON. A conexão já está aberta.
-    // O melhor a fazer é logar e encerrar a conexão. O frontend detectará o fechamento.
     if (!res.headersSent) {
       res.status(500).json({ error: { code: "STREAM_ERROR", message: "Ocorreu um erro interno no servidor durante o streaming." } })
     } else {
