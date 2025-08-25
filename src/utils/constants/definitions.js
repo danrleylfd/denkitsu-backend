@@ -11,10 +11,13 @@ const AGENTS_DEFINITIONS = [
   { name: "Transcritor", Icon: "Speech", description: "Especialista em transcrever áudio para texto com alta precisão., isCustom: false" }
 ]
 
-const TOOLS_DEFINITIONS = [
+const INTERNAL_TOOLS_DEFINITIONS = [
   { name: "web", title: "Pesquisa Profunda", Icon: "Globe", description: "Realiza uma busca aprofundada na web para encontrar respostas detalhadas sobre qualquer assunto." },
   { name: "browser_search", title: "Pesquisar no Navegador", Icon: "MonitorPlay", description: "Permite que a IA navegue interativamente em sites para obter respostas detalhadas. (Apenas modelos gpt-oss)" },
   { name: "code_interpreter", title: "Interpretador de Código", Icon: "Terminal", description: "Permite que a IA execute código Python para realizar cálculos e resolver problemas computacionais." },
+]
+
+const TOOLS_DEFINITIONS = [
   { name: "browserTool", title: "Acessar Site Específico", Icon: "Link2", description: "Extrai e analisa o conteúdo de uma URL específica que você fornecer no prompt." },
   { name: "httpTool", title: "Requisição HTTP", Icon: "Server", description: "Faz uma requisição GET para uma URL, útil para acessar APIs ou dados brutos de uma página." },
   { name: "duckduckgoTool", title: "Pesquisar no DuckDuckGo", Icon: "Search", description: "Executa uma pesquisa rápida e direta no DuckDuckGo para obter resultados imediatos." },
@@ -37,4 +40,4 @@ const TOOLS_DEFINITIONS = [
   { name: "nasaLibraryTool", title: "NASA: Biblioteca de Mídia", Icon: "SquareLibrary", description: "Pesquisa na vasta biblioteca de imagens e vídeos da NASA." }
 ]
 
-module.exports = { AGENTS_DEFINITIONS, TOOLS_DEFINITIONS }
+module.exports = { AGENTS_DEFINITIONS, INTERNAL_TOOLS_DEFINITIONS, TOOLS_DEFINITIONS }
