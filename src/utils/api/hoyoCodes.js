@@ -42,7 +42,7 @@ const hoyoCodesTool = {
       properties: {
         game: {
           type: "string",
-          description: "O jogo para o qual buscar os códigos. Use 'genshin' para Genshin Impact, 'hkrpg' para Honkai: Star Rail (HSR), e 'nap' para Zenless Zone Zero (ZZZ). 'honkai3rd' (Honkai Impact 3rd) e 'tot' (Tears of Themis) são depreciados e podem não funcionar.",
+          description: "O jogo para o qual buscar os códigos. Use 'genshin' para Genshin Impact, 'hkrpg' para Honkai: Star Rail, 'nap' para Zenless Zone Zero. 'honkai3rd' para Honkai Impact 3rd e 'tot' para Tears of Themis são depreciados e podem não funcionar. o usuário pode pedir os códigos usando apelidos case insensitive (ZZZ,HSR,SR,TOT)",
           enum: ["genshin", "hkrpg", "nap", "honkai3rd", "tot"]
         }
       },
