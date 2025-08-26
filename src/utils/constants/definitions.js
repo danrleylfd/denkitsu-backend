@@ -28,6 +28,7 @@ const TOOLS_DEFINITIONS = [
   { name: "gamesTool", title: "Pesquisar Jogos", Icon: "Gamepad", description: "Encontra detalhes sobre videojogos, como data de lançamento, plataformas e gênero." },
   { name: "pokedexTool", title: "Pesquisar na Pokédex", Icon: "Smartphone", description: "Obtém informações detalhadas sobre qualquer Pokémon, como tipos, habilidades e status." },
   { name: "genshinTool", title: "Análise Genshin Impact (Beta)", Icon: "Gamepad2", description: "Analisa builds de personagens do Genshin Impact a partir de um UID." },
+  { name: "hoyoCodesTool", title: "Códigos Hoyoverse", Icon: "Gift", description: "Busca códigos de resgate para jogos da Hoyoverse (Genshin Impact, Zenless Zone Zero, etc)." },
   { name: "criptoTool", title: "Cotação: Cripto (Beta)", Icon: "Bitcoin", description: "Verifica a cotação atual de diversas criptomoedas em tempo real." },
   { name: "albionTool", title: "Cotação: Albion Online Ouro (Beta)", Icon: "Coins", description: "Consulta o preço atual do ouro no jogo Albion Online." },
   { name: "weatherTool", title: "Clima na Terra", Icon: "Cloud", description: "Fornece a previsão do tempo para qualquer cidade do mundo." },
