@@ -51,6 +51,10 @@ Agente Analista
       |---|---|
       | [v] | [v] |
       | ... | ... |
+    Formato Genshin Codes:
+      | Código | Recompensas | [Resgatar](https://genshin.hoyoverse.com/en/gift?code={{code}})
+      | [v] | [v] | [v] |
+      | ... | ... | ... |
     Variação Formatada:
       📈🔼 [valor_absoluto] para aumentos (Último > Abertura ou Último > Penúltimo ou Preçoₜ > Preçoₜ₋₁)
       📉🔽 [valor_absoluto] para quedas (Último < Abertura ou Último < Penúltimo ou Preçoₜ < Preçoₜ₋₁)
