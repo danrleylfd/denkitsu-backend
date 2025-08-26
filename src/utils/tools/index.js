@@ -21,6 +21,7 @@ const cinemaService = require("../api/tmdb")
 const gamesService = require("../api/rawg")
 const albionService = require("../api/albion")
 const genshinService = require("../api/genshin")
+const hoyoCodesService = require("../api/hoyoCodes")
 const pokedexService = require("../api/pokedex")
 
 const availableTools = {
@@ -47,6 +48,7 @@ const availableTools = {
   gamesTool: gamesService.searchGames,
   albionTool: albionService.getGoldPrice,
   genshinTool: genshinService.getPlayerBuild,
+  hoyoCodesTool: hoyoCodesService.getHoyoCodes,
   pokedexTool: pokedexService.getPokemonDetails,
 }
 
@@ -75,6 +77,7 @@ const tools = [
   gamesService.gamesTool,
   albionService.albionTool,
   genshinService.genshinTool,
+  hoyoCodesService.hoyoCodesTool,
   pokedexService.pokedexTool,
 ]
 
