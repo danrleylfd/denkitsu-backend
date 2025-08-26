@@ -1,6 +1,6 @@
 const axios = require("axios")
 
-const getHoyoCodes = async ({ game }) => {
+const getHoyoCodes = async (game) => {
   try {
     console.log(`[TOOL_CALL] Buscando códigos para o jogo: ${game}`)
     const { data } = await axios.get(`https://hoyo-codes.seria.moe/codes?game=${game}`)
