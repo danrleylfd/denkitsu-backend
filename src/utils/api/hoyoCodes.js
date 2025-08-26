@@ -16,7 +16,8 @@ const getHoyoCodes = async ({ game }) => {
       genshin: "https://genshin.hoyoverse.com/en/gift",
       hkrpg: "https://hsr.hoyoverse.com/gift",
       honkai3rd: "https://honkaiimpact3.hoyoverse.com/global/en-us/fab",
-      nap: "https://zenless.hoyoverse.com/en-us/gift"
+      nap: "https://zenless.hoyoverse.com/en-us/gift",
+      tot: "https://tot.hoyoverse.com/gift"
     }
 
     const baseUrl = redeemUrlMap[game] || redeemUrlMap.genshin
