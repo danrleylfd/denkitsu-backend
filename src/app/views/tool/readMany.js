@@ -3,7 +3,9 @@ const Tool = require("../../models/tool")
 const readMany = async (req, res) => {
   try {
     const { userID } = req
-    const tools = await Tool.find({ author: userID }).sort("-createdAt")
+    const tools = await Tool.find({
+      $or: [{ author: userID }, { clients: userID }]
+    }).sort("-createdAt")
     return res.status(200).json(tools)
   } catch (error) {
     console.error(`[READ_MANY_TOOLS] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })

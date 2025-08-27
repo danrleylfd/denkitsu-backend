@@ -16,14 +16,21 @@ const updateOne = require("../views/agent/updateOne")
 const deleteOne = require("../views/agent/deleteOne")
 const readPublished = require("../views/agent/readPublished")
 const acquireOne = require("../views/agent/acquireOne")
-
-routes.get("/store", readPublished)
-routes.post("/store/:agentId/acquire", acquireAgentIdInParams(), validate, acquireOne)
+const unacquireOne = require("../views/agent/unacquireOne")
 
 routes.post("/", createOrUpdateAgentRules(), validate, createOne)
+
 routes.get("/", readMany)
+
 routes.put("/:agentId", agentIdInParams(), createOrUpdateAgentRules(), validate, updateOne)
+
 routes.delete("/:agentId", agentIdInParams(), validate, deleteOne)
+
+routes.post("/store/:agentId/acquire", acquireAgentIdInParams(), validate, acquireOne)
+
+routes.get("/store", readPublished)
+
+routes.delete("/store/:agentId/acquire", acquireAgentIdInParams(), validate, unacquireOne)
 
 const loadAgentRoutes = (app) => app.use("/agents", routes)
 

@@ -3,7 +3,9 @@ const Agent = require("../../models/agent")
 const readMany = async (req, res) => {
   try {
     const { userID } = req
-    const agents = await Agent.find({ author: userID }).sort("-createdAt")
+    const agents = await Agent.find({
+      $or: [{ author: userID }, { clients: userID }]
+    }).sort("-createdAt")
     return res.status(200).json(agents)
   } catch (error) {
     console.error(`[READ_MANY_AGENTS] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
