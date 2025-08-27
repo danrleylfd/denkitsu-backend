@@ -4,12 +4,13 @@ const Agent = require("../../models/agent")
 const readPublished = async (req, res) => {
   try {
     const { userID } = req
+
     const agents = await Agent.aggregate([
-      // Encontra todos os agentes publicados, exceto os do próprio usuário
+      // Para testes, vamos comentar a linha que esconde os seus próprios agentes
       {
         $match: {
-          published: true,
-          author: { $ne: new mongoose.Types.ObjectId(userID) }
+          published: true
+          // author: { $ne: new mongoose.Types.ObjectId(userID) }
         }
       },
       // Popula os dados do autor
@@ -59,6 +60,7 @@ const readPublished = async (req, res) => {
       // Ordena pelos mais recentes
       { $sort: { createdAt: -1 } }
     ])
+
     return res.status(200).json(agents)
   } catch (error) {
     console.error(`[READ_PUBLISHED_AGENTS] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
