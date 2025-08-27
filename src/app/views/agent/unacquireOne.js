@@ -1,11 +1,11 @@
-const Agent = require("../../models/agent")
+const Acquisition = require("../../models/acquisition")
 
 const unacquireOne = async (req, res) => {
   try {
     const { userID } = req
     const { agentId } = req.params
 
-    await Agent.updateOne({ _id: agentId }, { $pull: { clients: userID } })
+    await Acquisition.deleteOne({ user: userID, item: agentId })
 
     return res.status(200).json({ message: "Agente removido da sua coleção." })
   } catch (error) {

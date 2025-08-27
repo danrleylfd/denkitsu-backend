@@ -4,13 +4,12 @@ const Comment = require("../../../models/comment")
 const delComment = async (req, res) => {
   try {
     const { userID } = req
-    const { video: videoID, comment: commentID } = req.params
+    const { comment: commentID } = req.params
     const deletedComment = await Comment.findOneAndDelete({ _id: commentID, user: userID })
     if (!deletedComment) throw new Error("COMMENT_NOT_FOUND_OR_UNAUTHORIZED")
     await Promise.all([
-      deletedComment.parent && Comment.updateOne({ _id: deletedComment.parent }, { $pull: { replies: deletedComment._id } } ),
-      !deletedComment.parent && Comment.deleteMany({ parent: commentID }),
-      !deletedComment.parent && Video.updateOne({ _id: videoID }, { $pull: { comments: commentID } })
+      deletedComment.parent && Comment.updateOne({ _id: deletedComment.parent }, { $pull: { replies: deletedComment._id } }),
+      !deletedComment.parent && Comment.deleteMany({ parent: commentID })
     ])
     return res.status(204).send()
   } catch (error) {

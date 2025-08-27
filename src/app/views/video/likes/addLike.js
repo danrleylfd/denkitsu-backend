@@ -1,15 +1,17 @@
+const Like = require("../../../models/like")
 const Video = require("../../../models/video")
 
 const addLike = async (req, res) => {
   try {
     const { userID } = req
     const { video: videoID } = req.params
-    const video = await Video.findOneAndUpdate(
-      { _id: videoID, likes: { $ne: userID } },
-      { $addToSet: { likes: userID } },
-      { new: true }
-    ).select("_id")
+    const video = await Video.findById(videoID)
     if (!video) throw new Error("VIDEO_NOT_FOUND_OR_ALREADY_LIKED")
+    await Like.findOneAndUpdate(
+      { user: userID, video: videoID },
+      { user: userID, video: videoID },
+      { upsert: true }
+    )
     return res.status(201).send()
   } catch (error) {
     console.error(`[LIKE] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })

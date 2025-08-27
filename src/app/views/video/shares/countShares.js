@@ -1,18 +1,10 @@
-const { Types: { ObjectId } } = require("../../../../utils/database")
-
-const Video = require("../../../models/video")
+const Share = require("../../../models/share")
 
 const countShares = async (req, res) => {
   try {
     const { video: videoID } = req.params
-    const [ video ] = await Video.aggregate([
-      { $match: { _id: new ObjectId(videoID) } },
-      { $project: { sharesCount: { $size: "$shares" }, sharesExtras: 1 } }
-    ])
-    return res.status(200).json({
-      shares: video.sharesCount,
-      sharesExtras: video.sharesExtras
-    })
+    const sharesCount = await Share.countDocuments({ video: videoID })
+    return res.status(200).json({ shares: sharesCount })
   } catch (error) {
     console.error(`[COUNT_SHARES] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
     const defaultError = { status: 500, message: "Ocorreu um erro interno no servidor." }

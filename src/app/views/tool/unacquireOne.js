@@ -1,11 +1,11 @@
-const Tool = require("../../models/tool")
+const Acquisition = require("../../models/acquisition")
 
 const unacquireOne = async (req, res) => {
   try {
     const { userID } = req
     const { toolId } = req.params
 
-    await Tool.updateOne({ _id: toolId }, { $pull: { clients: userID } })
+    await Acquisition.deleteOne({ user: userID, item: toolId })
 
     return res.status(200).json({ message: "Ferramenta removida da sua coleção." })
   } catch (error) {

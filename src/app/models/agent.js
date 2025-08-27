@@ -26,10 +26,6 @@ const AgentSchema = new mongoose.Schema(
       ref: "User",
       required: true
     },
-    clients: [{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User"
-    }],
     published: {
       type: Boolean,
       default: false,

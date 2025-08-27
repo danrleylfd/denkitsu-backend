@@ -9,12 +9,15 @@ routes.use(authMiddleware)
 // routes.use(videoMiddleware)
 
 const addLike = require("../views/video/likes/addLike")
+const getLikeStatus = require("../views/video/likes/getLikeStatus")
 const countLikes = require("../views/video/likes/countLikes")
 const delLike = require("../views/video/likes/delLike")
 
 routes.post("/:video", videoIdInParams(), validate, videoMiddleware, addLike)
 
 routes.get("/:video", videoIdInParams(), validate, videoMiddleware, countLikes)
+
+routes.get("/:video/status", videoIdInParams(), validate, getLikeStatus)
 
 routes.delete("/:video", videoIdInParams(), validate, videoMiddleware, delLike)
 

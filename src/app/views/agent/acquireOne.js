@@ -1,4 +1,5 @@
 const Agent = require("../../models/agent")
+const Acquisition = require("../../models/acquisition")
 
 const acquireOne = async (req, res) => {
   try {
@@ -9,7 +10,11 @@ const acquireOne = async (req, res) => {
     if (!agent || !agent.published) throw new Error("AGENT_NOT_FOUND_OR_NOT_PUBLISHED")
     if (agent.author.toString() === userID.toString()) throw new Error("CANNOT_ACQUIRE_OWN_AGENT")
 
-    await Agent.updateOne({ _id: agentId }, { $addToSet: { clients: userID } })
+    await Acquisition.findOneAndUpdate(
+      { user: userID, item: agentId },
+      { user: userID, item: agentId, itemType: "Agent" },
+      { upsert: true }
+    )
 
     return res.status(200).json({ message: "Agente adquirido com sucesso." })
   } catch (error) {

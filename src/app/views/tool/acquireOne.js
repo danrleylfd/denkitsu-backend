@@ -1,4 +1,5 @@
 const Tool = require("../../models/tool")
+const Acquisition = require("../../models/acquisition")
 
 const acquireOne = async (req, res) => {
   try {
@@ -9,7 +10,11 @@ const acquireOne = async (req, res) => {
     if (!tool || !tool.published) throw new Error("TOOL_NOT_FOUND_OR_NOT_PUBLISHED")
     if (tool.author.toString() === userID.toString()) throw new Error("CANNOT_ACQUIRE_OWN_TOOL")
 
-    await Tool.updateOne({ _id: toolId }, { $addToSet: { clients: userID } })
+    await Acquisition.findOneAndUpdate(
+      { user: userID, item: toolId },
+      { user: userID, item: toolId, itemType: "Tool" },
+      { upsert: true }
+    )
 
     return res.status(200).json({ message: "Ferramenta adquirida com sucesso." })
   } catch (error) {
