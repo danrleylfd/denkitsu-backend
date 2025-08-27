@@ -1,13 +1,5 @@
 const { body, param } = require("express-validator")
 
-const agentIdInParams = () => {
-  return [
-    param("agentId")
-      .isMongoId()
-      .withMessage("O ID do agente na URL é inválido."),
-  ]
-}
-
 const createOrUpdateAgentRules = () => {
   return [
     body("name")
@@ -63,7 +55,24 @@ const createOrUpdateAgentRules = () => {
   ]
 }
 
+const agentIdInParams = () => {
+  return [
+    param("agentId")
+      .isMongoId()
+      .withMessage("O ID do agente na URL é inválido."),
+  ]
+}
+
+const acquireAgentIdInParams = () => {
+  return [
+    param("agentId")
+      .isMongoId()
+      .withMessage("O ID do agente na URL é inválido.")
+  ]
+}
+
 module.exports = {
   agentIdInParams,
   createOrUpdateAgentRules,
+  acquireAgentIdInParams,
 }

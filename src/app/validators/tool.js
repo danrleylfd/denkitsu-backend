@@ -79,8 +79,17 @@ const toolIdInParams = () => {
   ]
 }
 
+const acquireToolIdInParams = () => {
+  return [
+    param("toolId")
+      .isMongoId()
+      .withMessage("O ID da ferramenta na URL é inválido.")
+  ]
+}
+
 module.exports = {
   createToolRules,
   updateToolRules,
   toolIdInParams,
+  acquireToolIdInParams,
 }
