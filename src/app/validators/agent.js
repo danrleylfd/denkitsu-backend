@@ -32,6 +32,10 @@ const createOrUpdateAgentRules = () => {
       .withMessage("O ícone não pode ter mais de 32 caracteres.")
       .matches(/^[a-zA-Z0-9]+$/)
       .withMessage("O ícone só pode conter letras e números."),
+    body("published")
+      .optional()
+      .isBoolean()
+      .withMessage("O campo 'published' deve ser um valor booleano."),
     body("prompt.goal")
       .trim()
       .notEmpty()

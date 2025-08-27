@@ -5,13 +5,13 @@ const createOne = async (req, res) => {
     const { userID } = req
     const { name, description, title, icon, parameters, httpConfig } = req.body
     const tool = await Tool.create({
-      user: userID,
+      author: userID,
       name,
       description,
       title,
       icon,
       parameters,
-      httpConfig,
+      httpConfig
     })
     return res.status(201).json(tool)
   } catch (error) {
