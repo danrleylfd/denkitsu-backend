@@ -5,7 +5,7 @@ const deleteOne = async (req, res) => {
     const { userID } = req
     const { agentId } = req.params
 
-    const result = await Agent.deleteOne({ _id: agentId, user: userID })
+    const result = await Agent.deleteOne({ _id: agentId, author: userID })
 
     if (result.deletedCount === 0) {
       throw new Error("AGENT_NOT_FOUND_OR_UNAUTHORIZED")

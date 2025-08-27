@@ -7,7 +7,7 @@ const updateOne = async (req, res) => {
     const agentData = req.body
 
     const agent = await Agent.findOneAndUpdate(
-      { _id: agentId, user: userID },
+      { _id: agentId, author: userID },
       { $set: agentData },
       { new: true }
     )

@@ -5,7 +5,7 @@ const deleteOne = async (req, res) => {
     const { userID } = req
     const { toolId } = req.params
 
-    const result = await Tool.deleteOne({ _id: toolId, user: userID })
+    const result = await Tool.deleteOne({ _id: toolId, author: userID })
 
     if (result.deletedCount === 0) throw new Error("TOOL_NOT_FOUND_OR_UNAUTHORIZED")
     return res.status(204).send()
