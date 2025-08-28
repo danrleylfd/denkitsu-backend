@@ -5,12 +5,8 @@ const readPublished = async (req, res) => {
   try {
     const { userID } = req
     const tools = await Tool.aggregate([
-      // Encontra todas as ferramentas publicadas, exceto as do próprio usuário
       {
-        $match: {
-          published: true,
-          author: { $ne: new mongoose.Types.ObjectId(userID) }
-        }
+        $match: { published: true }
       },
       // Popula os dados do autor
       {
