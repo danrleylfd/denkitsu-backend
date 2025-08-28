@@ -1,6 +1,7 @@
 const prompts = require("../../../utils/prompts")
 const Agent = require("../../models/agent")
 const Tool = require("../../models/tool")
+const Acquisition = require("../../models/acquisition")
 const { availableTools, tools: builtInTools } = require("../../../utils/tools")
 
 const cleanToolCallSyntax = (content) => {
@@ -42,7 +43,14 @@ async function* processStreamAndExtractReasoning(streamResponse) {
 const getRouterPrompt = async (userId) => {
   const routerPromptTemplate = prompts.find(p => p.content.trim().startsWith("Agente Roteador"))
   if (!routerPromptTemplate) return prompts[0]
-  const customAgents = await Agent.find({ user: userId }).select("name description")
+  const userAcquisitions = await Acquisition.find({ user: userId, itemType: "Agent" }).select("item").lean()
+  const acquiredAgentIds = userAcquisitions.map(acq => acq.item)
+  const customAgents = await Agent.find({
+    $or: [
+      { author: userId },
+      { _id: { $in: acquiredAgentIds } }
+    ]
+  }).select("name description")
   let customAgentsContext = ""
   if (customAgents && customAgents.length > 0) {
     const agentList = customAgents.map(a => `- ${a.name}: ${a.description}`).join("\n    ")
