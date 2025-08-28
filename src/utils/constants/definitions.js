@@ -8,7 +8,7 @@ const AGENTS_DEFINITIONS = [
   { name: "Prompter", Icon: "Sparkle", description: "Ajuda a refinar e melhorar as suas próprias perguntas para obter melhores respostas.", isCustom: false },
   { name: "Redator", Icon: "Newspaper", description: "Perfeito para escrever textos concisos, anúncios e notícias.", isCustom: false },
   { name: "Secretário", Icon: "ListTree", description: "Excelente para organizar informações, criar listas e formatar dados.", isCustom: false },
-  { name: "Transcritor", Icon: "Speech", description: "Especialista em transcrever áudio para texto com alta precisão., isCustom: false" }
+  { name: "Transcritor", Icon: "Speech", description: "Especialista em transcrever áudio para texto com alta precisão.", isCustom: false }
 ]
 
 const INTERNAL_TOOLS_DEFINITIONS = [
