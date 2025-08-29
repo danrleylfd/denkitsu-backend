@@ -3,7 +3,8 @@ const News = require("../../models/news")
 
 const readManyCursor = async (req, res) => {
   try {
-    const { cursor, limit = 10 } = req.query
+    const { cursor } = req.query
+    const limit = parseInt(req.query.limit, 10) || 10
     const query = {}
     if (cursor) query._id = { $lt: mongoose.Types.ObjectId(cursor) }
     const news = await News.find(query).sort({ _id: -1 }).limit(limit)
