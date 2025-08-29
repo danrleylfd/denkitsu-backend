@@ -13,7 +13,7 @@ const readManyCursor = async (req, res) => {
     const query = {}
     if (cursor) {
       console.log(`[NEWS CURSOR] Aplicando cursor: _id < ${cursor}`)
-      query._id = { $lt: new mongoose.Types.ObjectId(cursor) }
+      query._id = { $lt: new mongoose.ObjectId(cursor) }
     } else {
       console.log("[NEWS CURSOR] Carga inicial, sem cursor.")
     }
