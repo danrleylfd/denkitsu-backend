@@ -1,10 +1,11 @@
+const mongoose = require("mongoose")
 const News = require("../../models/news")
 
 const readManyCursor = async (req, res) => {
   try {
     const { cursor, limit = 10 } = req.query
     const query = {}
-    if (cursor) query._id = { $lt: cursor }
+    if (cursor) query._id = { $lt: mongoose.Types.ObjectId(cursor) }
     const news = await News.find(query).sort({ _id: -1 }).limit(limit)
     const nextCursor = news.length === limit ? news[news.length - 1]._id : null
     return res.status(200).json({ news, nextCursor })
