@@ -5,6 +5,7 @@ const {
   createNewsRules,
   generateNewsRules,
   paginateRules,
+  cursorRules,
   sourceInParamsRules
 } = require("../validators/news")
 
