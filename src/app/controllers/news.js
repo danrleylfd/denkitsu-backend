@@ -1,5 +1,6 @@
 const { Router } = require("express")
 
+const asyncHandler = require("../middlewares/asyncHandler")
 const validate = require("../middlewares/validator")
 const {
   createNewsRules,
@@ -18,17 +19,17 @@ const readMany = require("../views/news/readMany")
 const readManyPaginate = require("../views/news/readManyPaginate")
 const readManyCursor = require("../views/news/readManyCursor")
 
-routes.post("/", createNewsRules(), validate, createOne)
+routes.post("/", createNewsRules(), validate, asyncHandler(createOne))
 
-routes.post("/generate", generateNewsRules(), validate, generateOne)
+routes.post("/generate", generateNewsRules(), validate, asyncHandler(generateOne))
 
-routes.get("/", readMany)
+routes.get("/", asyncHandler(readMany))
 
-routes.get("/pages", paginateRules(), validate, readManyPaginate)
+routes.get("/pages", paginateRules(), validate, asyncHandler(readManyPaginate))
 
-routes.get("/cursor", cursorRules(), validate, readManyCursor)
+routes.get("/cursor", cursorRules(), validate, asyncHandler(readManyCursor))
 
-routes.get("/:source", sourceInParamsRules(), validate, readOneBySource)
+routes.get("/:source", sourceInParamsRules(), validate, asyncHandler(readOneBySource))
 
 const loadNewsRoutes = (app) => app.use("/news", routes)
 

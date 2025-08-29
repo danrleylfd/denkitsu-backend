@@ -25,7 +25,7 @@ const authMiddleware = async (req, res, next) => {
 
     const user = await User.findById(decoded.id).select("_id")
     if (!user) throw new Error("USER_NOT_FOUND")
-
+    req.user = user
     req.userID = user._id
     return next()
   } catch (error) {

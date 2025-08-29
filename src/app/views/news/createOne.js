@@ -1,15 +1,14 @@
 const News = require("../../models/news")
+const createAppError = require("../../../utils/errors")
 
 const createOne = async (req, res) => {
+  const { content, source } = req.body
   try {
-    const { content, source } = req.body
     const news = await News.create({ content: content.trim(), source: source.trim() })
     return res.status(201).json(news)
   } catch (error) {
-    console.error(`[CREATE_NEWS] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
-    const defaultError = { status: 500, message: "Ocorreu um erro interno no servidor." }
-    const { status, message } = defaultError
-    return res.status(status).json({ error: { code: error.message, message } })
+    if (error.code === 11000) throw createAppError("Uma notícia com esta fonte (source) já existe.", 409, "SOURCE_ALREADY_EXISTS")
+    throw error
   }
 }
 

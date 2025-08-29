@@ -1,6 +1,8 @@
 const { Router } = require("express")
+
 const authMiddleware = require("../middlewares/auth")
 const aiMiddleware = require("../middlewares/ai")
+const asyncHandler = require("../middlewares/asyncHandler")
 const validate = require("../middlewares/validator")
 const { sendMessageRules } = require("../validators/ai")
 
@@ -9,7 +11,6 @@ routes.use(authMiddleware)
 
 const sendWithStream = require("../views/ai/sendWithStream")
 const sendWithoutStream = require("../views/ai/sendWithoutStream")
-// const sendMessage = require("../views/ai/sendMsg")
 const getModels = require("../views/ai/getModels")
 const listAgents = require("../views/ai/listAgents")
 const listTools = require("../views/ai/listTools")
@@ -20,13 +21,13 @@ const sendMessage = (req, res, next) => {
   return sendWithoutStream(req, res, next)
 }
 
-routes.post("/chat/completions", sendMessageRules(), validate, aiMiddleware, sendMessage)
+routes.post("/chat/completions", sendMessageRules(), validate, aiMiddleware, asyncHandler(sendMessage))
 
-routes.get("/models", getModels)
+routes.get("/models", asyncHandler(getModels))
 
-routes.get("/agents", listAgents)
+routes.get("/agents", asyncHandler(listAgents))
 
-routes.get("/tools", listTools)
+routes.get("/tools", asyncHandler(listTools))
 
 const loadAIRoutes = (app) => app.use("/ai", routes)
 

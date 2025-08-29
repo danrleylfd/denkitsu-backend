@@ -1,6 +1,8 @@
 const { Router } = require("express")
 const multer = require("multer")
+
 const authMiddleware = require("../middlewares/auth")
+const asyncHandler = require("../middlewares/asyncHandler")
 
 const transcribeAudio = require("../views/audio/transcribe")
 
@@ -12,7 +14,7 @@ const upload = multer({
 
 routes.use(authMiddleware)
 
-routes.post("/transcribe", upload.single("audio"), transcribeAudio)
+routes.post("/transcribe", upload.single("audio"), asyncHandler(transcribeAudio))
 
 const loadAudioRoutes = (app) => app.use("/audio", routes)
 

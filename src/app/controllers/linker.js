@@ -1,5 +1,7 @@
 const { Router } = require("express")
+
 const authMiddleware = require("../middlewares/auth")
+const asyncHandler = require("../middlewares/asyncHandler")
 const validate = require("../middlewares/validator")
 const {
   createLinkerRules,
@@ -16,15 +18,15 @@ const readMany = require("../views/linker/readMany")
 const updateOne = require("../views/linker/updateOne")
 const deleteOne = require("../views/linker/deleteOne")
 
-routes.post("/", createLinkerRules(), validate, createOne)
+routes.post("/", createLinkerRules(), validate, asyncHandler(createOne))
 
-routes.get("/", readMany)
+routes.get("/", asyncHandler(readMany))
 
-routes.get("/by-user", readMany)
+routes.get("/by-user", asyncHandler(readMany))
 
-routes.put("/:oldLabel", updateLinkerRules(), validate, updateOne)
+routes.put("/:oldLabel", updateLinkerRules(), validate, asyncHandler(updateOne))
 
-routes.delete("/:label", deleteLinkerRules(), validate, deleteOne)
+routes.delete("/:label", deleteLinkerRules(), validate, asyncHandler(deleteOne))
 
 const loadLinkerRoutes = (app) => app.use("/linkers", routes)
 

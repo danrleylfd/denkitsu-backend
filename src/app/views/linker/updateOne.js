@@ -1,30 +1,21 @@
 const Linker = require("../../models/linker")
+const createAppError = require("../../../utils/errors")
 
 const updateOne = async (req, res) => {
+  const { user } = req
+  const { oldLabel } = req.params
+  const { newLabel, newLink } = req.body
   try {
-    const { userID } = req
-    const { oldLabel } = req.params
-    const { newLabel, newLink } = req.body
     const linker = await Linker.findOneAndUpdate(
-      { label: oldLabel.trim(), user: userID },
+      { label: oldLabel.trim(), user: user._id },
       { $set: { label: newLabel.trim(), link: newLink.trim() } },
-      { new: true }
+      { new: true, runValidators: true }
     )
-    if (!linker) throw new Error("LINKER_NOT_FOUND_OR_UNAUTHORIZED")
+    if (!linker) throw createAppError("Atalho não encontrado ou você não tem permissão para editá-lo.", 404, "LINKER_NOT_FOUND_OR_UNAUTHORIZED")
     return res.status(200).json(linker)
   } catch (error) {
-    console.error(`[UPDATE_LINKER] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
-    if (error.code === 11000) {
-      return res.status(409).json({
-        error: { code: "LABEL_ALREADY_EXISTS", message: "O novo rótulo (label) já está em uso." }
-      })
-    }
-    const defaultError = { status: 500, message: "Ocorreu um erro interno no servidor." }
-    const errorMessages = {
-      LINKER_NOT_FOUND_OR_UNAUTHORIZED: { status: 404, message: "Atalho não encontrado ou você não tem permissão para editá-lo." }
-    }
-    const { status, message } = errorMessages[error.message] || defaultError
-    return res.status(status).json({ error: { code: error.message, message } })
+    if (error.code === 11000) throw createAppError("O novo rótulo (label) já está em uso.", 409, "LABEL_ALREADY_EXISTS")
+    throw error
   }
 }
 

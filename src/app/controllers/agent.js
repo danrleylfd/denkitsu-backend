@@ -1,5 +1,7 @@
 const { Router } = require("express")
+
 const authMiddleware = require("../middlewares/auth")
+const asyncHandler = require("../middlewares/asyncHandler")
 const validate = require("../middlewares/validator")
 const {
   agentIdInParams,
@@ -18,19 +20,20 @@ const readPublished = require("../views/agent/readPublished")
 const acquireOne = require("../views/agent/acquireOne")
 const unacquireOne = require("../views/agent/unacquireOne")
 
-routes.post("/", createOrUpdateAgentRules(), validate, createOne)
 
-routes.get("/", readMany)
+routes.post("/", createOrUpdateAgentRules(), validate, asyncHandler(createOne))
 
-routes.put("/:agentId", agentIdInParams(), createOrUpdateAgentRules(), validate, updateOne)
+routes.get("/", asyncHandler(readMany))
 
-routes.delete("/:agentId", agentIdInParams(), validate, deleteOne)
+routes.put("/:agentId", agentIdInParams(), createOrUpdateAgentRules(), validate, asyncHandler(updateOne))
 
-routes.post("/store/:agentId/acquire", acquireAgentIdInParams(), validate, acquireOne)
+routes.delete("/:agentId", agentIdInParams(), validate, asyncHandler(deleteOne))
 
-routes.get("/store", readPublished)
+routes.post("/store/:agentId/acquire", acquireAgentIdInParams(), validate, asyncHandler(acquireOne))
 
-routes.delete("/store/:agentId/acquire", acquireAgentIdInParams(), validate, unacquireOne)
+routes.get("/store", asyncHandler(readPublished))
+
+routes.delete("/store/:agentId/acquire", acquireAgentIdInParams(), validate, asyncHandler(unacquireOne))
 
 const loadAgentRoutes = (app) => app.use("/agents", routes)
 

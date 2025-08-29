@@ -1,19 +1,13 @@
 const Acquisition = require("../../models/acquisition")
 
+const createAppError = require("../../../utils/errors")
+
 const unacquireOne = async (req, res) => {
-  try {
-    const { userID } = req
-    const { toolId } = req.params
-
-    await Acquisition.deleteOne({ user: userID, item: toolId })
-
-    return res.status(200).json({ message: "Ferramenta removida da sua coleção." })
-  } catch (error) {
-    console.error(`[UNACQUIRE_TOOL] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
-    const defaultError = { status: 500, message: "Ocorreu um erro interno no servidor." }
-    const { status, message } = defaultError
-    return res.status(status).json({ error: { code: error.message, message } })
-  }
+  const { user } = req
+  const { toolId } = req.params
+  const result = await Acquisition.deleteOne({ user: user._id, item: toolId })
+  if (result.deletedCount === 0) throw createAppError("Você não possui esta ferramenta para removê-la.", 404, "ACQUISITION_NOT_FOUND")
+  return res.status(200).json({ message: "Ferramenta removida da sua coleção." })
 }
 
 module.exports = unacquireOne

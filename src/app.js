@@ -3,6 +3,7 @@ const express = require("express")
 const requestIp = require("request-ip")
 const cors = require("./app/middlewares/cors")
 const { globalLimiter, authLimiter } = require("./app/middlewares/rateLimiter")
+const errorHandler = require("./app/middlewares/errorHandler")
 
 const app = express()
 
@@ -12,8 +13,8 @@ app.use(express.urlencoded({ extended: true }))
 app.use(requestIp.mw())
 app.use(globalLimiter)
 app.use(authLimiter)
-
 require("./app/controllers/index")(app)
+app.use(errorHandler)
 
 app.listen(process.env.PORT)
 

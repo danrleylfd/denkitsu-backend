@@ -1,32 +1,18 @@
 const Tool = require("../../models/tool")
 
+const createAppError = require("../../../utils/errors")
+
 const createOne = async (req, res) => {
+  const { user } = req
+  const toolData = { ...req.body, author: user._id }
   try {
-    const { userID } = req
-    const { name, description, title, icon, parameters, httpConfig } = req.body
-    const tool = await Tool.create({
-      author: userID,
-      name,
-      description,
-      title,
-      icon,
-      parameters,
-      httpConfig
-    })
+    const tool = await Tool.create(toolData)
     return res.status(201).json(tool)
   } catch (error) {
-    console.error(`[CREATE_TOOL] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
     if (error.code === 11000) {
-      return res.status(409).json({
-        error: { code: "TOOL_NAME_EXISTS", message: "Você já possui uma ferramenta com este nome." }
-      })
+      throw createAppError("Você já possui uma ferramenta com este nome.", 409, "TOOL_NAME_EXISTS")
     }
-    const errorMessages = {
-      TOOL_LIMIT_REACHED: { status: 403, message: "Limite de 6 ferramentas customizadas atingido." }
-    }
-    const defaultError = { status: 500, message: "Ocorreu um erro interno no servidor." }
-    const { status, message } = errorMessages[error.message] || defaultError
-    return res.status(status).json({ error: { code: error.message, message } })
+    throw error
   }
 }
 

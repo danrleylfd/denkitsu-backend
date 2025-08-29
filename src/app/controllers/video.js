@@ -1,5 +1,7 @@
 const { Router } = require("express")
+
 const authMiddleware = require("../middlewares/auth")
+const asyncHandler = require("../middlewares/asyncHandler")
 const validate = require("../middlewares/validator")
 const {
   createVideoRules,
@@ -21,21 +23,21 @@ const readOne = require("../views/video/readOne")
 const updateOne = require("../views/video/updateOne")
 const deleteOne = require("../views/video/deleteOne")
 
-routes.post("/", createVideoRules(), validate, createOne)
+routes.post("/", createVideoRules(), validate, asyncHandler(createOne))
 
-routes.get("/", readManyByUser)
+routes.get("/", asyncHandler(readManyByUser))
 
-routes.get("/one/:video", readOneVideoRules(), validate, readOne)
+routes.get("/one/:video", readOneVideoRules(), validate, asyncHandler(readOne))
 
-routes.get("/popular", readPopular)
+routes.get("/popular", asyncHandler(readPopular))
 
-routes.get("/recents", readRecents)
+routes.get("/recents", asyncHandler(readRecents))
 
-routes.get("/:userID", readUserVideosRules(), validate, readManyByUser)
+routes.get("/:userID", readUserVideosRules(), validate, asyncHandler(readManyByUser))
 
-routes.put("/:video", updateVideoRules(), validate, updateOne)
+routes.put("/:video", updateVideoRules(), validate, asyncHandler(updateOne))
 
-routes.delete("/:video", deleteVideoRules(), validate, deleteOne)
+routes.delete("/:video", deleteVideoRules(), validate, asyncHandler(deleteOne))
 
 const loadVideoRoutes = (app) => app.use("/videos", routes)
 

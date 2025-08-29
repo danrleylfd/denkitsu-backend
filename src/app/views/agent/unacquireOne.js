@@ -1,19 +1,13 @@
 const Acquisition = require("../../models/acquisition")
 
+const createAppError = require("../../../utils/errors")
+
 const unacquireOne = async (req, res) => {
-  try {
-    const { userID } = req
-    const { agentId } = req.params
-
-    await Acquisition.deleteOne({ user: userID, item: agentId })
-
-    return res.status(200).json({ message: "Agente removido da sua coleção." })
-  } catch (error) {
-    console.error(`[UNACQUIRE_AGENT] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
-    const defaultError = { status: 500, message: "Ocorreu um erro interno no servidor." }
-    const { status, message } = defaultError
-    return res.status(status).json({ error: { code: error.message, message } })
-  }
+  const { userID } = req
+  const { agentId } = req.params
+  const result = await Acquisition.deleteOne({ user: userID, item: agentId })
+  if (result.deletedCount === 0) throw createAppError("Você não possui este agente para removê-lo.", 404, "ACQUISITION_NOT_FOUND")
+  return res.status(200).json({ message: "Agente removido da sua coleção." })
 }
 
 module.exports = unacquireOne

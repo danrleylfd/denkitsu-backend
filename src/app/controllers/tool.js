@@ -1,5 +1,7 @@
 const { Router } = require("express")
+
 const authMiddleware = require("../middlewares/auth")
+const asyncHandler = require("../middlewares/asyncHandler")
 const validate = require("../middlewares/validator")
 const {
   createToolRules,
@@ -19,19 +21,19 @@ const readPublished = require("../views/tool/readPublished")
 const acquireOne = require("../views/tool/acquireOne")
 const unacquireOne = require("../views/tool/unacquireOne")
 
-routes.post("/", createToolRules(), validate, createOne)
+routes.post("/", createToolRules(), validate, asyncHandler(createOne))
 
-routes.get("/", readMany)
+routes.get("/", asyncHandler(readMany))
 
-routes.put("/:toolId", updateToolRules(), validate, updateOne)
+routes.put("/:toolId", updateToolRules(), validate, asyncHandler(updateOne))
 
-routes.delete("/:toolId", toolIdInParams(), validate, deleteOne)
+routes.delete("/:toolId", toolIdInParams(), validate, asyncHandler(deleteOne))
 
-routes.post("/store/:toolId/acquire", acquireToolIdInParams(), validate, acquireOne)
+routes.post("/store/:toolId/acquire", acquireToolIdInParams(), validate, asyncHandler(acquireOne))
 
-routes.get("/store", readPublished)
+routes.get("/store", asyncHandler(readPublished))
 
-routes.delete("/store/:toolId/acquire", acquireToolIdInParams(), validate, unacquireOne)
+routes.delete("/store/:toolId/acquire", acquireToolIdInParams(), validate, asyncHandler(unacquireOne))
 
 const loadToolRoutes = (app) => app.use("/tools", routes)
 
