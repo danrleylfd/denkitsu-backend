@@ -1,5 +1,7 @@
-const { verify, JsonWebTokenError, TokenExpiredError } = require("jsonwebtoken")
+const { verify } = require("jsonwebtoken")
 const { generateToken, generateRefreshToken } = require("../../../utils/api/auth")
+
+const createAppError = require("../../../utils/errors")
 
 const refreshToken = async (req, res) => {
   try {
@@ -10,15 +12,8 @@ const refreshToken = async (req, res) => {
     const newToken = generateToken({ id: decoded.id })
     return res.status(200).json({ refreshToken: newRefreshToken, token: newToken })
   } catch (error) {
-    console.error(`[REFRESH_TOKEN] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
-    if (error instanceof JsonWebTokenError || error instanceof TokenExpiredError) {
-      return res.status(401).json({
-        error: { code: "REFRESH_TOKEN_INVALID", message: "O refresh token é inválido ou expirou." }
-      })
-    }
-    const defaultError = { status: 500, message: "Ocorreu um erro interno no servidor." }
-    const { status, message } = defaultError
-    return res.status(status).json({ error: { code: error.message, message } })
+    if (error.name === "JsonWebTokenError" || error.name === "TokenExpiredError") throw createAppError("O refresh token é inválido ou expirou.", 401, "REFRESH_TOKEN_INVALID")
+    throw error
   }
 }
 

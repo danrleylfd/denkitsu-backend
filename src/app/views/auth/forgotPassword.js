@@ -1,44 +1,31 @@
 const { renderFile } = require("ejs")
-
 const User = require("../../models/auth")
 const mailer = require("../../../utils/api/mail")
-
 const { generateOTPToken, generateOTPCode } = require("../../../utils/api/auth")
+const createAppError = require("../../../utils/errors")
 
 const forgotPassword = async (req, res) => {
-  try {
-    const { email } = req.body
-    const user = await User.findOne({ email })
-    if (user) {
-      const token = generateOTPCode() || generateOTPToken()
-      const now = new Date()
-      now.setMinutes(now.getMinutes() + 3)
-      user.passwordResetToken = token
-      user.passwordResetExpires = now
-      await user.save()
-      const html = await renderFile(`${__dirname}/../../../utils/templates/forgotPassword.ejs`, {
-        username: user.name,
-        token
+  const { email } = req.body
+  const user = await User.findOne({ email })
+  if (user) {
+    const token = generateOTPCode() || generateOTPToken()
+    const now = new Date()
+    now.setMinutes(now.getMinutes() + 3)
+    user.passwordResetToken = token
+    user.passwordResetExpires = now
+    await user.save()
+    const html = await renderFile(`${__dirname}/../../../utils/templates/forgotPassword.ejs`, {
+      username: user.name,
+      token
+    })
+    await new Promise((resolve, reject) => {
+      mailer.sendMail({ to: email, subject: "Token de recuperação", html }, (err, info) => {
+        if (err) return reject(createAppError("Não foi possível enviar o e-mail de recuperação.", 502, "MAIL_SEND_FAILURE"))
+        resolve(info)
       })
-      mailer.sendMail({ to: email, subject: "Token de recuperação", html }, (err) => {
-        if (err) {
-          console.error(`[MAIL_ERROR] ${new Date().toISOString()} -`, { error: err.message, stack: err.stack })
-          throw new Error("MAIL_ERROR")
-        }
-      })
-    }
-    return res.status(200).send()
-  } catch (error) {
-    if (error.message !== "MAIL_ERROR") {
-      console.error(`[FORGOT_PASSWORD] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
-    }
-    const defaultError = { status: 500, message: "Ocorreu um erro interno no servidor." }
-    const errorMessages = {
-      MAIL_ERROR: { status: 500, message: "Não foi possível enviar o e-mail de recuperação. Tente novamente mais tarde." }
-    }
-    const { status, message } = errorMessages[error.message] || defaultError
-    return res.status(status).json({ error: { code: error.message, message } })
+    })
   }
+  return res.status(200).json({ message: "Se um usuário com este e-mail existir, um token de recuperação foi enviado." })
 }
 
 module.exports = forgotPassword
