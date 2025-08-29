@@ -15,6 +15,7 @@ const generateOne = require("../views/news/generateOne")
 const readOneBySource = require("../views/news/readOneBySource")
 const readMany = require("../views/news/readMany")
 const readManyPaginate = require("../views/news/readManyPaginate")
+const readManyCursor = require("../views/news/readManyCursor")
 
 routes.post("/", createNewsRules(), validate, createOne)
 
@@ -23,6 +24,8 @@ routes.post("/generate", generateNewsRules(), validate, generateOne)
 routes.get("/", readMany)
 
 routes.get("/pages", paginateRules(), validate, readManyPaginate)
+
+routes.get("/cursor", cursorRules(), validate, readManyCursor)
 
 routes.get("/:source", sourceInParamsRules(), validate, readOneBySource)
 

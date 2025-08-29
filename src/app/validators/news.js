@@ -43,6 +43,20 @@ const paginateRules = () => {
   ]
 }
 
+const cursorRules = () => {
+  return [
+    query("cursor")
+      .optional()
+      .isMongoId()
+      .withMessage("O cursor fornecido é um ID inválido."),
+    query("limit")
+      .optional()
+      .isInt({ min: 1, max: 50 })
+      .withMessage("O limite deve ser um número inteiro entre 1 e 50.")
+      .toInt()
+  ]
+}
+
 const sourceInParamsRules = () => {
   return [
     param("source")
@@ -55,5 +69,6 @@ module.exports = {
   createNewsRules,
   generateNewsRules,
   paginateRules,
+  cursorRules,
   sourceInParamsRules,
 }
