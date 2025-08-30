@@ -7,6 +7,7 @@ module.exports = cors({
       process.env.HOST1,
       process.env.HOST2,
       process.env.HOST3,
+      process.env.HOST4,
     ]
     if (!origin || allowedOrigins.includes(origin)) callback(null, true)
     else callback(new Error("Not allowed by CORS"))
