@@ -7,17 +7,17 @@ const {
   processStreamAndExtractReasoning
 } = require("./chatHelpers")
 
-const sendWithStream = async (req, res) => {
+const sendWithStream = async (req, res, next) => {
   try {
     const { aiProvider, model, messages: userPrompts, aiKey, use_tools = [], mode } = req.body
     const { userID } = req
+    res.setHeader("Content-Type", "text/event-stream")
+    res.setHeader("Cache-Control", "no-cache")
+    res.setHeader("Connection", "keep-alive")
     const systemPrompt = await getSystemPrompt(mode, userID)
     let messages = [systemPrompt, ...userPrompts]
     const toolOptions = await buildToolOptions(aiProvider, use_tools, userID, mode)
     const requestOptions = { model, stream: true, ...toolOptions }
-    res.setHeader("Content-Type", "text/event-stream")
-    res.setHeader("Cache-Control", "no-cache")
-    res.setHeader("Connection", "keep-alive")
     const streamResponse = await ask(aiProvider, aiKey, messages, requestOptions)
     let aggregatedToolCalls = []
     let hasToolCall = false
@@ -61,16 +61,14 @@ const sendWithStream = async (req, res) => {
       if (resultData.action === "SWITCH_AGENT" && resultData.agent) {
         const newAgentName = resultData.agent
         const newSystemPrompt = await getSystemPrompt(newAgentName, userID)
-        messages = [newSystemPrompt, ...userPrompts]
+        messages = [newSystemPrompt, ...userPrompts] // Reinicia o histórico com o novo prompt de sistema
         const switchNotification = {
           choices: [{ delta: { reasoning: `<think>Roteador selecionou o Agente ${newAgentName}. Trocando contexto e continuando o fluxo.</think>` } }]
         }
         res.write(`data: ${JSON.stringify(switchNotification)}\n\n`)
       }
     } else messages.push(...toolResultMessages)
-    if (initialReasoningSent) {
-      res.write(`data: ${JSON.stringify({ choices: [{ delta: { reasoning: "\n\n...\n\n" } }] })}\n\n`)
-    }
+    if (initialReasoningSent) res.write(`data: ${JSON.stringify({ choices: [{ delta: { reasoning: "\n\n...\n\n" } }] })}\n\n`)
     const secondCallOptions = { model, stream: true }
     const finalResponseStream = await ask(aiProvider, aiKey, sanitizeMessages(messages), secondCallOptions)
     const finalProcessedStream = processStreamAndExtractReasoning(finalResponseStream)
@@ -79,15 +77,9 @@ const sendWithStream = async (req, res) => {
     }
     return res.end()
   } catch (error) {
-    console.error(`[SEND_MESSAGE_STREAM] ${new Date().toISOString()} -`, {
-      error: error.message,
-      stack: error.stack,
-      aiProvider: req.body.aiProvider,
-      model: req.body.model
-    })
-    if (!res.headersSent) {
-      res.status(500).json({ error: { code: "STREAM_ERROR", message: "Ocorreu um erro interno no servidor durante o streaming." } })
-    } else {
+    next(error)
+    if (res.headersSent) {
+      console.error(`[STREAM_ERROR] Erro durante o streaming, encerrando conexão: ${error.message}`)
       res.end()
     }
   }

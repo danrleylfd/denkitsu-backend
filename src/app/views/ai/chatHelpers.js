@@ -112,59 +112,69 @@ const executeToolCall = async (toolCall, allUserCustomTools) => {
   try {
     functionArgs = JSON.parse(toolCall.function.arguments)
   } catch (e) {
-    console.error(`[TOOL_ARG_PARSE_ERROR] Failed to parse arguments for tool ${functionName}. Raw args:`, toolCall.function.arguments)
+    console.error(`[TOOL_ARG_PARSE_ERROR] Ferramenta: ${functionName}. Args:`, toolCall.function.arguments)
     return {
       tool_call_id: toolCall.id,
       role: "tool",
       name: functionName,
-      content: JSON.stringify({ error: "Invalid arguments provided. Could not parse JSON.", raw_arguments: toolCall.function.arguments })
+      content: JSON.stringify({ error: `Argumentos inválidos fornecidos em formato JSON não-processável. Raw: ${toolCall.function.arguments}` })
     }
   }
-  let functionResponseContent
-  const customTool = allUserCustomTools.find(t => t.name === functionName)
-  if (customTool) {
-    console.log(`[CUSTOM TOOL CALL] Executing: ${functionName}(${JSON.stringify(functionArgs)})`)
-    let { url, queryParams, headers, body } = customTool.httpConfig
-    const replacePlaceholders = (template) => {
-      if (!template) return template
-      let processed = JSON.stringify(template)
-      Object.keys(functionArgs).forEach(key => {
-        const regex = new RegExp(`{{${key}}}`, "g")
-        processed = processed.replace(regex, functionArgs[key])
-      })
-      return JSON.parse(processed)
-    }
-    let finalUrl = new URL(replacePlaceholders(url))
-    if (queryParams) {
-      const processedQueryParams = replacePlaceholders(queryParams)
-      const searchParams = new URLSearchParams(finalUrl.search)
-      for (const key in processedQueryParams) {
-        searchParams.set(key, processedQueryParams[key])
+  try {
+    let functionResponseContent
+    const customTool = allUserCustomTools.find(t => t.name === functionName)
+    if (customTool) {
+      console.log(`[CUSTOM TOOL CALL] Executing: ${functionName}(${JSON.stringify(functionArgs)})`)
+      let { url, queryParams, headers, body } = customTool.httpConfig
+      const replacePlaceholders = (template) => {
+        if (!template) return template
+        let processed = JSON.stringify(template)
+        Object.keys(functionArgs).forEach(key => {
+          const regex = new RegExp(`{{${key}}}`, "g")
+          processed = processed.replace(regex, functionArgs[key])
+        })
+        return JSON.parse(processed)
       }
-      finalUrl.search = searchParams.toString()
+      let finalUrl = new URL(replacePlaceholders(url))
+      if (queryParams) {
+        const processedQueryParams = replacePlaceholders(queryParams)
+        const searchParams = new URLSearchParams(finalUrl.search)
+        for (const key in processedQueryParams) {
+          searchParams.set(key, processedQueryParams[key])
+        }
+        finalUrl.search = searchParams.toString()
+      }
+      const httpConfig = {
+        method: customTool.httpConfig.method,
+        url: finalUrl.toString(),
+        headers: replacePlaceholders(headers),
+        body: replacePlaceholders(body)
+      }
+      const functionResponse = await availableTools.httpTool(httpConfig)
+      functionResponseContent = JSON.stringify(functionResponse.data)
+    } else if (availableTools[functionName]) {
+      console.log(`[TOOL CALL] Executing: ${functionName}(${JSON.stringify(functionArgs)})`)
+      const functionToCall = availableTools[functionName]
+      const functionResponse = await functionToCall(...Object.values(functionArgs))
+      functionResponseContent = JSON.stringify(functionResponse.data)
+    } else {
+      console.warn(`[TOOL WARNING] Function ${functionName} not found.`)
+      throw createAppError(`A ferramenta "${functionName}" não foi encontrada ou não está ativa.`, 404, "TOOL_NOT_FOUND")
     }
-    const httpConfig = {
-      method: customTool.httpConfig.method,
-      url: finalUrl.toString(),
-      headers: replacePlaceholders(headers),
-      body: replacePlaceholders(body)
+    return {
+      tool_call_id: toolCall.id,
+      role: "tool",
+      name: functionName,
+      content: functionResponseContent
     }
-    const functionResponse = await availableTools.httpTool(httpConfig)
-    functionResponseContent = JSON.stringify(functionResponse.data)
-  } else if (availableTools[functionName]) {
-    console.log(`[TOOL CALL] Executing: ${functionName}(${JSON.stringify(functionArgs)})`)
-    const functionToCall = availableTools[functionName]
-    const functionResponse = await functionToCall(...Object.values(functionArgs))
-    functionResponseContent = JSON.stringify(functionResponse.data)
-  } else {
-    console.warn(`[TOOL WARNING] Function ${functionName} not found.`)
-    functionResponseContent = JSON.stringify({ error: `A ferramenta "${functionName}" não foi encontrada ou não está ativa.` })
-  }
-  return {
-    tool_call_id: toolCall.id,
-    role: "tool",
-    name: functionName,
-    content: functionResponseContent
+  } catch (error) {
+    console.error(`[TOOL_EXECUTION_ERROR] Ferramenta: ${functionName}. Erro:`, error.message)
+    return {
+      tool_call_id: toolCall.id,
+      role: "tool",
+      name: functionName,
+      content: JSON.stringify({ error: `A ferramenta '${functionName}' falhou durante a execução. Motivo: ${error.message}` })
+    }
   }
 }
 
