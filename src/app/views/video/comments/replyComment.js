@@ -1,26 +1,22 @@
 const Comment = require("../../../models/comment")
+const createAppError = require("../../../../utils/errors")
 
 const replyComment = async (req, res) => {
-  try {
-    const { userID } = req
-    const { comment: commentID } = req.params
-    const { content } = req.body
-    const comment = await Comment.findById(commentID)
-    if (comment.parent) throw new Error("IMPOSSIBLE_REPLY")
-    const reply = await Comment.create({ content, user: userID, parent: commentID })
-    comment.replies.push(reply._id)
-    await comment.save()
-    const populatedReply = await reply.populate("user")
-    return res.status(201).json(populatedReply)
-  } catch (error) {
-    console.error(`[REPLY_COMMENT] ${new Date().toISOString()} -`, { error: error.message, stack: error.stack })
-    const defaultError = { status: 500, message: "Ocorreu um erro interno no servidor." }
-    const errorMessages = {
-      IMPOSSIBLE_REPLY: { status: 400, message: "Não é possível responder a uma resposta de outro comentário." }
-    }
-    const { status, message } = errorMessages[error.message] || defaultError
-    return res.status(status).json({ error: { code: error.message, message } })
-  }
+  const { userID } = req
+  const { comment: commentID } = req.params
+  const { content } = req.body
+  const parentComment = await Comment.findById(commentID)
+  if (parentComment.parent) throw createAppError("Não é possível responder a uma resposta de outro comentário.", 400, "CANNOT_REPLY_TO_REPLY")
+  const reply = await Comment.create({
+    content: content.trim(),
+    user: userID,
+    parent: commentID,
+    video: parentComment.video
+  })
+  parentComment.replies.push(reply._id)
+  await parentComment.save()
+  const populatedReply = await reply.populate("user")
+  return res.status(201).json(populatedReply)
 }
 
 module.exports = replyComment
