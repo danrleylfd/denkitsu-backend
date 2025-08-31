@@ -1,38 +1,106 @@
-const { createAIProvider } = require("../helpers/aiProviderFactory")
+const OpenAI = require("openai")
 
-const getModels = async (providerName, apiKey = null, customConfig = null) => {
-  try {
-    const { client, defaultModel } = createAIProvider(providerName, apiKey, customConfig)
-    const response = await client.models.list()
-    return response.data.map(model => ({
-      id: model.id,
-      name: model.id.split('/').pop() || model.id,
-      provider: providerName,
-      supports_tools: model.id.includes("tool") || false,
-      supports_images: model.id.includes("vision") || false,
-      supports_files: false
-    }))
-  } catch (error) {
-    console.error(`Erro ao obter modelos do provedor ${providerName}:`, error.message)
-    throw new Error(`Falha ao buscar modelos do provedor ${providerName}. Verifique suas configurações.`)
+const providerConfig = {
+  groq: {
+    apiUrl: process.env.GROQ_API_URL,
+    apiKey: process.env.GROQ_API_KEY,
+    defaultModel: "openai/gpt-oss-120b"
+  },
+  openrouter: {
+    apiUrl: process.env.OPENROUTER_API_URL,
+    apiKey: process.env.OPENROUTER_API_KEY,
+    defaultModel: "deepseek/deepseek-r1-0528:free"
   }
 }
 
-const ask = async (providerName, apiKey, prompts, options = {}) => {
+const ask = async (aiProvider, aiKey, prompts, options = {}) => {
+  const config = providerConfig[aiProvider]
+  if (!config) throw new Error(`Provedor de aiProvider inválido ou não configurado: ${aiProvider}`)
+  const apiKey = aiKey || config.apiKey
+  if (!apiKey) throw new Error(`API key para ${aiProvider} não encontrada`)
+  const openai = new OpenAI({ apiKey, baseURL: config.apiUrl })
+  const { model, stream, ...props } = options
+  const finalModel = model || config.defaultModel
+  const timestampsMsg = { role: "system", content: `O sistema informa a data atual em formato ISO: ${new Date().toISOString()}, converta para horário de Brasília conforme necessidade do usuário, não mostre se o usuário não solicitar, use como referência temporal quando o usuário mencionar alguma data ou quando alguma tool fornecer uma data.`}
   try {
-    const { client, defaultModel } = createAIProvider(providerName, apiKey)
-    const model = options.model || defaultModel
-    const completion = await client.chat.completions.create({
-      model,
-      messages: prompts,
-      stream: options.stream,
-      ...options
+    if (stream) {
+      const streamResponse = await openai.chat.completions.create({
+        model: finalModel,
+        messages: [timestampsMsg, ...prompts],
+        stream: true,
+        ...props
+      })
+      return streamResponse
+    }
+    const response = await openai.chat.completions.create({
+      model: finalModel,
+      messages: [timestampsMsg, ...prompts],
+      stream: false,
+      ...props
     })
-    return completion
+    return { status: 200, data: response }
   } catch (error) {
-    console.error(`Erro na requisição para ${providerName}:`, error.message)
-    throw error
+    console.error(`Erro ao chamar a API ${aiProvider}:`, {
+      message: error.message,
+      status: error.status,
+      type: error.type,
+      stack: error.stack
+    })
+    if (error instanceof OpenAI.AuthenticationError) {
+      throw new Error("AUTHENTICATION_FAILED")
+    } else if (error instanceof OpenAI.RateLimitError) {
+      throw new Error("RATE_LIMIT_EXCEEDED")
+    } else if (error instanceof OpenAI.APIError) {
+      throw new Error("API_REQUEST_FAILED")
+    } else {
+      throw new Error("API_UNEXPECTED_ERROR")
+    }
   }
+}
+
+const checkToolCompatibility = (model) => {
+  if (model.supported_parameters && Array.isArray(model.supported_parameters)) {
+    const params = new Set(model.supported_parameters)
+    return params.has("tools") && params.has("tool_choice")
+  }
+  return false
+}
+
+const checkImageCompatibility = (model) => {
+  if (model.architecture?.input_modalities && Array.isArray(model.architecture.input_modalities)) {
+    return model.architecture.input_modalities.includes("image")
+  }
+  return false
+}
+
+const checkFileCompatibility = (model) => {
+  if (model.architecture?.input_modalities && Array.isArray(model.architecture.input_modalities)) {
+    return model.architecture.input_modalities.includes("file")
+  }
+  return false
+}
+
+const getModels = async () => {
+  const models = []
+  for (const [provider, config] of Object.entries(providerConfig)) {
+    const apiKey = config.apiKey
+    if (!apiKey) continue
+    const openai = new OpenAI({ apiKey, baseURL: config.apiUrl })
+    try {
+      const response = await openai.models.list()
+      const providerModels = response.data.map((model) => ({
+        id: model.id,
+        supports_tools: provider === "groq" ? true : checkToolCompatibility(model),
+        supports_images: checkImageCompatibility(model),
+        supports_files: checkFileCompatibility(model),
+        aiProvider: provider
+      }))
+      models.push(...providerModels)
+    } catch (error) {
+      console.error(`Erro ao obter modelos de ${provider}:`, error)
+    }
+  }
+  return models
 }
 
 module.exports = { ask, getModels }
