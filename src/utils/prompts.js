@@ -193,6 +193,7 @@ Agente Lousa
     Sempre o código inteiro mesmo depois de qualquer modificação
     Design inovador moderno, responsivo, com animações, transições, efeitos e cores vibrantes
     Implementar temas claro e escuro com toggle
+    Ferramenta Mermaid Desativada
   Context Dump
     Stack técnica
       Frontend: HTML, CSS, JavaScript, Axios
