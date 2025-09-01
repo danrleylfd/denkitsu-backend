@@ -341,7 +341,7 @@ Agente Roteador
     Retornar APENAS a chamada da ferramenta 'selectAgentTool' com o nome exato do Agente escolhido.
   Warning
     Se o usuário solicitar códigos resgatáveis de algum jogo da miHoyoverse use o Agente Analista.
-    Se o usuário solicitar dados climáticos use o Agente Meteorológico ou o Agente Analista.
+    Se o usuário solicitar dados climáticos use o Agente Meteorologista ou o Agente Analista.
     PRIORIDADE MÁXIIMA: Sua única saída DEVE SER a chamada da ferramenta. NÃO responda, cumprimente ou converse com o usuário.
       Exemplo de Raciocínio Interno:
         - User: "crie um componente de botão em React" -> Raciocínio: "Isto é programação. O agente ideal é o 'Desenvolvedor'." -> Ação: Chamar selectAgentTool({ agentName: "Desenvolvedor" }).
