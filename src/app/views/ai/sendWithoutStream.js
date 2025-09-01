@@ -9,12 +9,12 @@ const {
 } = require("./chatHelpers")
 
 const sendWithoutStream = async (req, res) => {
-  const { aiProvider, model, messages: userPrompts, aiKey, use_tools = [], mode } = req.body
+  const { aiProvider, model, messages: userPrompts, aiKey, use_tools = [], mode, customApiUrl } = req.body
   const { userID } = req
   const systemPrompt = await getSystemPrompt(mode, userID)
   let messages = [systemPrompt, ...userPrompts]
   const toolOptions = await buildToolOptions(aiProvider, use_tools, userID, mode)
-  const requestOptions = { model, stream: false, ...toolOptions }
+  const requestOptions = { model, stream: false, customApiUrl, ...toolOptions }
   const { data } = await ask(aiProvider, aiKey, messages, requestOptions)
   let responseMessage = data.choices[0].message
   responseMessage.content = cleanToolCallSyntax(responseMessage.content)
@@ -31,7 +31,7 @@ const sendWithoutStream = async (req, res) => {
     messages.push(responseMessage)
     const toolResultMessages = await processToolCalls(responseMessage.tool_calls, userID)
     messages.push(...toolResultMessages)
-    const finalResponse = await ask(aiProvider, aiKey, sanitizeMessages(messages), { model, stream: false })
+    const finalResponse = await ask(aiProvider, aiKey, sanitizeMessages(messages), { model, stream: false, customApiUrl })
     const finalMessage = finalResponse.data.choices[0].message
     finalMessage.content = cleanToolCallSyntax(finalMessage.content)
     const { content, reasoning: finalExtractedReasoning } = extractReasoning(finalMessage.content)

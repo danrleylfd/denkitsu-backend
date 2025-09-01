@@ -9,7 +9,7 @@ const {
 
 const sendWithStream = async (req, res, next) => {
   try {
-    const { aiProvider, model, messages: userPrompts, aiKey, use_tools = [], mode } = req.body
+    const { aiProvider, model, messages: userPrompts, aiKey, use_tools = [], mode, customApiUrl } = req.body
     const { userID } = req
     res.setHeader("Content-Type", "text/event-stream")
     res.setHeader("Cache-Control", "no-cache")
@@ -17,7 +17,7 @@ const sendWithStream = async (req, res, next) => {
     const systemPrompt = await getSystemPrompt(mode, userID)
     let messages = [systemPrompt, ...userPrompts]
     const toolOptions = await buildToolOptions(aiProvider, use_tools, userID, mode)
-    const requestOptions = { model, stream: true, ...toolOptions }
+    const requestOptions = { model, stream: true, customApiUrl, ...toolOptions }
     const streamResponse = await ask(aiProvider, aiKey, messages, requestOptions)
     let aggregatedToolCalls = []
     let hasToolCall = false
@@ -61,7 +61,7 @@ const sendWithStream = async (req, res, next) => {
       if (resultData.action === "SWITCH_AGENT" && resultData.agent) {
         const newAgentName = resultData.agent
         const newSystemPrompt = await getSystemPrompt(newAgentName, userID)
-        messages = [newSystemPrompt, ...userPrompts] // Reinicia o histórico com o novo prompt de sistema
+        messages = [newSystemPrompt, ...userPrompts]
         const switchNotification = {
           choices: [{ delta: { reasoning: `<think>Roteador selecionou o Agente ${newAgentName}. Trocando contexto e continuando o fluxo.</think>` } }]
         }
@@ -69,7 +69,7 @@ const sendWithStream = async (req, res, next) => {
       }
     } else messages.push(...toolResultMessages)
     if (initialReasoningSent) res.write(`data: ${JSON.stringify({ choices: [{ delta: { reasoning: "\n\n...\n\n" } }] })}\n\n`)
-    const secondCallOptions = { model, stream: true }
+    const secondCallOptions = { model, stream: true, customApiUrl }
     const finalResponseStream = await ask(aiProvider, aiKey, sanitizeMessages(messages), secondCallOptions)
     const finalProcessedStream = processStreamAndExtractReasoning(finalResponseStream)
     for await (const finalChunk of finalProcessedStream) {

@@ -13,14 +13,21 @@ const providerConfig = {
   }
 }
 
+const createAIClientFactory = (provider, apiKey, customApiUrl) => {
+  const config = providerConfig[provider]
+  const finalApiUrl = customApiUrl || config?.apiUrl
+  if (!finalApiUrl) throw new Error(`Provedor de IA inválido ou URL não configurada: ${provider}`)
+  const finalApiKey = apiKey || config?.apiKey
+  if (!finalApiKey) throw new Error(`API key para ${provider} não encontrada`)
+  return new OpenAI({ apiKey: finalApiKey, baseURL: finalApiUrl })
+}
+
 const ask = async (aiProvider, aiKey, prompts, options = {}) => {
+  const { customApiUrl, ...restOptions } = options
+  const openai = createAIClientFactory(aiProvider, aiKey, customApiUrl)
+  const { model, stream, ...props } = restOptions
   const config = providerConfig[aiProvider]
-  if (!config) throw new Error(`Provedor de aiProvider inválido ou não configurado: ${aiProvider}`)
-  const apiKey = aiKey || config.apiKey
-  if (!apiKey) throw new Error(`API key para ${aiProvider} não encontrada`)
-  const openai = new OpenAI({ apiKey, baseURL: config.apiUrl })
-  const { model, stream, ...props } = options
-  const finalModel = model || config.defaultModel
+  const finalModel = model || config?.defaultModel
   const timestampsMsg = { role: "system", content: `O sistema informa a data atual em formato ISO: ${new Date().toISOString()}, converta para horário de Brasília conforme necessidade do usuário, não mostre se o usuário não solicitar, use como referência temporal quando o usuário mencionar alguma data ou quando alguma tool fornecer uma data.`}
   try {
     if (stream) {
@@ -46,15 +53,10 @@ const ask = async (aiProvider, aiKey, prompts, options = {}) => {
       type: error.type,
       stack: error.stack
     })
-    if (error instanceof OpenAI.AuthenticationError) {
-      throw new Error("AUTHENTICATION_FAILED")
-    } else if (error instanceof OpenAI.RateLimitError) {
-      throw new Error("RATE_LIMIT_EXCEEDED")
-    } else if (error instanceof OpenAI.APIError) {
-      throw new Error("API_REQUEST_FAILED")
-    } else {
-      throw new Error("API_UNEXPECTED_ERROR")
-    }
+    if (error instanceof OpenAI.AuthenticationError) throw new Error("AUTHENTICATION_FAILED")
+    else if (error instanceof OpenAI.RateLimitError) throw new Error("RATE_LIMIT_EXCEEDED")
+    else if (error instanceof OpenAI.APIError) throw new Error("API_REQUEST_FAILED")
+    else throw new Error("API_UNEXPECTED_ERROR")
   }
 }
 
