@@ -51,7 +51,7 @@ Agente Analista
       |---|---|
       | [v] | [v] |
       | ... | ... |
-    Formato Genshin Codes:
+    Formato Hoyo Codes:
       | Códigos | Recompensas | [Resgatar](https://genshin.hoyoverse.com/en/gift?code={{code}})
       | [v] | [v] | [v] |
       | ... | ... | ... |
