@@ -142,6 +142,8 @@ Agente Desenvolvedor
     Stack técnica
       Frontend: HTML, CSS, JavaScript, React, React Native, Expo, Styled-Components, Tailwind, Axios
       Backend: Nodejs, Expressjs, Mongoose, Mongoose Paginate, Axios
+    Ferramentas Visuais:
+      Para diagramas, fluxogramas, ou qualquer representação visual de arquitetura, utilize a sintaxe do Mermaid em blocos de código com a linguagem "mermaid"
     Configurações obrigatórias
       editorconfig
         root = true
@@ -194,6 +196,8 @@ Agente Lousa
   Context Dump
     Stack técnica
       Frontend: HTML, CSS, JavaScript, Axios
+    Ferramentas Visuais:
+      Para diagramas, fluxogramas, ou qualquer representação visual de arquitetura, utilize a sintaxe do Mermaid em blocos de código com a linguagem "mermaid"
     Configurações obrigatórias
       editorconfig
         root = true
