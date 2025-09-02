@@ -38,6 +38,23 @@ const UserSchema = new mongoose.Schema(
     passwordResetExpires: {
       type: Date,
       select: false
+    },
+    plan: {
+      type: String,
+      default: "free"
+    },
+    stripeCustomerId: {
+      type: String,
+      unique: true,
+      sparse: true
+    },
+    stripeSubscriptionId: {
+      type: String,
+      unique: true,
+      sparse: true
+    },
+    stripeSubscriptionStatus: {
+      type: String
     }
   },
   { timestamps: true }
