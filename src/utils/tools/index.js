@@ -24,6 +24,8 @@ const genshinService = require("../api/genshin")
 const hoyoCodesService = require("../api/hoyoCodes")
 const pokedexService = require("../api/pokedex")
 
+const adminService = require("../api/admin")
+
 const availableTools = {
   selectAgentTool: agentService.selectAgent,
 
@@ -50,6 +52,9 @@ const availableTools = {
   genshinTool: genshinService.getPlayerBuild,
   hoyoCodesTool: hoyoCodesService.getHoyoCodes,
   pokedexTool: pokedexService.getPokemonDetails,
+
+  manageSubscriptionTool: adminService.manageSubscription,
+  checkAndSyncSubscriptionTool: adminService.checkAndSyncSubscription,
 }
 
 const tools = [
@@ -79,6 +84,9 @@ const tools = [
   genshinService.genshinTool,
   hoyoCodesService.hoyoCodesTool,
   pokedexService.pokedexTool,
+
+  adminService.manageSubscriptionTool,
+  adminService.checkAndSyncSubscriptionTool,
 ]
 
 module.exports = { availableTools, tools }

@@ -30,7 +30,8 @@ const stripeWebhook = async (req, res) => {
         {
           stripeSubscriptionId: subscriptionId,
           stripeSubscriptionStatus: "active",
-          plan: "pro"
+          plan: "pro",
+          subscriptionStartDate: new Date(subscription.created * 1000)
         }
       )
       break

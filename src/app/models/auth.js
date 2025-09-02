@@ -55,6 +55,9 @@ const UserSchema = new mongoose.Schema(
     },
     stripeSubscriptionStatus: {
       type: String
+    },
+    subscriptionStartDate: {
+      type: Date
     }
   },
   { timestamps: true }
