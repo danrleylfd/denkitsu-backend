@@ -4,8 +4,12 @@ const requestIp = require("request-ip")
 const cors = require("./app/middlewares/cors")
 const { globalLimiter, authLimiter } = require("./app/middlewares/rateLimiter")
 const errorHandler = require("./app/middlewares/errorHandler")
+const asyncHandler = require("./app/middlewares/asyncHandler")
+const { stripeWebhook } = require("./app/controllers/stripe")
 
 const app = express()
+
+app.post("/stripe/webhook", express.raw({ type: "application/json" }), asyncHandler(stripeWebhook))
 
 app.use(cors)
 app.use(express.json())
