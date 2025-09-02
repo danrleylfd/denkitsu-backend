@@ -33,8 +33,8 @@ const createCheckoutSession = async (req, res) => {
 }
 
 const createCustomerPortal = async (req, res) => {
-  const { userID } = req
-  const user = await User.findById(userID)
+  const { user } = req
+  console.log(user)
   if (!user.stripeCustomerId) return res.status(400).json({ error: "Usuário não possui assinatura." })
   const portalSession = await stripe.billingPortal.sessions.create({
     customer: user.stripeCustomerId,
