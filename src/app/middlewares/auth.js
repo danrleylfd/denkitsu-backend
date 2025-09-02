@@ -23,7 +23,7 @@ const authMiddleware = async (req, res, next) => {
     const decoded = verify(token, process.env.JWT_SECRET)
     if (!decoded) throw new Error("TOKEN_INVALID")
 
-    const user = await User.findById(decoded.id).select("_id")
+    const user = await User.findById(decoded.id)
     if (!user) throw new Error("USER_NOT_FOUND")
     req.user = user
     req.userID = user._id
