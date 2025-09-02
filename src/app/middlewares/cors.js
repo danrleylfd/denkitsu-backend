@@ -9,9 +9,7 @@ module.exports = cors({
       process.env.HOST3,
       process.env.HOST4,
     ]
-    console.log("Origem:", origin)
-    callback(null, true)
-    // if (!origin || allowedOrigins.includes(origin)) callback(null, true)
-    // else callback(new Error("Not allowed by CORS"))
+    if (!origin || allowedOrigins.includes(origin)) callback(null, true)
+    else callback(new Error("Not allowed by CORS"))
   }
 })
