@@ -5,7 +5,7 @@ const cors = require("./app/middlewares/cors")
 const { globalLimiter, authLimiter } = require("./app/middlewares/rateLimiter")
 const errorHandler = require("./app/middlewares/errorHandler")
 const asyncHandler = require("./app/middlewares/asyncHandler")
-const { stripeWebhook } = require("./app/controllers/stripe")
+const stripeWebhook = require("./app/views/stripe/webhook")
 
 const app = express()
 
