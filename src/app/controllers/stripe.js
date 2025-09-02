@@ -7,8 +7,23 @@ const asyncHandler = require("../middlewares/asyncHandler")
 
 const routes = Router()
 
+const createCustomerPortal = async (req, res) => {
+  const { user } = req
+  console.log(user)
+  if (!user.stripeCustomerId) return res.status(400).json({ error: "Usuário não possui assinatura." })
+  const portalSession = await stripe.billingPortal.sessions.create({
+    customer: user.stripeCustomerId,
+    return_url: `${process.env.HOST1}/subscription`,
+  })
+  return res.json({ url: portalSession.url })
+}
+
 const createCheckoutSession = async (req, res) => {
   const { userID, user } = req
+  if (user.plan === "pro" && user.stripeSubscriptionStatus === "active") {
+    console.log("Usuário já é Pro. Redirecionando para o portal do cliente.")
+    return createCustomerPortal(req, res)
+  }
   let customerId = user.stripeCustomerId
   if (!customerId) {
     const customer = await stripe.customers.create({
@@ -32,19 +47,8 @@ const createCheckoutSession = async (req, res) => {
   return res.json({ url: session.url })
 }
 
-const createCustomerPortal = async (req, res) => {
-  const { user } = req
-  console.log(user)
-  if (!user.stripeCustomerId) return res.status(400).json({ error: "Usuário não possui assinatura." })
-  const portalSession = await stripe.billingPortal.sessions.create({
-    customer: user.stripeCustomerId,
-    return_url: `${process.env.HOST1}/subscription`,
-  })
-  return res.json({ url: portalSession.url })
-}
-
-routes.post("/create-checkout-session", authMiddleware, asyncHandler(createCheckoutSession))
 routes.post("/create-customer-portal", authMiddleware, asyncHandler(createCustomerPortal))
+routes.post("/create-checkout-session", authMiddleware, asyncHandler(createCheckoutSession))
 
 const loadStripeRoutes = (app) => {
   app.use("/stripe", routes)
