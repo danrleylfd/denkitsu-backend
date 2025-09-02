@@ -9,17 +9,7 @@ module.exports = cors({
       process.env.HOST3,
       process.env.HOST4,
     ]
-    const referer = callback.req.headers.referer
-    let refererOrigin = null
-    if (referer) {
-      try {
-        refererOrigin = new URL(referer).origin
-      } catch (error) {
-        console.warn("Could not parse referer URL:", referer)
-      }
-    }
-    const requestOrigin = origin || refererOrigin
-    if (!requestOrigin || allowedOrigins.includes(requestOrigin)) callback(null, true)
-    else callback(new Error(`Not allowed by CORS. Origin: ${requestOrigin}`))
+    if (!origin || allowedOrigins.includes(origin)) callback(null, true)
+    else callback(new Error("Not allowed by CORS"))
   }
 })
