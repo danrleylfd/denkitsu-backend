@@ -50,8 +50,6 @@ const createCheckoutSession = async (req, res) => {
 routes.post("/create-customer-portal", authMiddleware, asyncHandler(createCustomerPortal))
 routes.post("/create-checkout-session", authMiddleware, asyncHandler(createCheckoutSession))
 
-const loadStripeRoutes = (app) => {
-  app.use("/stripe", routes)
-}
+const loadStripeRoutes = (app) => app.use("/stripe", routes)
 
 module.exports = loadStripeRoutes
