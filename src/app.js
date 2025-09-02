@@ -7,8 +7,6 @@ const errorHandler = require("./app/middlewares/errorHandler")
 
 const app = express()
 
-require("./app/controllers/stripe")(app)
-
 app.use(cors)
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
