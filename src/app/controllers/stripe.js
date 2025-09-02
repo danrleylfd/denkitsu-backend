@@ -11,7 +11,6 @@ const routes = Router()
 const createCheckoutSession = async (req, res) => {
   const { userID } = req
   const user = await User.findById(userID)
-
   let customerId = user.stripeCustomerId
   if (!customerId) {
     const customer = await stripe.customers.create({
@@ -22,7 +21,6 @@ const createCheckoutSession = async (req, res) => {
     customerId = customer.id
     await User.updateOne({ _id: userID }, { stripeCustomerId: customerId })
   }
-
   const idempotencyKey = uuidv4()
   const session = await stripe.checkout.sessions.create({
     customer: customerId,
@@ -33,7 +31,6 @@ const createCheckoutSession = async (req, res) => {
     cancel_url: `${process.env.HOST1}/subscription?payment_canceled=true`,
     metadata: { userId: userID.toString() }
   }, { idempotencyKey })
-
   return res.json({ url: session.url })
 }
 
