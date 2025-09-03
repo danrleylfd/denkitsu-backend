@@ -19,7 +19,7 @@ const manageSubscriptionTool = {
   type: "function",
   function: {
     name: "manageSubscriptionTool",
-    description: "Gerencia a assinatura de um usuário. A ação 'cancel' apenas cancela cobranças futuras. A ação 'refund' tenta reembolsar a última cobrança (se dentro da política de 7 dias) E também cancela a assinatura.",
+    description: "Gerencia a assinatura do usuário AUTENTICADO. A ação 'cancel' agenda o cancelamento para o fim do período. A ação 'refund' tenta reembolsar a última cobrança (se dentro da política de 7 dias) E também agenda o cancelamento.",
     parameters: {
       type: "object",
       properties: {
@@ -27,13 +27,9 @@ const manageSubscriptionTool = {
           type: "string",
           description: "A ação específica a ser executada: 'cancel' ou 'refund'.",
           enum: ["cancel", "refund"]
-        },
-        email: {
-          type: "string",
-          description: "O e-mail do usuário cuja assinatura deve ser gerenciada."
-        },
+        }
       },
-      required: ["action", "email"]
+      required: ["action"]
     }
   }
 }
@@ -57,16 +53,11 @@ const checkAndSyncSubscriptionTool = {
   type: "function",
   function: {
     name: "checkAndSyncSubscriptionTool",
-    description: "Verifica o status real da assinatura de um cliente no Stripe e força a sincronização com o banco de dados local para garantir que o plano de acesso esteja correto. Use esta ferramenta quando um usuário alega ter pago mas ainda está no plano free.",
+    description: "Verifica e sincroniza o status da assinatura do usuário AUTENTICADO com o provedor de pagamentos. Use quando um usuário alega ter pago mas ainda está no plano free.",
     parameters: {
       type: "object",
-      properties: {
-        email: {
-          type: "string",
-          description: "O e-mail do usuário que precisa ter a conta sincronizada."
-        }
-      },
-      required: ["email"]
+      properties: {},
+      required: []
     }
   }
 }

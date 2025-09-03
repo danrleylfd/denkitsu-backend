@@ -110,7 +110,7 @@ const buildToolOptions = async (aiProvider, use_tools = [], userId, mode) => {
   return toolOptions
 }
 
-const executeToolCall = async (toolCall, allUserCustomTools) => {
+const executeToolCall = async (toolCall, allUserCustomTools, userID) => {
   const functionName = toolCall.function.name
   let functionArgs
   try {
@@ -159,6 +159,15 @@ const executeToolCall = async (toolCall, allUserCustomTools) => {
     } else if (availableTools[functionName]) {
       console.log(`[TOOL CALL] Executing: ${functionName}(${JSON.stringify(functionArgs)})`)
       const functionToCall = availableTools[functionName]
+      if (functionName === "manageSubscriptionTool" || functionName === "checkAndSyncSubscriptionTool") {
+        const user = await User.findById(userId)
+        if (!user || !user.email) throw new Error("Usuário autenticado ou e-mail não encontrado para a execução da ferramenta de suporte.")
+        const functionResponse = await functionToCall(functionArgs.action, user.email)
+        functionResponseContent = JSON.stringify(functionResponse.data)
+      } else {
+        const functionResponse = await functionToCall(...Object.values(functionArgs))
+        functionResponseContent = JSON.stringify(functionResponse.data)
+      }
       const functionResponse = await functionToCall(...Object.values(functionArgs))
       functionResponseContent = JSON.stringify(functionResponse.data)
     } else {
@@ -182,9 +191,9 @@ const executeToolCall = async (toolCall, allUserCustomTools) => {
   }
 }
 
-const processToolCalls = async (toolCalls, userId) => {
-  const allUserCustomTools = await Tool.find({ user: userId })
-  const toolResultPromises = toolCalls.map(toolCall => executeToolCall(toolCall, allUserCustomTools))
+const processToolCalls = async (toolCalls, userID) => {
+  const allUserCustomTools = await Tool.find({ user: userID })
+  const toolResultPromises = toolCalls.map(toolCall => executeToolCall(toolCall, allUserCustomTools, userID))
   return Promise.all(toolResultPromises)
 }
 
