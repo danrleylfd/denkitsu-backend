@@ -168,8 +168,6 @@ const executeToolCall = async (toolCall, allUserCustomTools, user) => {
         const functionResponse = await functionToCall(...Object.values(functionArgs))
         functionResponseContent = JSON.stringify(functionResponse.data)
       }
-      const functionResponse = await functionToCall(...Object.values(functionArgs))
-      functionResponseContent = JSON.stringify(functionResponse.data)
     } else {
       console.warn(`[TOOL WARNING] Function ${functionName} not found.`)
       throw createAppError(`A ferramenta "${functionName}" não foi encontrada ou não está ativa.`, 404, "TOOL_NOT_FOUND")
