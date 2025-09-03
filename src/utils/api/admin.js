@@ -34,11 +34,11 @@ const manageSubscriptionTool = {
   }
 }
 
-const checkAndSyncSubscription = async (email) => {
+const checkAndSyncSubscription = async (_, user) => {
   try {
-    console.log(`[SUPPORT_TOOL] Verificando e sincronizando assinatura para ${email}`)
+    console.log(`[SUPPORT_TOOL] Verificando e sincronizando assinatura para ${user.name}`)
     const { data } = await api.post(`/admin/sync-subscription`,
-      { email },
+      { email: user.email },
       { headers: { "X-Internal-API-Key": process.env.INTERNAL_API_KEY } }
     )
     return { status: 200, data }
