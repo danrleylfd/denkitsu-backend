@@ -57,7 +57,8 @@ const UserSchema = new mongoose.Schema(
       type: String
     },
     subscriptionStartDate: {
-      type: Date
+      type: Date,
+      default: null
     }
   },
   { timestamps: true }
