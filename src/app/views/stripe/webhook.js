@@ -20,20 +20,19 @@ const stripeWebhook = async (req, res) => {
         console.error("Webhook de checkout sem userId nos metadados.")
         break
       }
-      const user = await User.findById(userId)
-      if (user && user.stripeSubscriptionId) {
-        console.log(`Webhook ${event.id} já processado para o usuário ${userId}. Ignorando.`)
-        break
-      }
+      const subscription = await stripe.subscriptions.retrieve(subscriptionId)
       await User.updateOne(
         { _id: userId },
         {
-          stripeSubscriptionId: subscriptionId,
-          stripeSubscriptionStatus: "active",
-          plan: "pro",
-          subscriptionStartDate: new Date(subscription.created * 1000)
+          $set: {
+            stripeSubscriptionId: subscription.id,
+            stripeSubscriptionStatus: subscription.status,
+            plan: "pro",
+            subscriptionStartDate: new Date(subscription.created * 1000)
+          }
         }
       )
+      console.log(`[STRIPE_WEBHOOK] Usuário ${userId} atualizado para o plano 'pro' com a nova assinatura ${subscription.id}`)
       break
     }
     case "customer.subscription.updated":
