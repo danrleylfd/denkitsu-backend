@@ -1,6 +1,6 @@
 const api = require("../../services/api")
 
-const manageSubscription = async ({ email, action }) => {
+const manageSubscription = async (email, action) => {
   try {
     console.log(`[ADMIN_TOOL] Executando ação '${action}' para o usuário ${email}`)
     const { data } = await api.post(`/admin/manage-subscription`,
@@ -38,7 +38,7 @@ const manageSubscriptionTool = {
   }
 }
 
-const checkAndSyncSubscription = async ({ email }) => {
+const checkAndSyncSubscription = async (email) => {
   try {
     console.log(`[SUPPORT_TOOL] Verificando e sincronizando assinatura para ${email}`)
     const { data } = await api.post(`/admin/sync-subscription`,
