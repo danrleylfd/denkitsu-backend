@@ -33,7 +33,7 @@ const manageSubscriptionTool = {
           description: "O e-mail do usuário cuja assinatura deve ser gerenciada."
         },
       },
-      required: ["email", "action"]
+      required: ["action", "email"]
     }
   }
 }
