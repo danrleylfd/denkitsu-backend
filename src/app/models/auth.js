@@ -51,10 +51,11 @@ const UserSchema = new mongoose.Schema(
     stripeSubscriptionId: {
       type: String,
       unique: true,
-      sparse: true
+      sparse: true,
     },
     stripeSubscriptionStatus: {
-      type: String
+      type: String,
+      default: null
     },
     subscriptionStartDate: {
       type: Date,
