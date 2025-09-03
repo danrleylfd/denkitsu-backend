@@ -26,8 +26,9 @@ const createCheckoutSession = async (req, res) => {
       console.log(`Usuário ${userID} está reativando a assinatura ${subscription.id}.`)
       await stripe.subscriptions.update(user.stripeSubscriptionId, { cancel_at_period_end: false })
       await User.updateOne({ _id: userID }, { $set: { stripeSubscriptionStatus: "active" } })
-      console.log("Assinatura reativada com sucesso. Redirecionando para o portal do cliente.")
-      return createCustomerPortal(req, res)
+      const updatedUser = await User.findById(userID)
+      console.log("Assinatura reativada. Enviando dados atualizados para o frontend.")
+      return res.status(200).json({ type: "reactivation", user: updatedUser })
     }
   }
   if (user.plan === "pro" && user.stripeSubscriptionStatus === "active") {
@@ -54,7 +55,7 @@ const createCheckoutSession = async (req, res) => {
     cancel_url: `${process.env.HOST1}/subscription?payment_canceled=true`,
     metadata: { userId: userID.toString() }
   }, { idempotencyKey })
-  return res.json({ url: session.url })
+  return res.json({ type: "checkout", url: session.url })
 }
 
 routes.post("/create-customer-portal", authMiddleware, asyncHandler(createCustomerPortal))
