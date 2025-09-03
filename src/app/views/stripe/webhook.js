@@ -28,7 +28,8 @@ const stripeWebhook = async (req, res) => {
             stripeSubscriptionId: subscription.id,
             stripeSubscriptionStatus: subscription.status,
             plan: "pro",
-            subscriptionStartDate: new Date(subscription.created * 1000)
+            subscriptionStartDate: new Date(subscription.created * 1000),
+            subscriptionCancelAtPeriodEnd: subscription.cancel_at_period_end
           }
         }
       )
@@ -45,7 +46,8 @@ const stripeWebhook = async (req, res) => {
         {
           $set: {
             stripeSubscriptionStatus: subscription.status,
-            plan: newPlan
+            plan: newPlan,
+            subscriptionCancelAtPeriodEnd: subscription.cancel_at_period_end
           }
         }
       )
@@ -58,7 +60,8 @@ const stripeWebhook = async (req, res) => {
         {
           $set: {
             stripeSubscriptionStatus: "deleted",
-            plan: "free"
+            plan: "free",
+            subscriptionCancelAtPeriodEnd: false,
           }
         }
       )

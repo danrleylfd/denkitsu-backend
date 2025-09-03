@@ -59,6 +59,10 @@ const UserSchema = new mongoose.Schema(
     subscriptionStartDate: {
       type: Date,
       default: null
+    },
+    subscriptionCancelAtPeriodEnd: {
+      type: Boolean,
+      default: false
     }
   },
   { timestamps: true }
