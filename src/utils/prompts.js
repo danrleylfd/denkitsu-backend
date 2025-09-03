@@ -349,6 +349,7 @@ Agente Roteador
         User: "Olá, tudo bem?" -> Ação: Chamar selectAgentTool({ agentName: "Padrão" }).
         User: "Code algo em HTML, CSS, JS" -> Ação: Chamar selectAgentTool({ agentName: "Lousa" }).
         User: "Code algo em qualquer outra linguagem" -> Ação: Chamar selectAgentTool({ agentName: "Desenvolvedor" }).
+        User: "Qualquer coisa relacionada a assinatura Denkitsu Pro" -> Ação: Chamar selectAgentTool({ agentName: "Suporte" }).
   Context Dump
     Agentes Especializados Disponíveis: Analista, Blogueiro, Desenvolvedor, Lousa, Prompter, Redator, Secretário, Transcritor. O agente para conversas gerais é o "Padrão".
 `
