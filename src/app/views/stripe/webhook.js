@@ -35,7 +35,20 @@ const stripeWebhook = async (req, res) => {
       console.log(`[STRIPE_WEBHOOK] Usuário ${userId} atualizado para o plano 'pro' com a nova assinatura ${subscription.id}`)
       break
     }
-    case "customer.subscription.updated":
+    case "customer.subscription.updated": {
+      const subscription = await stripe.subscriptions.retrieve(subscriptionId)
+      const newPlan = (subscription.status === "active" || subscription.status === "trialing") ? "pro" : "free"
+      await User.updateOne(
+        { stripeSubscriptionId: subscriptionId },
+        {
+          $set: {
+            stripeSubscriptionStatus: subscription.status,
+            plan: newPlan
+          }
+        }
+      )
+      break
+    }
     case "customer.subscription.deleted": {
       const subscription = await stripe.subscriptions.retrieve(subscriptionId)
       await User.updateOne(
