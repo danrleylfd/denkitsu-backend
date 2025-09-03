@@ -50,12 +50,13 @@ const stripeWebhook = async (req, res) => {
       break
     }
     case "customer.subscription.deleted": {
-      const subscription = await stripe.subscriptions.retrieve(subscriptionId)
       await User.updateOne(
         { stripeSubscriptionId: subscriptionId },
         {
-          stripeSubscriptionStatus: subscription.status,
-          plan: subscription.status === "active" ? "pro" : "free"
+          $set: {
+            stripeSubscriptionStatus: "deleted",
+            plan: "free"
+          }
         }
       )
       break
