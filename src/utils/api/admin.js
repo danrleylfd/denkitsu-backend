@@ -1,6 +1,6 @@
 const api = require("../../services/api")
 
-const manageSubscription = async (email, action) => {
+const manageSubscription = async (action, email) => {
   try {
     console.log(`[ADMIN_TOOL] Executando ação '${action}' para o usuário ${email}`)
     const { data } = await api.post(`/admin/manage-subscription`,
@@ -23,15 +23,15 @@ const manageSubscriptionTool = {
     parameters: {
       type: "object",
       properties: {
-        email: {
-          type: "string",
-          description: "O e-mail do usuário cuja assinatura deve ser gerenciada."
-        },
         action: {
           type: "string",
           description: "A ação específica a ser executada: 'cancel' ou 'refund'.",
           enum: ["cancel", "refund"]
-        }
+        },
+        email: {
+          type: "string",
+          description: "O e-mail do usuário cuja assinatura deve ser gerenciada."
+        },
       },
       required: ["email", "action"]
     }
