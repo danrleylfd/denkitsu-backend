@@ -10,7 +10,7 @@ const {
 
 const sendWithoutStream = async (req, res) => {
   const { aiProvider, model, messages: userPrompts, aiKey, use_tools = [], mode, customApiUrl } = req.body
-  const { userID } = req
+  const { userID, user } = req
   const systemPrompt = await getSystemPrompt(mode, userID)
   let messages = [systemPrompt, ...userPrompts]
   const toolOptions = await buildToolOptions(aiProvider, use_tools, userID, mode)
@@ -29,7 +29,7 @@ const sendWithoutStream = async (req, res) => {
     }
     const initialReasoning = responseMessage.reasoning || ""
     messages.push(responseMessage)
-    const toolResultMessages = await processToolCalls(responseMessage.tool_calls, userID)
+    const toolResultMessages = await processToolCalls(responseMessage.tool_calls, user)
     messages.push(...toolResultMessages)
     const finalResponse = await ask(aiProvider, aiKey, sanitizeMessages(messages), { model, stream: false, customApiUrl })
     const finalMessage = finalResponse.data.choices[0].message

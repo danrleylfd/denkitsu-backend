@@ -1,4 +1,5 @@
 const prompts = require("../../../utils/prompts")
+const User = require("../../models/auth")
 const Agent = require("../../models/agent")
 const Tool = require("../../models/tool")
 const Acquisition = require("../../models/acquisition")
@@ -61,11 +62,11 @@ const getRouterPrompt = async (userId) => {
   return dynamicRouterPrompt
 }
 
-const getSystemPrompt = async (mode, userId) => {
-  if (mode === "Roteador") return getRouterPrompt(userId)
+const getSystemPrompt = async (mode, userID) => {
+  if (mode === "Roteador") return getRouterPrompt(userID)
   let systemPrompt = prompts.find(p => p.role === "system" && p.content.trim().startsWith(`Agente ${mode}`))
   if (systemPrompt) return systemPrompt
-  const customAgent = await Agent.findOne({ user: userId, name: mode })
+  const customAgent = await Agent.findOne({ user: userID, name: mode })
   if (customAgent?.prompt) {
     const { goal, returnFormat, warning, contextDump } = customAgent.prompt
     return { role: "system", content: `Agente ${customAgent.name}\nGoal\n${goal}\nReturn Format\n${returnFormat}\nWarning\n${warning}\nContext Dump\n${contextDump}` }
@@ -110,7 +111,7 @@ const buildToolOptions = async (aiProvider, use_tools = [], userId, mode) => {
   return toolOptions
 }
 
-const executeToolCall = async (toolCall, allUserCustomTools, userID) => {
+const executeToolCall = async (toolCall, allUserCustomTools, user) => {
   const functionName = toolCall.function.name
   let functionArgs
   try {
@@ -160,7 +161,6 @@ const executeToolCall = async (toolCall, allUserCustomTools, userID) => {
       console.log(`[TOOL CALL] Executing: ${functionName}(${JSON.stringify(functionArgs)})`)
       const functionToCall = availableTools[functionName]
       if (functionName === "manageSubscriptionTool" || functionName === "checkAndSyncSubscriptionTool") {
-        const user = await User.findById(userId)
         if (!user || !user.email) throw new Error("Usuário autenticado ou e-mail não encontrado para a execução da ferramenta de suporte.")
         const functionResponse = await functionToCall(functionArgs.action, user.email)
         functionResponseContent = JSON.stringify(functionResponse.data)
@@ -191,9 +191,9 @@ const executeToolCall = async (toolCall, allUserCustomTools, userID) => {
   }
 }
 
-const processToolCalls = async (toolCalls, userID) => {
-  const allUserCustomTools = await Tool.find({ user: userID })
-  const toolResultPromises = toolCalls.map(toolCall => executeToolCall(toolCall, allUserCustomTools, userID))
+const processToolCalls = async (toolCalls, user) => {
+  const allUserCustomTools = await Tool.find({ user: user._id })
+  const toolResultPromises = toolCalls.map(toolCall => executeToolCall(toolCall, allUserCustomTools, user))
   return Promise.all(toolResultPromises)
 }
 

@@ -10,7 +10,7 @@ const {
 const sendWithStream = async (req, res, next) => {
   try {
     const { aiProvider, model, messages: userPrompts, aiKey, use_tools = [], mode, customApiUrl } = req.body
-    const { userID } = req
+    const { userID, user } = req
     res.setHeader("Content-Type", "text/event-stream")
     res.setHeader("Cache-Control", "no-cache")
     res.setHeader("Connection", "keep-alive")
@@ -54,7 +54,7 @@ const sendWithStream = async (req, res, next) => {
       }
       res.write(`data: ${JSON.stringify(statusUpdate)}\n\n`)
     }
-    const toolResultMessages = await processToolCalls(finalToolCalls, userID)
+    const toolResultMessages = await processToolCalls(finalToolCalls, user)
     const routerToolCallResult = toolResultMessages.find(r => r.name === "selectAgentTool")
     if (routerToolCallResult) {
       const resultData = JSON.parse(routerToolCallResult.content)

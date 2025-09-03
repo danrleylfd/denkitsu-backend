@@ -1,10 +1,10 @@
 const api = require("../../services/api")
 
-const manageSubscription = async (action, email) => {
+const manageSubscription = async (action, user) => {
   try {
-    console.log(`[ADMIN_TOOL] Executando ação '${action}' para o usuário ${email}`)
+    console.log(`[ADMIN_TOOL] Executando ação '${action}' para o usuário ${user.name}`)
     const { data } = await api.post(`/admin/manage-subscription`,
-      { email, action },
+      { email: user.email, action },
       { headers: { "X-Internal-API-Key": process.env.INTERNAL_API_KEY } }
     )
     return { status: 200, data }
