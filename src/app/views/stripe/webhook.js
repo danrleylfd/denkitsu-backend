@@ -37,6 +37,8 @@ const stripeWebhook = async (req, res) => {
     }
     case "customer.subscription.updated": {
       const subscription = await stripe.subscriptions.retrieve(subscriptionId)
+      // O plano só deixa de ser 'pro' se o status não for mais 'active' ou 'trialing'.
+      // Isso garante o acesso durante o período de carência após o cancelamento.
       const newPlan = (subscription.status === "active" || subscription.status === "trialing") ? "pro" : "free"
       await User.updateOne(
         { stripeSubscriptionId: subscriptionId },
@@ -50,6 +52,7 @@ const stripeWebhook = async (req, res) => {
       break
     }
     case "customer.subscription.deleted": {
+      // Quando a assinatura é efetivamente deletada (no fim do ciclo), o plano vira 'free'.
       await User.updateOne(
         { stripeSubscriptionId: subscriptionId },
         {

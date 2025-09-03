@@ -37,6 +37,7 @@ const manageSubscription = async (req, res) => {
   }
   if (action === "cancel" || action === "refund") {
     if (user.stripeSubscriptionId && user.stripeSubscriptionStatus === "active") {
+      // Modificação: Usar 'update' para agendar o cancelamento no final do período.
       await stripe.subscriptions.update(user.stripeSubscriptionId, { cancel_at_period_end: true })
       cancellationStatus = `Cancelamento da assinatura ${user.stripeSubscriptionId} agendado para o final do período.`
     } else {
