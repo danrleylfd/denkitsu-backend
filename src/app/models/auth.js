@@ -5,11 +5,15 @@ const UserSchema = new mongoose.Schema(
   {
     githubId: {
       type: String,
-      default: null,
       unique: true,
       sparse: true // Permite múltiplos documentos com valor nulo, mas garante unicidade para os que têm valor.
     },
     githubAccessToken: { type: String, select: false },
+    githubUsername: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
     name: {
       type: String,
       required: true

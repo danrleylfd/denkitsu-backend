@@ -28,6 +28,7 @@ const githubCallback = async (req, res) => {
       const existingGithubAccount = await User.findOne({ githubId: githubUser.id })
       if (existingGithubAccount && existingGithubAccount._id.toString() !== userID) throw new Error("GITHUB_ACCOUNT_IN_USE")
       userToLink.githubId = githubUser.id
+      userToLink.githubUsername = githubUser.login
       userToLink.githubAccessToken = access_token
       await userToLink.save()
       user = userToLink
@@ -39,11 +40,15 @@ const githubCallback = async (req, res) => {
         const emailToUse = primaryEmail || githubUser.email
         if (emailToUse) {
           user = await User.findOne({ email: emailToUse }).select("+githubAccessToken")
-          if (user) user.githubId = githubUser.id
+          if (user) {
+            user.githubId = githubUser.id
+            user.githubUsername = githubUser.login
+          }
         }
         if (!user) {
           user = await User.create({
             githubId: githubUser.id,
+            githubUsername: githubUser.login,
             name: githubUser.name || githubUser.login,
             email: emailToUse,
             avatarUrl: githubUser.avatar_url,
@@ -55,7 +60,7 @@ const githubCallback = async (req, res) => {
     }
     const token = generateToken({ id: user._id })
     const refreshToken = generateRefreshToken({ id: user._id })
-    const userPayload = { _id: user._id, name: user.name, email: user.email, avatarUrl: user.avatarUrl, githubId: user.githubId }
+    const userPayload = { _id: user._id, name: user.name, email: user.email, avatarUrl: user.avatarUrl, githubId: user.githubId, githubUsername: user.githubUsername }
     const userParam = encodeURIComponent(JSON.stringify(userPayload))
     const redirectUrl = userID
       ? `${process.env.HOST1}/profile`
