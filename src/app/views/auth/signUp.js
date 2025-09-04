@@ -24,7 +24,6 @@ const signUp = async (req, res) => {
         email: user.email,
         name: user.name,
         avatarUrl: user.avatarUrl,
-        plan: user.plan,
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
       }

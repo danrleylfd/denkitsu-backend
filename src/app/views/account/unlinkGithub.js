@@ -12,6 +12,9 @@ const unlinkGithub = async (req, res) => {
     name: updatedUser.name,
     avatarUrl: updatedUser.avatarUrl,
     plan: updatedUser.plan,
+    stripeSubscriptionStatus: user.stripeSubscriptionStatus,
+    subscriptionStartDate: user.subscriptionStartDate,
+    subscriptionCancelAtPeriodEnd: user.subscriptionCancelAtPeriodEnd,
     createdAt: updatedUser.createdAt,
     updatedAt: updatedUser.updatedAt,
   }})

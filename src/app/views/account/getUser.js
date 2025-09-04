@@ -14,6 +14,9 @@ const getUser = async (req, res) => {
       name: user.name,
       avatarUrl: user.avatarUrl,
       plan: user.plan,
+      stripeSubscriptionStatus: user.stripeSubscriptionStatus,
+      subscriptionStartDate: user.subscriptionStartDate,
+      subscriptionCancelAtPeriodEnd: user.subscriptionCancelAtPeriodEnd,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     }})
