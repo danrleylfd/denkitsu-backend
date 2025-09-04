@@ -8,6 +8,7 @@ const getUser = async (req, res) => {
   if (req.userID !== user._id) {
     return res.status(200).json({ user: {
       _id: user._id,
+      githubId: user.githubId,
       name: user.name,
       email: user.email,
       avatarUrl: user.avatarUrl,
