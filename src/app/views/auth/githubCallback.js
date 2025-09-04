@@ -53,8 +53,8 @@ const githubCallback = async (req, res) => {
           user = await User.create({
             githubId: githubUser.id,
             githubUsername: githubUser.login,
-            name: githubUser.name || githubUser.login,
             email: emailToUse,
+            name: githubUser.name || githubUser.login,
             avatarUrl: githubUser.avatar_url,
           })
           user.githubAccessToken = access_token

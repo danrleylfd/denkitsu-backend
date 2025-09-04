@@ -1,6 +1,8 @@
 const unlinkGithub = async (req, res) => {
   const { user } = req
   user.githubId = undefined
+  user.githubUsername = undefined
+  user.githubAccessToken = undefined
   await user.save()
   const updatedUser = user.toObject()
   delete updatedUser.password
