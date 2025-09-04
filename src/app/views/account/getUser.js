@@ -9,8 +9,8 @@ const getUser = async (req, res) => {
     return res.status(200).json({ user: {
       _id: user._id,
       githubId: user.githubId,
-      name: user.name,
       email: user.email,
+      name: user.name,
       avatarUrl: user.avatarUrl,
       plan: user.plan,
       createdAt: user.createdAt,

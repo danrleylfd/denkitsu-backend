@@ -4,7 +4,15 @@ const unlinkGithub = async (req, res) => {
   await user.save()
   const updatedUser = user.toObject()
   delete updatedUser.password
-  return res.status(200).json({ user: updatedUser })
+  return res.status(200).json({ user: {
+    _id: updatedUser._id,
+    email: updatedUser.email,
+    name: updatedUser.name,
+    avatarUrl: updatedUser.avatarUrl,
+    plan: updatedUser.plan,
+    createdAt: updatedUser.createdAt,
+    updatedAt: updatedUser.updatedAt,
+  }})
 }
 
 module.exports = unlinkGithub

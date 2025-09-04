@@ -14,7 +14,15 @@ const signIn = async (req, res) => {
   return res.status(200).json({
     refreshToken: generateRefreshToken({ id: user._id }),
     token: generateToken({ id: user._id }),
-    user
+    user: {
+      _id: user._id,
+      email: user.email,
+      name: user.name,
+      avatarUrl: user.avatarUrl,
+      plan: user.plan,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    }
   })
 }
 
