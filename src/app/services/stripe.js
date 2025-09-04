@@ -62,8 +62,8 @@ const syncFromStripe = async (user) => {
     throw createAppError("Nenhuma assinatura ativa encontrada no Stripe para este cliente.", 404, "NO_ACTIVE_SUBSCRIPTION")
   }
   const sub = subscriptions.data[0]
-  await User.updateOne({ _id: user._id }, { plan: "pro", stripeSubscriptionId: sub.id, stripeSubscriptionStatus: sub.status })
-  return { status: sub.status, plan: "pro" }
+  await User.updateOne({ _id: user._id }, { plan:  "plus", stripeSubscriptionId: sub.id, stripeSubscriptionStatus: sub.status })
+  return { status: sub.status, plan:  "plus" }
 }
 
 const createCheckout = async (user) => {

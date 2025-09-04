@@ -1,7 +1,7 @@
 const User = require("../../models/auth")
 
 const handleSubscriptionUpdated = async (subscription) => {
-  const newPlan = (subscription.status === "active" || subscription.status === "trialing") ? "pro" : "free"
+  const newPlan = (subscription.status === "active" || subscription.status === "trialing") ?  "plus" : "free"
   await User.updateOne(
     { stripeSubscriptionId: subscription.id },
     {

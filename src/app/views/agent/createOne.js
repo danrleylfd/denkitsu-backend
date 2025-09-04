@@ -5,7 +5,7 @@ const createAppError = require("../../../utils/errors")
 const createOne = async (req, res) => {
   try {
     const { userID, user } = req
-    if (user.plan === "pro") {
+    if (user.plan ===  "free") {
       const agentCount = await Agent.countDocuments({ author: userID })
       if (agentCount >= 3) throw createAppError("Você atingiu o limite de 3 agentes para o Plano Free. Faça upgrade para o Plano Plus para criar agentes ilimitados.", 409, "AGENT_LIMIT_REACHED")
     }

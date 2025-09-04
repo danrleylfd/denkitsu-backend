@@ -22,7 +22,7 @@ const createCheckoutSession = async (req, res) => {
     const updatedUser = await stripeService.reactivate(user)
     return res.status(200).json({ type: "reactivation", user: updatedUser })
   }
-  if (user.plan === "pro" && user.stripeSubscriptionStatus === "active") {
+  if (user.plan ===  "plus" && user.stripeSubscriptionStatus === "active") {
     return createCustomerPortal(req, res)
   }
   const { url } = await stripeService.createCheckout(user)

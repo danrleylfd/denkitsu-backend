@@ -4,7 +4,7 @@ const createAppError = require("../../../utils/errors")
 
 const createOne = async (req, res) => {
   const { userID, user } = req
-  if (user.plan === "pro") {
+  if (user.plan ===  "free") {
     const toolCount = await Tool.countDocuments({ author: userID })
     if (toolCount >= 3) throw createAppError("Você atingiu o limite de 3 ferramentas para o Plano Free. Faça upgrade para o Plano Plus para criar ferramentas ilimitadas.", 409, "TOOL_LIMIT_REACHED")
   }

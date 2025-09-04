@@ -15,7 +15,7 @@ const handleCheckoutSessionCompleted = async (session) => {
       $set: {
         stripeSubscriptionId: subscription.id,
         stripeSubscriptionStatus: subscription.status,
-        plan: "pro",
+        plan:  "plus",
         subscriptionStartDate: new Date(subscription.created * 1000),
         subscriptionCancelAtPeriodEnd: subscription.cancel_at_period_end
       }

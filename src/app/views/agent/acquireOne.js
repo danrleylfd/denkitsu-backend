@@ -6,7 +6,7 @@ const createAppError = require("../../../utils/errors")
 const acquireOne = async (req, res) => {
   const { userID, user } = req
   const { agentId } = req.params
-  if (user.plan === "pro") {
+  if (user.plan ===  "free") {
     const acquisitionCount = await Acquisition.countDocuments({ user: userID, itemType: "Agent" })
     if (acquisitionCount >= 3) throw createAppError("Você atingiu o limite de 3 agentes adquiridos da loja para o Plano Free. Faça upgrade para adquirir agentes ilimitados.", 409, "AGENT_LIMIT_REACHED")
   }
