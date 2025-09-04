@@ -56,7 +56,7 @@ const availableTools = {
   cancelSubscriptionTool: adminService.cancelSubscription,
   refundSubscriptionTool: adminService.refundSubscription,
   reactivateSubscriptionTool: adminService.reactivateSubscription,
-  checkAndSyncSubscriptionTool: adminService.checkAndSyncSubscription,
+  checkAndSyncSubscriptionTool: adminService.syncSubscription,
 }
 
 const tools = [
@@ -90,7 +90,7 @@ const tools = [
   adminService.cancelSubscriptionTool,
   adminService.refundSubscriptionTool,
   adminService.reactivateSubscriptionTool,
-  adminService.checkAndSyncSubscriptionTool,
+  adminService.syncSubscription,
 ]
 
 module.exports = { availableTools, tools }

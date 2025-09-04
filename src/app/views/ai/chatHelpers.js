@@ -55,7 +55,7 @@ const getRouterPrompt = async (userId) => {
   let customAgentsContext = ""
   if (customAgents && customAgents.length > 0) {
     const agentList = customAgents.map(a => `- ${a.name}: ${a.description}`).join("\n    ")
-    customAgentsContext = `\n    Agentes Customizados do Usuário:\n    ${agentList}`
+    customAgentsContext = `\n    Agentes Customizados do Usuário:\n    ${agentList}`
   }
   const dynamicRouterPrompt = JSON.parse(JSON.stringify(routerPromptTemplate))
   dynamicRouterPrompt.content += customAgentsContext
