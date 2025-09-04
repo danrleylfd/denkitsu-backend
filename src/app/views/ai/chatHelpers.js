@@ -54,8 +54,8 @@ const getRouterPrompt = async (userId) => {
   }).select("name description")
   let customAgentsContext = ""
   if (customAgents && customAgents.length > 0) {
-    const agentList = customAgents.map(a => `- ${a.name}: ${a.description}`).join("\n    ")
-    customAgentsContext = `\n    Agentes Customizados do Usuário:\n    ${agentList}`
+    const agentList = customAgents.map(a => `- ${a.name}: ${a.description}`).join("\n    ")
+    customAgentsContext = `\n    Agentes Customizados do Usuário:\n    ${agentList}`
   }
   const dynamicRouterPrompt = JSON.parse(JSON.stringify(routerPromptTemplate))
   dynamicRouterPrompt.content += customAgentsContext
@@ -78,7 +78,7 @@ const buildToolOptions = async (aiProvider, use_tools = [], userId, mode) => {
   let finalUseTools = [...use_tools]
   if (mode === "Suporte") {
     console.log("[AI_HELPER] Agente de Suporte ativado. Forçando o uso de ferramentas de administração.")
-    finalUseTools = ["manageSubscriptionTool", "checkAndSyncSubscriptionTool"]
+    finalUseTools = ["cancelSubscriptionTool", "refundSubscriptionTool", "reactivateSubscriptionTool", "checkAndSyncSubscriptionTool"]
   }
   if (mode === "Roteador") finalUseTools.push("selectAgentTool")
   let toolOptions = {}
@@ -160,9 +160,9 @@ const executeToolCall = async (toolCall, allUserCustomTools, user) => {
     } else if (availableTools[functionName]) {
       console.log(`[TOOL CALL] Executing: ${functionName}(${JSON.stringify(functionArgs)})`)
       const functionToCall = availableTools[functionName]
-      if (functionName === "manageSubscriptionTool" || functionName === "checkAndSyncSubscriptionTool") {
+      if (["cancelSubscriptionTool", "refundSubscriptionTool", "reactivateSubscriptionTool", "checkAndSyncSubscriptionTool"].includes(functionName)) {
         if (!user || !user.email) throw new Error("Usuário autenticado ou e-mail não encontrado para a execução da ferramenta de suporte.")
-        const functionResponse = await functionToCall(functionArgs.action, user)
+        const functionResponse = await functionToCall(user)
         functionResponseContent = JSON.stringify(functionResponse.data)
       } else {
         const functionResponse = await functionToCall(...Object.values(functionArgs))

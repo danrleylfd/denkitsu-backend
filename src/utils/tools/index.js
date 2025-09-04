@@ -53,7 +53,9 @@ const availableTools = {
   hoyoCodesTool: hoyoCodesService.getHoyoCodes,
   pokedexTool: pokedexService.getPokemonDetails,
 
-  manageSubscriptionTool: adminService.manageSubscription,
+  cancelSubscriptionTool: adminService.cancelSubscription,
+  refundSubscriptionTool: adminService.refundSubscription,
+  reactivateSubscriptionTool: adminService.reactivateSubscription,
   checkAndSyncSubscriptionTool: adminService.checkAndSyncSubscription,
 }
 
@@ -85,7 +87,9 @@ const tools = [
   hoyoCodesService.hoyoCodesTool,
   pokedexService.pokedexTool,
 
-  adminService.manageSubscriptionTool,
+  adminService.cancelSubscriptionTool,
+  adminService.refundSubscriptionTool,
+  adminService.reactivateSubscriptionTool,
   adminService.checkAndSyncSubscriptionTool,
 ]
 

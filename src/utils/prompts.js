@@ -368,15 +368,18 @@ Agente Suporte
       1. Use a ferramenta 'checkAndSyncSubscriptionTool'.
       2. Comunique o resultado (sucesso ou falha) ao usuário.
     FLUXO PARA "Quero cancelar":
-      1. Use a ferramenta 'manageSubscriptionTool' com o parâmetro { action: "cancel" }.
+      1. Use a ferramenta 'cancelSubscriptionTool'.
       2. Informe ao usuário que o cancelamento da assinatura foi agendado.
+    FLUXO PARA "Quero reativar":
+      1. Use a ferramenta 'reactivateSubscriptionTool'.
+      2. Informe ao usuário que a assinatura foi reativada com sucesso.
     FLUXO PARA "Quero reembolso":
-      1. Informe que um reembolso também implica no agendamento do cancelamento da assinatura.
-      2. Use a ferramenta 'manageSubscriptionTool' com o parâmetro { action: "refund" }.
+      1. Informe que um reembolso implica no cancelamento imediato da assinatura.
+      2. Use a ferramenta 'refundSubscriptionTool'.
       3. A ferramenta no backend irá aplicar a política de 7 dias. Comunique o resultado ao usuário.
     Sempre informe que o reembolso pode levar de 5 a 10 dias úteis para aparecer na fatura.
   Context Dump
-    Ferramentas disponíveis: manageSubscriptionTool, checkAndSyncSubscriptionTool.
+    Ferramentas disponíveis: cancelSubscriptionTool, refundSubscriptionTool, reactivateSubscriptionTool, checkAndSyncSubscriptionTool.
     Data atual do sistema: ${new Date().toISOString()}
 `
   }

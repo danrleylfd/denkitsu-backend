@@ -1,43 +1,57 @@
 const api = require("../../services/api")
 
-const manageSubscription = async (action, user) => {
+const makeAdminApiCall = async (endpoint, user) => {
   try {
-    console.log(`[ADMIN_TOOL] Executando ação '${action}' para o usuário ${user.name}`)
-    const { data } = await api.post(`/admin/manage-subscription`,
-      { email: user.email, action },
+    console.log(`[ADMIN_TOOL] Chamando endpoint '${endpoint}' para o usuário ${user.name}`)
+    const { data } = await api.post(
+      `/admin/${endpoint}`,
+      { email: user.email },
       { headers: { "X-Internal-API-Key": process.env.INTERNAL_API_KEY } }
     )
     return { status: 200, data }
   } catch (error) {
-    const errorMessage = error.response?.data?.error?.message || `Erro ao executar a ação '${action}'.`
-    console.error("[ADMIN_TOOL] Erro:", errorMessage)
+    const errorMessage = error.response?.data?.error?.message || `Erro ao chamar o endpoint '${endpoint}'.`
+    console.error(`[ADMIN_TOOL] Erro em ${endpoint}:`, errorMessage)
     return { status: error.response?.status || 500, data: { error: errorMessage } }
   }
 }
 
-const manageSubscriptionTool = {
+const cancelSubscription = (user) => makeAdminApiCall("cancel-subscription", user)
+const refundSubscription = (user) => makeAdminApiCall("refund-subscription", user)
+const reactivateSubscription = (user) => makeAdminApiCall("reactivate-subscription", user)
+
+const cancelSubscriptionTool = {
   type: "function",
   function: {
-    name: "manageSubscriptionTool",
-    description: "Gerencia a assinatura do usuário AUTENTICADO. A ação 'cancel' agenda o cancelamento para o fim do período. A ação 'refund' tenta reembolsar a última cobrança (se dentro da política de 7 dias) E também agenda o cancelamento.",
-    parameters: {
-      type: "object",
-      properties: {
-        action: {
-          type: "string",
-          description: "A ação específica a ser executada: 'cancel' ou 'refund'.",
-          enum: ["cancel", "refund"]
-        }
-      },
-      required: ["action"]
-    }
+    name: "cancelSubscriptionTool",
+    description: "Agenda o cancelamento da assinatura do usuário AUTENTICADO para o final do período de faturamento atual.",
+    parameters: { type: "object", properties: {}, required: [] }
   }
 }
 
-const checkAndSyncSubscription = async (_, user) => {
+const refundSubscriptionTool = {
+  type: "function",
+  function: {
+    name: "refundSubscriptionTool",
+    description: "Tenta reembolsar a última cobrança do usuário AUTENTICADO (se dentro da política de 7 dias) e agenda o cancelamento da assinatura.",
+    parameters: { type: "object", properties: {}, required: [] }
+  }
+}
+
+const reactivateSubscriptionTool = {
+  type: "function",
+  function: {
+    name: "reactivateSubscriptionTool",
+    description: "Remove o agendamento de cancelamento de uma assinatura do usuário AUTENTICADO, reativando-a efetivamente.",
+    parameters: { type: "object", properties: {}, required: [] }
+  }
+}
+
+const checkAndSyncSubscription = async (user) => {
   try {
     console.log(`[SUPPORT_TOOL] Verificando e sincronizando assinatura para ${user.name}`)
-    const { data } = await api.post(`/admin/sync-subscription`,
+    const { data } = await api.post(
+      "/admin/sync-subscription",
       { email: user.email },
       { headers: { "X-Internal-API-Key": process.env.INTERNAL_API_KEY } }
     )
@@ -63,8 +77,12 @@ const checkAndSyncSubscriptionTool = {
 }
 
 module.exports = {
-  manageSubscription,
-  manageSubscriptionTool,
+  cancelSubscription,
+  refundSubscription,
+  reactivateSubscription,
+  cancelSubscriptionTool,
+  refundSubscriptionTool,
+  reactivateSubscriptionTool,
   checkAndSyncSubscription,
   checkAndSyncSubscriptionTool
 }
