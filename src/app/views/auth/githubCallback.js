@@ -56,6 +56,7 @@ const githubCallback = async (req, res) => {
         }
       }
       user.githubAccessToken = access_token
+      user.githubUsername = githubUser.login
       await user.save()
     }
     const token = generateToken({ id: user._id })
