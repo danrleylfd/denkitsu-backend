@@ -8,8 +8,8 @@ const scheduleCancellation = async (user) => {
     throw createAppError("Nenhuma assinatura ativa para cancelar.", 400, "NO_ACTIVE_SUBSCRIPTION")
   }
   await stripe.subscriptions.update(user.stripeSubscriptionId, { cancel_at_period_end: true })
-  const updatedUser = await User.findByIdAndUpdate(user._id, { $set: { subscriptionCancelAtPeriodEnd: true } }, { new: true })
-  return updatedUser
+  await User.findByIdAndUpdate(user._id, { $set: { subscriptionCancelAtPeriodEnd: true } }, { new: true })
+  return { _id: user._id, subscriptionCancelAtPeriodEnd: true }
 }
 
 const reactivate = async (user) => {
@@ -17,8 +17,8 @@ const reactivate = async (user) => {
     throw createAppError("Este usuário não possui uma assinatura agendada para cancelamento para reativar.", 400, "NOTHING_TO_REACTIVATE")
   }
   await stripe.subscriptions.update(user.stripeSubscriptionId, { cancel_at_period_end: false })
-  const updatedUser = await User.findByIdAndUpdate(user._id, { $set: { subscriptionCancelAtPeriodEnd: false, stripeSubscriptionStatus: "active" } }, { new: true })
-  return updatedUser
+  await User.findByIdAndUpdate(user._id, { $set: { subscriptionCancelAtPeriodEnd: false, stripeSubscriptionStatus: "active" } }, { new: true })
+  return { _id: user._id, subscriptionCancelAtPeriodEnd: false, stripeSubscriptionStatus: "active" }
 }
 
 const processRefund = async (user) => {
