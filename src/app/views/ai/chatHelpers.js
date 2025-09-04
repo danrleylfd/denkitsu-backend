@@ -160,7 +160,7 @@ const executeToolCall = async (toolCall, allUserCustomTools, user) => {
     } else if (availableTools[functionName]) {
       console.log(`[TOOL CALL] Executing: ${functionName}(${JSON.stringify(functionArgs)})`)
       const functionToCall = availableTools[functionName]
-      if (["cancelSubscriptionTool", "refundSubscriptionTool", "reactivateSubscriptionTool", "checkAndSyncSubscriptionTool"].includes(functionName)) {
+      if (["cancelSubscriptionTool", "refundSubscriptionTool", "reactivateSubscriptionTool", "syncSubscriptionTool"].includes(functionName)) {
         if (!user || !user.email) throw new Error("Usuário autenticado ou e-mail não encontrado para a execução da ferramenta de suporte.")
         const functionResponse = await functionToCall(user)
         functionResponseContent = JSON.stringify(functionResponse.data)

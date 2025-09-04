@@ -48,10 +48,10 @@ const reactivateSubscriptionTool = {
   }
 }
 
-const checkAndSyncSubscriptionTool = {
+const syncSubscriptionTool = {
   type: "function",
   function: {
-    name: "checkAndSyncSubscriptionTool",
+    name: "syncSubscriptionTool",
     description: "Verifica e sincroniza o status da assinatura do usuário AUTENTICADO com o provedor de pagamentos. Use quando um usuário alega ter pago mas ainda está no plano free.",
     parameters: { type: "object", properties: {}, required: [] }
   }
@@ -65,5 +65,5 @@ module.exports = {
   refundSubscriptionTool,
   reactivateSubscriptionTool,
   syncSubscription,
-  checkAndSyncSubscriptionTool
+  syncSubscriptionTool
 }
