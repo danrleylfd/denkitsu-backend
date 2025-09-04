@@ -1,3 +1,6 @@
+// Backend (CommonJS)
+// Arquivo: Backend/src/app/views/auth/githubCallback.js
+
 const axios = require("axios")
 const User = require("../../models/auth")
 const { generateToken, generateRefreshToken } = require("../../../utils/api/auth")
@@ -28,24 +31,25 @@ const githubCallback = async (req, res) => {
       const existingGithubAccount = await User.findOne({ githubId: githubUser.id })
       if (existingGithubAccount && existingGithubAccount._id.toString() !== userID) throw new Error("GITHUB_ACCOUNT_IN_USE")
       userToLink.githubId = githubUser.id
-      userToLink.githubUsername = githubUser.login
       userToLink.githubAccessToken = access_token
+      userToLink.githubUsername = githubUser.login
       await userToLink.save()
       user = userToLink
     } else {
       user = await User.findOne({ githubId: githubUser.id }).select("+githubAccessToken")
-      if (!user) {
+      if (user) {
+        user.githubUsername = githubUser.login
+        user.githubAccessToken = access_token
+      } else {
         const emailsResponse = await axios.get("https://api.github.com/user/emails", { headers: { Authorization: `Bearer ${access_token}` } })
         const primaryEmail = emailsResponse.data.find(e => e.primary && e.verified)?.email
         const emailToUse = primaryEmail || githubUser.email
-        if (emailToUse) {
-          user = await User.findOne({ email: emailToUse }).select("+githubAccessToken")
-          if (user) {
-            user.githubId = githubUser.id
-            user.githubUsername = githubUser.login
-          }
-        }
-        if (!user) {
+        if (emailToUse) user = await User.findOne({ email: emailToUse }).select("+githubAccessToken")
+        if (user) {
+          user.githubId = githubUser.id
+          user.githubUsername = githubUser.login
+          user.githubAccessToken = access_token
+        } else {
           user = await User.create({
             githubId: githubUser.id,
             githubUsername: githubUser.login,
@@ -53,15 +57,14 @@ const githubCallback = async (req, res) => {
             email: emailToUse,
             avatarUrl: githubUser.avatar_url,
           })
+          user.githubAccessToken = access_token
         }
       }
-      user.githubAccessToken = access_token
-      user.githubUsername = githubUser.login
       await user.save()
     }
     const token = generateToken({ id: user._id })
     const refreshToken = generateRefreshToken({ id: user._id })
-    const userPayload = { _id: user._id, name: user.name, email: user.email, avatarUrl: user.avatarUrl, githubId: user.githubId, githubUsername: user.githubUsername }
+    const userPayload = { _id: user._id, name: user.name, email: user.email, avatarUrl: user.avatarUrl, githubId: user.githubId, username: user.username, githubUsername: user.githubUsername }
     const userParam = encodeURIComponent(JSON.stringify(userPayload))
     const redirectUrl = userID
       ? `${process.env.HOST1}/profile`
@@ -69,12 +72,7 @@ const githubCallback = async (req, res) => {
     res.redirect(redirectUrl)
   } catch (error) {
     console.error("Erro no callback do GitHub:", { error: error.message, stack: error.stack })
-    const knownErrorCodes = [
-      "GITHUB_CODE_MISSING",
-      "GITHUB_TOKEN_FETCH_FAILED",
-      "USER_LINK_NOT_FOUND",
-      "GITHUB_ACCOUNT_IN_USE"
-    ]
+    const knownErrorCodes = ["GITHUB_CODE_MISSING", "GITHUB_TOKEN_FETCH_FAILED", "USER_LINK_NOT_FOUND", "GITHUB_ACCOUNT_IN_USE"]
     const errorCode = knownErrorCodes.includes(error.message) ? error.message : "GITHUB_AUTH_FAILED"
     res.redirect(`${process.env.HOST1}/signin?error_code=${errorCode}`)
   }
