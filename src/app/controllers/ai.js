@@ -5,6 +5,7 @@ const aiMiddleware = require("../middlewares/ai")
 const asyncHandler = require("../middlewares/asyncHandler")
 const validate = require("../middlewares/validator")
 const { sendMessageRules } = require("../validators/ai")
+const createAppError = require("../../utils/errors")
 
 const routes = Router()
 routes.use(authMiddleware)
@@ -16,7 +17,9 @@ const listAgents = require("../views/ai/listAgents")
 const listTools = require("../views/ai/listTools")
 
 const sendMessage = (req, res, next) => {
-  const { stream = false } = req.body
+  const { user } = req
+  const { aiProvider = "groq", stream = false } = req.body
+  if (aiProvider === "custom" && user.plan === "free") return next(createAppError("O provedor de IA personalizado é um recurso exclusivo para membros Plus.", 403, "PLUS_PLAN_REQUIRED"))
   if (stream) return sendWithStream(req, res, next)
   return sendWithoutStream(req, res, next)
 }
