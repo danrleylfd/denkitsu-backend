@@ -32,7 +32,7 @@ const createCheckoutSession = async (req, res) => {
     }
   }
   if (user.plan === "pro" && user.stripeSubscriptionStatus === "active") {
-    console.log("Usuário já é Pro. Redirecionando para o portal do cliente.")
+    console.log("Usuário já é Plus. Redirecionando para o portal do cliente.")
     return createCustomerPortal(req, res)
   }
   let customerId = user.stripeCustomerId

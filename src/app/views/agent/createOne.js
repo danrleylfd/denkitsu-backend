@@ -7,7 +7,7 @@ const createOne = async (req, res) => {
     const { userID, user } = req
     if (user.plan === "pro") {
       const agentCount = await Agent.countDocuments({ author: userID })
-      if (agentCount >= 3) throw createAppError("Você atingiu o limite de 3 agentes para o Plano Free. Faça upgrade para o Plano Pro para criar agentes ilimitados.", 409, "AGENT_LIMIT_REACHED")
+      if (agentCount >= 3) throw createAppError("Você atingiu o limite de 3 agentes para o Plano Free. Faça upgrade para o Plano Plus para criar agentes ilimitados.", 409, "AGENT_LIMIT_REACHED")
     }
     const agentData = { ...req.body, author: userID }
     const agent = await Agent.create(agentData)
