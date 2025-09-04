@@ -29,7 +29,7 @@ const processRefund = async (user) => {
     refundStatus = "Reembolso não aplicável: Data de início da assinatura não encontrada."
   } else {
     const sevenDaysInMs = 7 * 24 * 60 * 60 * 1000
-    const subscriptionAgeInMs = Date.now() - user.subscriptionStartDate.getTime()
+    const subscriptionAgeInMs = Date.now() - new Date(user.subscriptionStartDate).getTime()
     if (subscriptionAgeInMs <= sevenDaysInMs) {
       const charges = await stripe.charges.list({ customer: user.stripeCustomerId, limit: 1 })
       if (charges.data.length > 0 && charges.data[0].paid && !charges.data[0].refunded) {
