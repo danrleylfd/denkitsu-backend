@@ -64,7 +64,20 @@ const githubCallback = async (req, res) => {
     }
     const token = generateToken({ id: user._id })
     const refreshToken = generateRefreshToken({ id: user._id })
-    const userPayload = { _id: user._id, name: user.name, email: user.email, avatarUrl: user.avatarUrl, githubId: user.githubId, username: user.username, githubUsername: user.githubUsername }
+    const userPayload = {
+      _id: user._id,
+      githubId: user.githubId,
+      githubUsername: user.githubUsername,
+      email: user.email,
+      name: user.name,
+      avatarUrl: user.avatarUrl,
+      plan: user.plan,
+      stripeSubscriptionStatus: user.stripeSubscriptionStatus,
+      subscriptionStartDate: user.subscriptionStartDate,
+      subscriptionCancelAtPeriodEnd: user.subscriptionCancelAtPeriodEnd,
+      updatedAt: user.updatedAt,
+      createdAt: user.createdAt,
+    }
     const userParam = encodeURIComponent(JSON.stringify(userPayload))
     const redirectUrl = userID
       ? `${process.env.HOST1}/profile`
