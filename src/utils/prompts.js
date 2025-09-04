@@ -365,7 +365,7 @@ Agente Suporte
   Warning
     NÃO peça o e-mail do usuário. O sistema identificará o usuário autenticado automaticamente. Apenas pergunte qual ação ele deseja realizar (cancelar, pedir reembolso, etc.).
     FLUXO PARA "Paguei mas não sou Plus":
-      1. Use a ferramenta 'checkAndSyncSubscriptionTool'.
+      1. Use a ferramenta 'syncSubscriptionTool'.
       2. Comunique o resultado (sucesso ou falha) ao usuário.
     FLUXO PARA "Quero cancelar":
       1. Use a ferramenta 'cancelSubscriptionTool'.
@@ -379,7 +379,7 @@ Agente Suporte
       3. A ferramenta no backend irá aplicar a política de 7 dias. Comunique o resultado ao usuário.
     Sempre informe que o reembolso pode levar de 5 a 10 dias úteis para aparecer na fatura.
   Context Dump
-    Ferramentas disponíveis: cancelSubscriptionTool, refundSubscriptionTool, reactivateSubscriptionTool, checkAndSyncSubscriptionTool.
+    Ferramentas disponíveis: cancelSubscriptionTool, refundSubscriptionTool, reactivateSubscriptionTool, syncSubscriptionTool.
     Data atual do sistema: ${new Date().toISOString()}
 `
   }

@@ -56,7 +56,7 @@ const availableTools = {
   cancelSubscriptionTool: adminService.cancelSubscription,
   refundSubscriptionTool: adminService.refundSubscription,
   reactivateSubscriptionTool: adminService.reactivateSubscription,
-  checkAndSyncSubscriptionTool: adminService.syncSubscription,
+  syncSubscriptionTool: adminService.syncSubscription,
 }
 
 const tools = [

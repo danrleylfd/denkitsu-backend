@@ -78,7 +78,7 @@ const buildToolOptions = async (aiProvider, use_tools = [], userId, mode) => {
   let finalUseTools = [...use_tools]
   if (mode === "Suporte") {
     console.log("[AI_HELPER] Agente de Suporte ativado. Forçando o uso de ferramentas de administração.")
-    finalUseTools = ["cancelSubscriptionTool", "refundSubscriptionTool", "reactivateSubscriptionTool", "checkAndSyncSubscriptionTool"]
+    finalUseTools = ["cancelSubscriptionTool", "refundSubscriptionTool", "reactivateSubscriptionTool", "syncSubscriptionTool"]
   }
   if (mode === "Roteador") finalUseTools.push("selectAgentTool")
   let toolOptions = {}
