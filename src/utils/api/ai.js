@@ -87,7 +87,7 @@ const getModels = async (aiProvider, apiUrl, apiKey) => {
     try {
       if (!apiKey) throw new Error("API Key não fornecida para provedor customizado.")
       if (!apiUrl) throw new Error("API URL não fornecida para provedor customizado.")
-      const customClient = createAIClientFactory("custom", apiKey, apiUrl)
+      const customClient = createAIClientFactory(aiProvider, apiKey, apiUrl)
       const response = await customClient.models.list()
       const autoModel = {
         id: "auto",
@@ -111,9 +111,7 @@ const getModels = async (aiProvider, apiUrl, apiKey) => {
     }
   }
   const config = providerConfig[aiProvider]
-  const apiKey = config.apiKey
-  if (!apiKey) throw new Error(`API key para ${aiProvider} não encontrada`)
-  const openai = new OpenAI({ apiKey, baseURL: config.apiUrl })
+  const openai = createAIClientFactory(aiProvider, apiKey || config.apiKey, apiUrl)
   try {
     const response = await openai.models.list()
     let providerModels = response.data.map((model) => ({
@@ -121,7 +119,7 @@ const getModels = async (aiProvider, apiUrl, apiKey) => {
       supports_tools: prov === "groq" ? true : checkToolCompatibility(model),
       supports_images: checkImageCompatibility(model),
       supports_files: checkFileCompatibility(model),
-      aiProvider: prov
+      aiProvider
     }))
     return providerModels
   } catch (error) {
