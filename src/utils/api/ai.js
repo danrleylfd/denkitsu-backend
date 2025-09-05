@@ -29,7 +29,7 @@ const ask = async (aiProvider, aiKey, prompts, options = {}) => {
   const { model, stream, ...props } = restOptions
   const config = providerConfig[aiProvider]
   const finalModel = model || config?.defaultModel
-  const timestampsMsg = { role: "system", content: `O sistema informa a data atual em formato ISO: ${new Date().toISOString()}, converta para horário de Brasília conforme necessidade do usuário, não mostre se o usuário não solicitar, use como referência temporal quando o usuário mencionar alguma data ou quando alguma tool fornecer uma data.`}
+  const timestampsMsg = { role: "system", content: `O sistema informa a data atual em formato ISO: ${new Date().toISOString()}, converta para horário de Brasília conforme necessidade do usuário, não mostre se o usuário não solicitar, use como referência temporal quando o usuário mencionar alguma data ou quando alguma tool fornecer uma data.` }
   try {
     if (stream) {
       const streamResponse = await openai.chat.completions.create({
@@ -89,19 +89,32 @@ const getModels = async (aiProvider, apiUrl, apiKey) => {
   if (aiProvider === "custom") providerConfig["custom"] = { apiUrl, apiKey, defaultModel: "auto" }
   const models = []
   if (aiProvider === "custom") models.push({ id: "auto", supports_tools: true, supports_images: true, supports_files: true, aiProvider: "custom" })
-    for (const [provider, config] of Object.entries(providerConfig)) {
-      const openai = createAIClientFactory(provider, apiKey || config.apiKey, apiUrl)
-      const response = await openai.models.list()
-      const updatedModels = response.data.map((model) => ({
-        id: model.id,
-        supports_tools: provider === "openrouter" ? checkToolCompatibility(model) : (provider === "groq") ? true : false,
-        supports_images: checkImageCompatibility(model),
-        supports_files: checkFileCompatibility(model),
-        aiProvider: provider
-      }))
-      models.push(...updatedModels)
-    }
-  return models
+  for (const [provider, config] of Object.entries(providerConfig)) {
+    const openai = createAIClientFactory(provider, apiKey || config.apiKey, apiUrl)
+    const response = await openai.models.list()
+    const updatedModels = response.data.map((model) => ({
+      id: model.id,
+      supports_tools: provider === "openrouter" ? checkToolCompatibility(model) : (provider === "groq") ? true : false,
+      supports_images: checkImageCompatibility(model),
+      supports_files: checkFileCompatibility(model),
+      aiProvider: provider
+    }))
+    models.push(...updatedModels)
+  }
+  const freeModels = models
+    .filter((item) => item.id && item.id.includes(":free"))
+    .sort((a, b) => a.id.localeCompare(b.id))
+  const payModels = models
+    .filter((item) => item.id && !item.id.includes(":free") && item.aiProvider !== "groq" && item.aiProvider !== "custom")
+    .sort((a, b) => a.id.localeCompare(b.id))
+  const groqModels = models
+    .filter((item) => item.aiProvider === "groq")
+    .sort((a, b) => a.id.localeCompare(b.id))
+  const customModels = models
+    .filter((item) => item.aiProvider === "custom")
+    .sort((a, b) => a.id.localeCompare(b.id))
+  const prettyModels = { freeModels, payModels, groqModels, customModels }
+  return prettyModels
 }
 
 module.exports = { ask, getModels }
