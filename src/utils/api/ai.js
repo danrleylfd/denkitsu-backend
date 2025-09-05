@@ -116,14 +116,14 @@ const getModels = async (aiProvider, apiUrl, apiKey) => {
     const response = await openai.models.list()
     let providerModels = response.data.map((model) => ({
       id: model.id,
-      supports_tools: prov === "groq" ? true : checkToolCompatibility(model),
+      supports_tools: aiProvider === "groq" ? true : checkToolCompatibility(model),
       supports_images: checkImageCompatibility(model),
       supports_files: checkFileCompatibility(model),
       aiProvider
     }))
     return providerModels
   } catch (error) {
-    console.error(`Erro ao obter modelos de ${prov}:`, error)
+    console.error(`Erro ao obter modelos de ${aiProvider}:`, error)
   }
 }
 
