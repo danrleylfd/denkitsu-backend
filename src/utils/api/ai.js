@@ -101,6 +101,9 @@ const getModels = async (aiProvider, apiUrl, apiKey) => {
     }))
     models.push(...updatedModels)
   }
+  const openRouterModels = models
+    .filter((item) => item.id && item.aiProvider === "openrouter")
+    .sort((a, b) => a.id.localeCompare(b.id))
   const freeModels = models
     .filter((item) => item.id && item.id.includes(":free"))
     .sort((a, b) => a.id.localeCompare(b.id))
@@ -113,7 +116,7 @@ const getModels = async (aiProvider, apiUrl, apiKey) => {
   const customModels = models
     .filter((item) => item.aiProvider === "custom")
     .sort((a, b) => a.id.localeCompare(b.id))
-  const prettyModels = { freeModels, payModels, groqModels, customModels }
+  const prettyModels = { freeModels, openRouterModels, payModels, groqModels, customModels }
   return prettyModels
 }
 
