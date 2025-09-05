@@ -82,9 +82,9 @@ const checkFileCompatibility = (model) => {
   return false
 }
 
-const getModels = async (provider, apiUrl, apiKey) => {
-  console.log(provider)
-  if (provider === "custom") {
+const getModels = async (aiProvider, apiUrl, apiKey) => {
+  console.log(aiProvider)
+  if (aiProvider === "custom") {
     try {
       if (!apiKey) throw new Error("API Key não fornecida para provedor customizado.")
       if (!apiUrl) throw new Error("API URL não fornecida para provedor customizado.")
@@ -95,7 +95,7 @@ const getModels = async (provider, apiUrl, apiKey) => {
         supports_tools: true,
         supports_images: true,
         supports_files: true,
-        aiProvider: "custom"
+        aiProvider
       }
       if (!response.data || response.data.length === 0) return [autoModel]
       return response.data.map((model) => ({
