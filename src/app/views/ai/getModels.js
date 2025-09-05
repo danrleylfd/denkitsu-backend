@@ -1,8 +1,9 @@
-const { getModels: listModels } = require("../../../utils/api/ai")
+const { getModels } = require("../../../utils/api/ai")
 
-const getModels = async (req, res) => {
-  const models = await listModels()
+const getModelsView = async (req, res) => {
+  const { provider, customApiUrl, customApiKey } = req.query
+  const models = await getModels(provider, customApiUrl, customApiKey)
   return res.status(200).json({ models })
 }
 
-module.exports = getModels
+module.exports = getModelsView

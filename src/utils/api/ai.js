@@ -82,24 +82,42 @@ const checkFileCompatibility = (model) => {
   return false
 }
 
-const getModels = async () => {
+const getModels = async (provider, apiUrl, apiKey) => {
+  if (provider === "custom") {
+    try {
+      if (!apiUrl) throw new Error("API URL não fornecida para provedor customizado.")
+      const customClient = createAIClientFactory("custom", apiKey || "N/A", apiUrl)
+      const response = await customClient.models.list()
+      if (!response.data || response.data.length === 0) return []
+      return response.data.map((model) => ({
+        id: model.id,
+        supports_tools: checkToolCompatibility(model),
+        supports_images: checkImageCompatibility(model),
+        supports_files: checkFileCompatibility(model),
+        aiProvider: "custom"
+      }))
+    } catch (error) {
+      console.error(`Erro ao obter modelos de ${apiUrl}:`, error.message)
+      return []
+    }
+  }
   const models = []
-  for (const [provider, config] of Object.entries(providerConfig)) {
+  for (const [prov, config] of Object.entries(providerConfig)) {
     const apiKey = config.apiKey
     if (!apiKey) continue
     const openai = new OpenAI({ apiKey, baseURL: config.apiUrl })
     try {
       const response = await openai.models.list()
-      const providerModels = response.data.map((model) => ({
+      let providerModels = response.data.map((model) => ({
         id: model.id,
-        supports_tools: provider === "groq" ? true : checkToolCompatibility(model),
+        supports_tools: prov === "groq" ? true : checkToolCompatibility(model),
         supports_images: checkImageCompatibility(model),
         supports_files: checkFileCompatibility(model),
-        aiProvider: provider
+        aiProvider: prov
       }))
       models.push(...providerModels)
     } catch (error) {
-      console.error(`Erro ao obter modelos de ${provider}:`, error)
+      console.error(`Erro ao obter modelos de ${prov}:`, error)
     }
   }
   return models
