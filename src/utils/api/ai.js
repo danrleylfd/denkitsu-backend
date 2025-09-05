@@ -85,8 +85,9 @@ const checkFileCompatibility = (model) => {
 const getModels = async (provider, apiUrl, apiKey) => {
   if (provider === "custom") {
     try {
+      if (!apiKey) throw new Error("API Key não fornecida para provedor customizado.")
       if (!apiUrl) throw new Error("API URL não fornecida para provedor customizado.")
-      const customClient = createAIClientFactory("custom", apiKey || "N/A", apiUrl)
+      const customClient = createAIClientFactory("custom", apiKey, apiUrl)
       const response = await customClient.models.list()
       if (!response.data || response.data.length === 0) return []
       return response.data.map((model) => ({
