@@ -83,47 +83,24 @@ const checkFileCompatibility = (model) => {
 }
 
 const getModels = async (aiProvider, apiUrl, apiKey) => {
-  const models = [{
-    id: "auto",
-    supports_tools: true,
-    supports_images: true,
-    supports_files: true,
-    aiProvider
-  }]
-  if (aiProvider === "custom") {
-    try {
-      if (!apiKey) throw new Error("API Key não fornecida para provedor customizado.")
-      if (!apiUrl) throw new Error("API URL não fornecida para provedor customizado.")
-      const customClient = createAIClientFactory(aiProvider, apiKey, apiUrl)
-      const response = await customClient.models.list()
-      models.push(autoModel)
-      let customModels = response.data.map((model) => ({
-        id: model.id,
-        supports_tools: checkToolCompatibility(model),
-        supports_images: checkImageCompatibility(model),
-        supports_files: checkFileCompatibility(model),
-        aiProvider
-      }))
-      models.push(...customModels)
-    } catch (error) {
-      console.error(`Erro ao obter modelos de ${apiUrl}:`, error.message)
-      return []
-    }
-  }
+  if (aiProvider === "custom" && !apiKey) throw new Error("API Key não fornecida para provedor customizado.")
+  if (aiProvider === "custom" && !apiUrl) throw new Error("API URL não fornecida para provedor customizado.")
+  if (aiProvider === "custom") providerConfig["custom"] = { apiUrl, apiKey, defaultModel: "auto" }
+  const models = [{ id: "auto", supports_tools: true, supports_images: true, supports_files: true, aiProvider }]
   const config = providerConfig[aiProvider]
   const openai = createAIClientFactory(aiProvider, apiKey || config.apiKey, apiUrl)
   try {
     const response = await openai.models.list()
-    let providerModels = response.data.map((model) => ({
+    const updatedModels = response.data.map((model) => ({
       id: model.id,
-      supports_tools: aiProvider === "groq" ? true : checkToolCompatibility(model),
+      supports_tools: aiProvider === "openrouter" ? checkToolCompatibility(model) : (aiProvider === "groq") ? true : false,
       supports_images: checkImageCompatibility(model),
       supports_files: checkFileCompatibility(model),
       aiProvider
     }))
-    models.push(...providerModels)
+    models.push(...updatedModels)
   } catch (error) {
-    console.error(`Erro ao obter modelos de ${aiProvider}:`, error)
+    console.error(`Erro ao obter modelos de ${apiUrl}:`, error.message)
     return []
   }
   return models
