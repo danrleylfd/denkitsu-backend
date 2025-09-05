@@ -1,4 +1,5 @@
 const OpenAI = require("openai")
+const createAppError = require("../errors")
 
 const providerConfig = {
   groq: {
@@ -83,12 +84,11 @@ const checkFileCompatibility = (model) => {
 }
 
 const getModels = async (aiProvider, apiUrl, apiKey) => {
-  if (aiProvider === "custom" && !apiKey) throw new Error("API Key não fornecida para provedor customizado.")
-  if (aiProvider === "custom" && !apiUrl) throw new Error("API URL não fornecida para provedor customizado.")
+  if (aiProvider === "custom" && !apiKey) throw createAppError("API Key não fornecida para provedor customizado.", 400)
+  if (aiProvider === "custom" && !apiUrl) throw createAppError("API URL não fornecida para provedor customizado.", 400)
   if (aiProvider === "custom") providerConfig["custom"] = { apiUrl, apiKey, defaultModel: "auto" }
   const models = []
   if (aiProvider === "custom") models.push({ id: "auto", supports_tools: true, supports_images: true, supports_files: true, aiProvider: "custom" })
-  try {
     for (const [provider, config] of Object.entries(providerConfig)) {
       const openai = createAIClientFactory(provider, apiKey || config.apiKey, apiUrl)
       const response = await openai.models.list()
@@ -101,10 +101,6 @@ const getModels = async (aiProvider, apiUrl, apiKey) => {
       }))
       models.push(...updatedModels)
     }
-  } catch (error) {
-    console.error(`Erro ao obter modelos de ${apiUrl}:`, error.message)
-    return []
-  }
   return models
 }
 
