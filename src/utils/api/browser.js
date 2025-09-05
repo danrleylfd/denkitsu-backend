@@ -1,7 +1,7 @@
 const axios = require("axios")
 const cheerio = require("cheerio")
 
-const browseUrl = async (url) => {
+const browseUrl = async ({ url }) => {
   try {
     const { data: html } = await axios.get(url, {
       headers: {

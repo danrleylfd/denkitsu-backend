@@ -19,7 +19,7 @@ const formatGame = (item) => {
   }
 }
 
-const searchGames = async (query) => {
+const searchGames = async ({ query }) => {
   try {
     console.log(`[TOOL_CALL] Buscando jogos para: ${query}`)
     const { data } = await rawgAPI.get("/games", {

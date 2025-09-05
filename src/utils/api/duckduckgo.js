@@ -1,7 +1,7 @@
 const axios = require("axios")
 const cheerio = require("cheerio")
 
-const searchDuckDuckGo = async (query) => {
+const searchDuckDuckGo = async ({ query }) => {
   try {
     console.log(`[TOOL_CALL] Buscando no DuckDuckGo (HTML) por: ${query}`)
     const apiRequest = axios.get("https://api.duckduckgo.com/", {

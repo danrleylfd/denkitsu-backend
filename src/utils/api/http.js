@@ -1,6 +1,6 @@
 const axios = require("axios")
 
-const executeHttpRequest = async (config) => {
+const executeHttpRequest = async ({ config }) => {
   console.log(config)
   try {
     const response = await axios({

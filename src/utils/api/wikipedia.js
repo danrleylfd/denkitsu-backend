@@ -1,6 +1,6 @@
 const axios = require("axios")
 
-const searchWikipedia = async (query) => {
+const searchWikipedia = async ({ query }) => {
   try {
     const encodedTopic = encodeURIComponent(query.replace(/ /g, "_"))
     const url = `https://pt.wikipedia.org/api/rest_v1/page/summary/${encodedTopic}`

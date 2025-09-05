@@ -182,7 +182,7 @@ const filterPlayerData = (playerData) => {
 
 const AMBR_API_BASE_URL = "https://gi.yatta.moe/api/v2/pt"
 
-const getPlayerBuild = async (characterName, uid) => {
+const getPlayerBuild = async ({ characterName, uid }) => {
   try {
     console.log(`[TOOL_CALL] Iniciando análise para ${characterName} (UID: ${uid})`)
     console.log("[TOOL_HELPER] Buscando mapa de IDs de personagens...")

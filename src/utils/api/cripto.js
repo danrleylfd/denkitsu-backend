@@ -2,7 +2,7 @@ const axios = require("axios")
 
 const MB_API_V4_URL = "https://api.mercadobitcoin.net/api/v4"
 
-const getCoinQuote = async (symbols) => {
+const getCoinQuote = async ({ symbols }) => {
   try {
     console.log(`[TOOL_CALL] Buscando tickers para os símbolos: ${symbols}`)
     const formattedSymbols = symbols.toUpperCase().trim()

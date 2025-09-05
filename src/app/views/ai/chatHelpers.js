@@ -165,7 +165,7 @@ const executeToolCall = async (toolCall, allUserCustomTools, user) => {
         const functionResponse = await functionToCall(user)
         functionResponseContent = JSON.stringify(functionResponse.data)
       } else {
-        const functionResponse = await functionToCall(...Object.values(functionArgs))
+        const functionResponse = await functionToCall(functionArgs)
         functionResponseContent = JSON.stringify(functionResponse.data)
       }
     } else {

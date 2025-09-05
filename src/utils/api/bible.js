@@ -1,6 +1,6 @@
 const axios = require("axios")
 
-const formatQuery = (query) => {
+const formatQuery = ({ query }) => {
   return query
     .trim()
     .normalize("NFD")

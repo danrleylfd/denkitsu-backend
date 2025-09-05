@@ -5,7 +5,7 @@ const api = axios.create({
   headers: { "Content-Type": "application/json" }
 })
 
-const getWeatherByLocation = async (location) => {
+const getWeatherByLocation = async ({ location }) => {
   try {
     const { data: geoCodeData } = await api.get(`/geo/1.0/direct?q=${location}&limit=1&appid=${process.env.WEATHER_API_KEY}`)
     if (geoCodeData.length === 0) throw new Error("LOCATION_NOT_FOUND")

@@ -1,6 +1,6 @@
 const axios = require("axios")
 
-const searchNasaLibrary = async (query) => {
+const searchNasaLibrary = async ({ query }) => {
   try {
     console.log(`[TOOL_CALL] Buscando na biblioteca da NASA por: ${query}`)
     const { data } = await axios.get("https://images-api.nasa.gov/search", {

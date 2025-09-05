@@ -1,6 +1,6 @@
 const api = require("../../app/services/api")
 
-const makeAdminApiCall = async (endpoint, user) => {
+const makeAdminApiCall = async ({ endpoint, user }) => {
   try {
     console.log(`[ADMIN_TOOL] Chamando endpoint '${endpoint}' para o usuário ${user.name}`)
     const { data } = await api.post(
@@ -16,10 +16,10 @@ const makeAdminApiCall = async (endpoint, user) => {
   }
 }
 
-const cancelSubscription = (user) => makeAdminApiCall("cancel-subscription", user)
-const refundSubscription = (user) => makeAdminApiCall("refund-subscription", user)
-const reactivateSubscription = (user) => makeAdminApiCall("reactivate-subscription", user)
-const syncSubscription = (user) => makeAdminApiCall("sync-subscription", user)
+const cancelSubscription = (user) => makeAdminApiCall({ endpoint: "cancel-subscription", user })
+const refundSubscription = (user) => makeAdminApiCall({ endpoint: "refund-subscription", user })
+const reactivateSubscription = (user) => makeAdminApiCall({ endpoint: "reactivate-subscription", user })
+const syncSubscription = (user) => makeAdminApiCall({ endpoint: "sync-subscription", user })
 
 const cancelSubscriptionTool = {
   type: "function",

@@ -5,7 +5,7 @@ const openai = new OpenAI({
   baseURL: process.env.GROQ_API_URL
 })
 
-const textToSpeech = async (model = "playai-tts", response_format = "wav", text, voice = "Mason-PlayAI") => {
+const textToSpeech = async ({ model = "playai-tts", response_format = "wav", text, voice = "Mason-PlayAI" }) => {
   try {
     console.log(`[TOOL_CALL] Convertendo texto em áudio com a voz: ${voice}`)
     const response = await openai.audio.speech.create({

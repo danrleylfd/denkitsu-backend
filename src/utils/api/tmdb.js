@@ -22,7 +22,7 @@ const formatMedia = (item) => {
   }
 }
 
-const searchMedia = async (query) => {
+const searchMedia = async ({ query }) => {
   try {
     console.log(`[TOOL_CALL] Buscando mídia para: ${query}`)
     const { data } = await tmdbAPI.get("/search/multi", { params: { query } })

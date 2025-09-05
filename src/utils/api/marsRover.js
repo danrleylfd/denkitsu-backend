@@ -1,6 +1,6 @@
 const axios = require("axios")
 
-const getMarsRoverLatestPhotos = async (roverName) => {
+const getMarsRoverLatestPhotos = async ({ roverName }) => {
   try {
     const apiKey = process.env.NASA_API_KEY
     if (!apiKey) throw new Error("A chave da API da NASA (NASA_API_KEY) não foi configurada no servidor.")

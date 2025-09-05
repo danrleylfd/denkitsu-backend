@@ -13,7 +13,7 @@ const parseEvolutionChain = (chain) => {
   return evolutions.join(" → ")
 }
 
-const getPokemonDetails = async (pokemonNameOrId) => {
+const getPokemonDetails = async ({ pokemonNameOrId }) => {
   try {
     console.log(`[TOOL_CALL] Buscando dados para o Pokémon: ${pokemonNameOrId}`)
     const name = pokemonNameOrId.toLowerCase().trim()
