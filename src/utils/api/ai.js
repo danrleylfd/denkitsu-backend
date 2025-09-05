@@ -84,8 +84,8 @@ const checkFileCompatibility = (model) => {
 }
 
 const getModels = async (aiProvider, apiUrl, apiKey) => {
-  if (aiProvider === "custom" && !apiKey) throw createAppError("API Key não fornecida para provedor customizado.", 400)
-  if (aiProvider === "custom" && !apiUrl) throw createAppError("API URL não fornecida para provedor customizado.", 400)
+  if (aiProvider === "custom" && !apiKey) throw createAppError("API Key não fornecida para provedor customizado.", 400, "CUSTOM_API_KEY_MISSING")
+  if (aiProvider === "custom" && !apiUrl) throw createAppError("API URL não fornecida para provedor customizado.", 400, "CUSTOM_API_URL_MISSING")
   if (aiProvider === "custom") providerConfig["custom"] = { apiUrl, apiKey, defaultModel: "auto" }
   const models = []
   if (aiProvider === "custom") models.push({ id: "auto", supports_tools: true, supports_images: true, supports_files: true, aiProvider: "custom" })
