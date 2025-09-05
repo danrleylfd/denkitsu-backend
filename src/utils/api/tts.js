@@ -26,7 +26,7 @@ const textToSpeech = async ({ text, voice = "Mason-PlayAI", model = "playai-tts"
       }
     }
   } catch (error) {
-    console.error(`[TTS_SERVICE] Erro ao converter texto em áudio:`, error.message)
+    console.error(`[TTS_SERVICE] Erro ao converter texto em áudio:`, error.message, text)
     throw new Error("TOOL_ERROR")
   }
 }
