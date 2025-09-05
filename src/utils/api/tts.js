@@ -5,13 +5,13 @@ const openai = new OpenAI({
   baseURL: "https://api.groq.com/openai/v1"
 })
 
-const textToSpeech = async ({ text, voice = "Fritz-PlayAI", model = "playai-tts", response_format = "wav" }) => {
+const textToSpeech = async ({ text, voice = "Mason-PlayAI", model = "playai-tts", response_format = "wav" }) => {
   try {
     console.log(`[TOOL_CALL] Convertendo texto em áudio com a voz: ${voice}`)
     const response = await openai.audio.speech.create({
       model,
-      input: text,
       voice,
+      input: text,
       response_format
     })
     const arrayBuffer = await response.arrayBuffer()
