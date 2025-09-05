@@ -86,19 +86,21 @@ const getModels = async (aiProvider, apiUrl, apiKey) => {
   if (aiProvider === "custom" && !apiKey) throw new Error("API Key não fornecida para provedor customizado.")
   if (aiProvider === "custom" && !apiUrl) throw new Error("API URL não fornecida para provedor customizado.")
   if (aiProvider === "custom") providerConfig["custom"] = { apiUrl, apiKey, defaultModel: "auto" }
-  const models = [{ id: "auto", supports_tools: true, supports_images: true, supports_files: true, aiProvider }]
-  const config = providerConfig[aiProvider]
-  const openai = createAIClientFactory(aiProvider, apiKey || config.apiKey, apiUrl)
+  const models = []
+  if (aiProvider === "custom") models.push({ id: "auto", supports_tools: true, supports_images: true, supports_files: true, aiProvider: "custom" })
   try {
-    const response = await openai.models.list()
-    const updatedModels = response.data.map((model) => ({
-      id: model.id,
-      supports_tools: aiProvider === "openrouter" ? checkToolCompatibility(model) : (aiProvider === "groq") ? true : false,
-      supports_images: checkImageCompatibility(model),
-      supports_files: checkFileCompatibility(model),
-      aiProvider
-    }))
-    models.push(...updatedModels)
+    for (const [provider, config] in providerConfig) {
+      const openai = createAIClientFactory(provider, apiKey || config.apiKey, apiUrl)
+      const response = await openai.models.list()
+      const updatedModels = response.data.map((model) => ({
+        id: model.id,
+        supports_tools: provider === "openrouter" ? checkToolCompatibility(model) : (provider === "groq") ? true : false,
+        supports_images: checkImageCompatibility(model),
+        supports_files: checkFileCompatibility(model),
+        aiProvider: provider
+      }))
+      models.push(...updatedModels)
+    }
   } catch (error) {
     console.error(`Erro ao obter modelos de ${apiUrl}:`, error.message)
     return []
