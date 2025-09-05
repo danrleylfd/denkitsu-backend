@@ -90,7 +90,7 @@ const getModels = async (aiProvider, apiUrl, apiKey) => {
   const models = []
   if (aiProvider === "custom") models.push({ id: "auto", supports_tools: true, supports_images: true, supports_files: true, aiProvider: "custom" })
   for (const [provider, config] of Object.entries(providerConfig)) {
-    const openai = createAIClientFactory(provider, apiKey || config.apiKey, apiUrl)
+    const openai = createAIClientFactory(provider, apiKey || config.apiKey, config.apiUrl)
     const response = await openai.models.list()
     const updatedModels = response.data.map((model) => ({
       id: model.id,
