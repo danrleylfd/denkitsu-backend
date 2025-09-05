@@ -83,8 +83,6 @@ const checkFileCompatibility = (model) => {
 }
 
 const getModels = async (aiProvider, apiUrl, apiKey) => {
-  console.log(aiProvider)
-  const models = []
   if (aiProvider === "custom") {
     try {
       if (!apiKey) throw new Error("API Key não fornecida para provedor customizado.")
@@ -106,31 +104,29 @@ const getModels = async (aiProvider, apiUrl, apiKey) => {
         supports_files: checkFileCompatibility(model),
         aiProvider
       }))
-      models.push(...customModels)
+      return customModels
     } catch (error) {
       console.error(`Erro ao obter modelos de ${apiUrl}:`, error.message)
       return []
     }
   }
-  for (const [prov, config] of Object.entries(providerConfig)) {
-    const apiKey = config.apiKey
-    if (!apiKey) continue
-    const openai = new OpenAI({ apiKey, baseURL: config.apiUrl })
-    try {
-      const response = await openai.models.list()
-      let providerModels = response.data.map((model) => ({
-        id: model.id,
-        supports_tools: prov === "groq" ? true : checkToolCompatibility(model),
-        supports_images: checkImageCompatibility(model),
-        supports_files: checkFileCompatibility(model),
-        aiProvider: prov
-      }))
-      models.push(...providerModels)
-    } catch (error) {
-      console.error(`Erro ao obter modelos de ${prov}:`, error)
-    }
+  const config = providerConfig[aiProvider]
+  const apiKey = config.apiKey
+  if (!apiKey) throw new Error(`API key para ${aiProvider} não encontrada`)
+  const openai = new OpenAI({ apiKey, baseURL: config.apiUrl })
+  try {
+    const response = await openai.models.list()
+    let providerModels = response.data.map((model) => ({
+      id: model.id,
+      supports_tools: prov === "groq" ? true : checkToolCompatibility(model),
+      supports_images: checkImageCompatibility(model),
+      supports_files: checkFileCompatibility(model),
+      aiProvider: prov
+    }))
+    return providerModels
+  } catch (error) {
+    console.error(`Erro ao obter modelos de ${prov}:`, error)
   }
-  return models
 }
 
 module.exports = { ask, getModels }
