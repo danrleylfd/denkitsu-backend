@@ -89,7 +89,6 @@ const getModels = async (provider, apiUrl, apiKey) => {
       const customClient = createAIClientFactory("custom", apiKey || "N/A", apiUrl)
       const response = await customClient.models.list()
       if (!response.data || response.data.length === 0) return []
-
       return response.data.map((model) => ({
         id: model.id,
         supports_tools: checkToolCompatibility(model),
@@ -102,7 +101,6 @@ const getModels = async (provider, apiUrl, apiKey) => {
       return []
     }
   }
-
   const models = []
   for (const [prov, config] of Object.entries(providerConfig)) {
     const apiKey = config.apiKey
@@ -127,7 +125,6 @@ const getModels = async (provider, apiUrl, apiKey) => {
         }
         providerModels = [autoModel, ...providerModels]
       }
-
       models.push(...providerModels)
     } catch (error) {
       console.error(`Erro ao obter modelos de ${prov}:`, error)
