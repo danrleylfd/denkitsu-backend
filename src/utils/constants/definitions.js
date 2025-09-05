@@ -39,7 +39,8 @@ const TOOLS_DEFINITIONS = [
   { name: "nasaTool", title: "NASA: Imagem do dia", Icon: "Telescope", description: "Busca e exibe a 'Imagem Astronômica do Dia' da NASA." },
   { name: "earthTool", title: "NASA: Imagens da Terra", Icon: "Earth", description: "Recupera imagens da Terra a partir de uma localização e data específicas, via satélites da NASA." },
   { name: "marsRoverTool", title: "NASA: Imagens de Marte", Icon: "Orbit", description: "Busca fotos tiradas pelos rovers da NASA em Marte." },
-  { name: "nasaLibraryTool", title: "NASA: Biblioteca de Mídia", Icon: "SquareLibrary", description: "Pesquisa na vasta biblioteca de imagens e vídeos da NASA." }
+  { name: "nasaLibraryTool", title: "NASA: Biblioteca de Mídia", Icon: "SquareLibrary", description: "Pesquisa na vasta biblioteca de imagens e vídeos da NASA." },
+  { name: "ttsTool", title: "Texto para Áudio (Inglês / Árabe)", Icon: "Speech", description: "Converte texto para áudio."},
 ]
 
 module.exports = { AGENTS_DEFINITIONS, INTERNAL_TOOLS_DEFINITIONS, TOOLS_DEFINITIONS }

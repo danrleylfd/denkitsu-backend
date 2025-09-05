@@ -24,6 +24,8 @@ const genshinService = require("../api/genshin")
 const hoyoCodesService = require("../api/hoyoCodes")
 const pokedexService = require("../api/pokedex")
 
+const ttsService = require("../api/tts")
+
 const adminService = require("../api/admin")
 
 const availableTools = {
@@ -57,6 +59,8 @@ const availableTools = {
   refundSubscriptionTool: adminService.refundSubscription,
   reactivateSubscriptionTool: adminService.reactivateSubscription,
   syncSubscriptionTool: adminService.syncSubscription,
+
+  ttsTool: ttsService.textToSpeech,
 }
 
 const tools = [
@@ -91,6 +95,8 @@ const tools = [
   adminService.refundSubscriptionTool,
   adminService.reactivateSubscriptionTool,
   adminService.syncSubscriptionTool,
+
+  ttsService.ttsTool,
 ]
 
 module.exports = { availableTools, tools }
