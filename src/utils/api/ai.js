@@ -83,20 +83,20 @@ const checkFileCompatibility = (model) => {
 }
 
 const getModels = async (aiProvider, apiUrl, apiKey) => {
+  const models = [{
+    id: "auto",
+    supports_tools: true,
+    supports_images: true,
+    supports_files: true,
+    aiProvider
+  }]
   if (aiProvider === "custom") {
     try {
       if (!apiKey) throw new Error("API Key não fornecida para provedor customizado.")
       if (!apiUrl) throw new Error("API URL não fornecida para provedor customizado.")
       const customClient = createAIClientFactory(aiProvider, apiKey, apiUrl)
       const response = await customClient.models.list()
-      const autoModel = {
-        id: "auto",
-        supports_tools: true,
-        supports_images: true,
-        supports_files: true,
-        aiProvider
-      }
-      if (!response.data || response.data.length === 0) models.push(autoModel)
+      models.push(autoModel)
       let customModels = response.data.map((model) => ({
         id: model.id,
         supports_tools: checkToolCompatibility(model),
@@ -104,7 +104,7 @@ const getModels = async (aiProvider, apiUrl, apiKey) => {
         supports_files: checkFileCompatibility(model),
         aiProvider
       }))
-      return customModels
+      models.push(...customModels)
     } catch (error) {
       console.error(`Erro ao obter modelos de ${apiUrl}:`, error.message)
       return []
@@ -121,10 +121,12 @@ const getModels = async (aiProvider, apiUrl, apiKey) => {
       supports_files: checkFileCompatibility(model),
       aiProvider
     }))
-    return providerModels
+    models.push(...providerModels)
   } catch (error) {
     console.error(`Erro ao obter modelos de ${aiProvider}:`, error)
+    return []
   }
+  return models
 }
 
 module.exports = { ask, getModels }
