@@ -14,6 +14,7 @@ const textToSpeech = async ({ text, voice = "Mason-PlayAI", model = "playai-tts"
       input: text,
       response_format
     })
+    console.log(response)
     const arrayBuffer = await response.arrayBuffer()
     const buffer = Buffer.from(arrayBuffer)
     const audioBase64 = buffer.toString('base64')
