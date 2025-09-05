@@ -90,13 +90,20 @@ const getModels = async (provider, apiUrl, apiKey) => {
       const customClient = createAIClientFactory("custom", apiKey, apiUrl)
       const response = await customClient.models.list()
       if (!response.data || response.data.length === 0) return []
-      return response.data.map((model) => ({
+      const autoModel = {
+        id: "auto",
+        supports_tools: true,
+        supports_images: true,
+        supports_files: true,
+        aiProvider: "custom"
+      }
+      return [autoModel, ...response.data.map((model) => ({
         id: model.id,
         supports_tools: checkToolCompatibility(model),
         supports_images: checkImageCompatibility(model),
         supports_files: checkFileCompatibility(model),
         aiProvider: "custom"
-      }))
+      }))]
     } catch (error) {
       console.error(`Erro ao obter modelos de ${apiUrl}:`, error.message)
       return []
@@ -116,16 +123,6 @@ const getModels = async (provider, apiUrl, apiKey) => {
         supports_files: checkFileCompatibility(model),
         aiProvider: prov
       }))
-      if (prov === "custom") {
-        const autoModel = {
-          id: "auto",
-          supports_tools: true,
-          supports_images: true,
-          supports_files: true,
-          aiProvider: "custom"
-        }
-        providerModels = [autoModel, ...providerModels]
-      }
       models.push(...providerModels)
     } catch (error) {
       console.error(`Erro ao obter modelos de ${prov}:`, error)
