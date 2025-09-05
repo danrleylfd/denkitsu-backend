@@ -40,6 +40,16 @@ const ttsTool = {
     parameters: {
       type: "object",
       properties: {
+        model: {
+          type: "string",
+          description: "O modelo TTS a ser usado. Padrão: 'playai-tts'",
+          enum: ["playai-tts", "playai-tts-arabic"]
+        },
+        response_format: {
+          type: "string",
+          description: "O formato do áudio. Atualmente apenas 'wav' é suportado.",
+          enum: ["wav"]
+        },
         text: {
           type: "string",
           description: "O texto a ser convertido em áudio. Máximo de 10.000 caracteres."
@@ -55,16 +65,6 @@ const ttsTool = {
             "Mitch-PlayAI", "Quinn-PlayAI", "Thunder-PlayAI", "Ahmad-PlayAI",
             "Amira-PlayAI", "Khalid-PlayAI", "Nasser-PlayAI"
           ]
-        },
-        model: {
-          type: "string",
-          description: "O modelo TTS a ser usado. Padrão: 'playai-tts'",
-          enum: ["playai-tts", "playai-tts-arabic"]
-        },
-        response_format: {
-          type: "string",
-          description: "O formato do áudio. Atualmente apenas 'wav' é suportado.",
-          enum: ["wav"]
         }
       },
       required: ["text"]
