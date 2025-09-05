@@ -83,13 +83,13 @@ const checkFileCompatibility = (model) => {
 }
 
 const getModels = async (provider, apiUrl, apiKey) => {
+  console.log(provider)
   if (provider === "custom") {
     try {
       if (!apiKey) throw new Error("API Key não fornecida para provedor customizado.")
       if (!apiUrl) throw new Error("API URL não fornecida para provedor customizado.")
       const customClient = createAIClientFactory("custom", apiKey, apiUrl)
       const response = await customClient.models.list()
-      if (!response.data || response.data.length === 0) return []
       const autoModel = {
         id: "auto",
         supports_tools: true,
@@ -97,13 +97,14 @@ const getModels = async (provider, apiUrl, apiKey) => {
         supports_files: true,
         aiProvider: "custom"
       }
-      return [autoModel, ...response.data.map((model) => ({
+      if (!response.data || response.data.length === 0) return [autoModel]
+      return response.data.map((model) => ({
         id: model.id,
         supports_tools: checkToolCompatibility(model),
         supports_images: checkImageCompatibility(model),
         supports_files: checkFileCompatibility(model),
         aiProvider: "custom"
-      }))]
+      }))
     } catch (error) {
       console.error(`Erro ao obter modelos de ${apiUrl}:`, error.message)
       return []
