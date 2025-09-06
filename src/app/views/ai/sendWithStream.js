@@ -64,7 +64,7 @@ const sendWithStream = async (req, res, next) => {
           choices: [{
             delta: {
               role: "assistant",
-              content: "Áudio gerado.",
+              content: audioData.inputText || "Áudio gerado.",
               audio: {
                 data: audioData.audio,
                 format: audioData.format || "wav"
