@@ -1,9 +1,10 @@
 const axios = require("axios")
+const createAppError = require("../../errors")
 
 const getNearEarthObjects = async ({ startDate, endDate }) => {
   try {
     const apiKey = process.env.NASA_API_KEY
-    if (!apiKey) throw new Error("A chave da API da NASA (NASA_API_KEY) não foi configurada no servidor.")
+    if (!apiKey) throw createAppError("A chave da API da NASA (NASA_API_KEY) não foi configurada no servidor.", 500, "NASA_API_KEY_MISSING")
     const today = new Date().toISOString().split("T")[0]
     const finalStartDate = startDate || today
     const finalEndDate = endDate || finalStartDate
@@ -15,12 +16,7 @@ const getNearEarthObjects = async ({ startDate, endDate }) => {
         api_key: apiKey
       }
     })
-    if (!data.near_earth_objects || Object.keys(data.near_earth_objects).length === 0) {
-      return {
-        status: 404,
-        data: { message: "Nenhum asteroide encontrado para o período especificado." }
-      }
-    }
+    if (!data.near_earth_objects || Object.keys(data.near_earth_objects).length === 0) throw createAppError("Nenhum asteroide próximo à Terra foi encontrado para o período especificado.", 404, "ASTEROIDS_NOT_FOUND")
     const allObjects = Object.values(data.near_earth_objects).flat()
     const formattedObjects = allObjects.map(neo => ({
       name: neo.name,
@@ -37,8 +33,9 @@ const getNearEarthObjects = async ({ startDate, endDate }) => {
     }))
     return { status: 200, data: { count: data.element_count, objects: formattedObjects } }
   } catch (error) {
+    if (error.isOperational) throw error
     console.error("[ASTEROIDS_SERVICE] Erro ao buscar por asteroides:", error.response?.data || error.message)
-    throw new Error("TOOL_ERROR")
+    throw createAppError("Falha ao conectar com o serviço de rastreamento de asteroides da NASA.", 503, "NASA_NEO_API_ERROR")
   }
 }
 

@@ -1,9 +1,10 @@
 const axios = require("axios")
+const createAppError = require("../../errors")
 
 const getSpaceWeatherEvents = async ({ startDate, endDate }) => {
   try {
     const apiKey = process.env.NASA_API_KEY
-    if (!apiKey) throw new Error("A chave da API da NASA (NASA_API_KEY) não foi configurada no servidor.")
+    if (!apiKey) throw createAppError("A chave da API da NASA (NASA_API_KEY) não foi configurada no servidor.", 500, "NASA_API_KEY_MISSING")
     const today = new Date()
     const sevenDaysAgo = new Date(today)
     sevenDaysAgo.setDate(today.getDate() - 7)
@@ -37,8 +38,9 @@ const getSpaceWeatherEvents = async ({ startDate, endDate }) => {
       }
     }
   } catch (error) {
+    if (error.isOperational) throw error
     console.error("[SPACE_WEATHER_SERVICE] Erro ao buscar eventos de clima espacial:", error.response?.data || error.message)
-    throw new Error("TOOL_ERROR")
+    throw createAppError("Falha ao conectar com o serviço de clima espacial da NASA (DONKI).", 503, "NASA_DONKI_API_ERROR")
   }
 }
 

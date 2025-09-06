@@ -1,4 +1,5 @@
 const axios = require("axios")
+const createAppError = require("../../errors")
 
 const MB_API_V4_URL = "https://api.mercadobitcoin.net/api/v4"
 
@@ -9,6 +10,7 @@ const getCoinQuote = async ({ symbols }) => {
     const { data } = await axios.get(`${MB_API_V4_URL}/tickers`, {
       params: { symbols: formattedSymbols }
     })
+    if (!data || data.length === 0) throw createAppError(`Nenhuma cotação encontrada para os símbolos fornecidos: "${symbols}". Verifique se os símbolos são válidos (ex: BTC-BRL).`, 404, "CRYPTO_SYMBOLS_NOT_FOUND")
     const formatBRL = (value) => {
       return parseFloat(value).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
     }
@@ -25,8 +27,9 @@ const getCoinQuote = async ({ symbols }) => {
     }))
     return { status: 200, data: tickers }
   } catch (error) {
+    if (error.isOperational) throw error
     console.error(`[CRIPTO_SERVICE] Erro ao buscar os tickers "${symbols}":`, error.message)
-    throw new Error("TOOL_ERROR")
+    throw createAppError("Falha ao conectar com o serviço de cotação de criptomoedas (Mercado Bitcoin).", 503, "CRYPTO_API_ERROR")
   }
 }
 

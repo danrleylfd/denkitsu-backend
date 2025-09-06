@@ -1,19 +1,15 @@
 const axios = require("axios")
+const createAppError = require("../../errors")
 
 const getEarthImages = async () => {
   try {
     const apiKey = process.env.NASA_API_KEY
-    if (!apiKey) throw new Error("A chave da API da NASA (NASA_API_KEY) não foi configurada no servidor.")
+    if (!apiKey) throw createAppError("A chave da API da NASA (NASA_API_KEY) não foi configurada no servidor.", 500, "NASA_API_KEY_MISSING")
     console.log("[TOOL_CALL] Buscando as imagens mais recentes da Terra (EPIC)")
     const { data } = await axios.get(`${process.env.NASA_API_URL}/EPIC/api/natural/images`, {
       params: { api_key: apiKey }
     })
-    if (!data || data.length === 0) {
-      return {
-        status: 404,
-        data: { message: "Nenhuma imagem recente da Terra foi encontrada." }
-      }
-    }
+    if (!data || data.length === 0) throw createAppError("Nenhuma imagem recente da Terra foi encontrada no serviço da NASA.", 404, "NASA_EARTH_NO_IMAGES")
     const formattedImages = data.slice(0, 5).map(image => {
       const date = new Date(image.date)
       const year = date.getFullYear()
@@ -28,8 +24,9 @@ const getEarthImages = async () => {
     })
     return { status: 200, data: { images: formattedImages } }
   } catch (error) {
+    if (error.isOperational) throw error
     console.error("[EPIC_SERVICE] Erro ao buscar imagens da Terra:", error.response?.data || error.message)
-    throw new Error("TOOL_ERROR")
+    throw createAppError("Falha ao conectar com o serviço de imagens da Terra da NASA (EPIC).", 503, "NASA_EPIC_API_ERROR")
   }
 }
 

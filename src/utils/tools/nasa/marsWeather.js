@@ -1,9 +1,10 @@
 const axios = require("axios")
+const createAppError = require("../../errors")
 
 const getMarsWeather = async () => {
   try {
     const apiKey = process.env.NASA_API_KEY
-    if (!apiKey) throw new Error("A chave da API da NASA (NASA_API_KEY) não foi configurada no servidor.")
+    if (!apiKey) throw createAppError("A chave da API da NASA (NASA_API_KEY) não foi configurada no servidor.", 500, "NASA_API_KEY_MISSING")
     console.log("[TOOL_CALL] Buscando o clima mais recente em Marte (InSight)")
     const { data } = await axios.get(`${process.env.NASA_API_URL}/insight_weather/`, {
       params: {
@@ -13,12 +14,7 @@ const getMarsWeather = async () => {
       }
     })
     const solKeys = data.sol_keys
-    if (!solKeys || solKeys.length === 0) {
-      return {
-        status: 404,
-        data: { message: "Nenhum dado meteorológico de Marte disponível no momento." }
-      }
-    }
+    if (!solKeys || solKeys.length === 0) throw createAppError("Nenhum dado meteorológico de Marte está disponível no momento.", 404, "MARS_WEATHER_NO_DATA")
     const latestSolKey = solKeys[solKeys.length - 1]
     const latestSolData = data[latestSolKey]
     const formattedWeather = {
@@ -35,8 +31,9 @@ const getMarsWeather = async () => {
     }
     return { status: 200, data: formattedWeather }
   } catch (error) {
+    if (error.isOperational) throw error
     console.error("[MARS_WEATHER_SERVICE] Erro ao buscar clima de Marte:", error.response?.data || error.message)
-    throw new Error("TOOL_ERROR")
+    throw createAppError("Falha ao conectar com o serviço de meteorologia de Marte da NASA.", 503, "NASA_MARS_WEATHER_API_ERROR")
   }
 }
 

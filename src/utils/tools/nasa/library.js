@@ -1,4 +1,5 @@
 const axios = require("axios")
+const createAppError = require("../../errors")
 
 const searchNasaLibrary = async ({ query }) => {
   try {
@@ -6,12 +7,7 @@ const searchNasaLibrary = async ({ query }) => {
     const { data } = await axios.get("https://images-api.nasa.gov/search", {
       params: { q: query, media_type: "image,video" }
     })
-    if (!data.collection || data.collection.items.length === 0) {
-      return {
-        status: 404,
-        data: { message: `Nenhum resultado encontrado para "${query}" na biblioteca da NASA.` }
-      }
-    }
+    if (!data.collection || data.collection.items.length === 0) throw createAppError(`Nenhum resultado encontrado para "${query}" na biblioteca da NASA.`, 404, "NASA_LIBRARY_NO_RESULTS")
     const formattedResults = data.collection.items.slice(0, 5).map(item => ({
       nasa_id: item.data[0].nasa_id,
       title: item.data[0].title,
@@ -22,8 +18,9 @@ const searchNasaLibrary = async ({ query }) => {
     }))
     return { status: 200, data: { results: formattedResults } }
   } catch (error) {
+    if (error.isOperational) throw error
     console.error(`[NASA_LIBRARY_SERVICE] Erro ao buscar por "${query}":`, error.response?.data || error.message)
-    throw new Error("TOOL_ERROR")
+    throw createAppError("Falha ao conectar com o serviço da biblioteca de mídias da NASA.", 503, "NASA_LIBRARY_API_ERROR")
   }
 }
 
