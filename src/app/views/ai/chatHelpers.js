@@ -1,5 +1,4 @@
 const prompts = require("../../../utils/prompts")
-const User = require("../../models/auth")
 const Agent = require("../../models/agent")
 const Tool = require("../../models/tool")
 const Acquisition = require("../../models/acquisition")
