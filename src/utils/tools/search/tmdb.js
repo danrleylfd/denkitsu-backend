@@ -1,4 +1,5 @@
 const axios = require("axios")
+const createAppError = require("../../../utils/errors")
 
 const tmdbAPI = axios.create({
   baseURL: "https://api.themoviedb.org/3",
@@ -29,10 +30,12 @@ const searchMedia = async ({ query }) => {
     const results = data.results
       .filter(item => (item.media_type === "movie" || item.media_type === "tv") && item.poster_path)
       .map(formatMedia)
+    if (results.length === 0) throw createAppError(`Nenhum filme ou série encontrado para "${query}".`, 404, "TMDB_NO_RESULTS")
     return { status: 200, data: results }
   } catch (error) {
+    if (error.isOperational) throw error
     console.error(`[MEDIA_SERVICE] Erro ao buscar mídia "${query}":`, error.message)
-    throw new Error("TOOL_ERROR")
+    throw createAppError("Não foi possível conectar ao serviço de busca de filmes e séries (TMDb).", 503, "TMDB_API_ERROR")
   }
 }
 
@@ -42,7 +45,7 @@ const getMediaDetails = async (type, id) => {
     return { status: 200, data: formatMedia(data) }
   } catch (error) {
     console.error(`[MEDIA_SERVICE] Erro ao buscar detalhes para ${type}/${id}:`, error.message)
-    throw new Error("API_ERROR")
+    throw createAppError("Não foi possível obter os detalhes da mídia do serviço TMDb.", 503, "TMDB_API_ERROR")
   }
 }
 

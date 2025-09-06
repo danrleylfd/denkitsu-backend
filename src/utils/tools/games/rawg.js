@@ -1,4 +1,5 @@
 const axios = require("axios")
+const createAppError = require("../../errors")
 
 const rawgAPI = axios.create({
   baseURL: process.env.RAWG_API_URL,
@@ -28,11 +29,13 @@ const searchGames = async ({ query }) => {
         page_size: 1
       }
     })
+    if (!data.results || data.results.length === 0) throw createAppError(`Nenhum jogo encontrado para "${query}".`, 404, "RAWG_NO_RESULTS")
     const results = data.results.map(formatGame)
     return { status: 200, data: results }
   } catch (error) {
+    if (error.isOperational) throw error
     console.error(`[GAMES_SERVICE] Erro ao buscar jogos "${query}":`, error.message)
-    throw new Error("TOOL_ERROR")
+    throw createAppError("Não foi possível conectar ao serviço de busca de jogos (RAWG).", 503, "RAWG_API_ERROR")
   }
 }
 

@@ -1,11 +1,11 @@
 const axios = require("axios")
+const createAppError = require("../../../utils/errors")
 
 const POKEAPI_BASE_URL = "https://pokeapi.co/api/v2"
 
 const parseEvolutionChain = (chain) => {
   const evolutions = []
   let current = chain
-
   while (current) {
     evolutions.push(current.species.name.charAt(0).toUpperCase() + current.species.name.slice(1))
     current = current.evolves_to[0]
@@ -17,20 +17,13 @@ const getPokemonDetails = async ({ pokemonNameOrId }) => {
   try {
     console.log(`[TOOL_CALL] Buscando dados para o Pokémon: ${pokemonNameOrId}`)
     const name = pokemonNameOrId.toLowerCase().trim()
-
     const pokemonResponse = await axios.get(`${POKEAPI_BASE_URL}/pokemon/${name}`)
     const speciesResponse = await axios.get(pokemonResponse.data.species.url)
-
     const { data: pokemonData } = pokemonResponse
     const { data: speciesData } = speciesResponse
-
     const evolutionChainResponse = await axios.get(speciesData.evolution_chain.url)
     const evolutionChain = parseEvolutionChain(evolutionChainResponse.data.chain)
-
-    const description = speciesData.flavor_text_entries.find(entry => entry.language.name === "pt")?.flavor_text ||
-                        speciesData.flavor_text_entries.find(entry => entry.language.name === "en")?.flavor_text ||
-                        "Nenhuma descrição disponível."
-
+    const description = speciesData.flavor_text_entries.find(entry => entry.language.name === "pt")?.flavor_text || speciesData.flavor_text_entries.find(entry => entry.language.name === "en")?.flavor_text || "Nenhuma descrição disponível."
     const result = {
       status: 200,
       data: {
@@ -47,7 +40,8 @@ const getPokemonDetails = async ({ pokemonNameOrId }) => {
     return result
   } catch (error) {
     console.error(`[POKEDEX_SERVICE] Erro ao buscar o Pokémon "${pokemonNameOrId}":`, error.message)
-    throw new Error("TOOL_ERROR")
+    if (error.response?.status === 404) throw createAppError(`Não foi possível encontrar o Pokémon "${pokemonNameOrId}". Verifique o nome ou número.`, 404, "POKEMON_NOT_FOUND")
+    throw createAppError("Não foi possível conectar ao serviço da Pokédex (PokéAPI).", 503, "POKEDEX_API_ERROR")
   }
 }
 

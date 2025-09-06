@@ -1,102 +1,98 @@
+const adminService = require("../api/admin")
 const agentService = require("../api/agent")
+const newsService = require("../api/news")
+
+const ttsService = require("./audio/tts")
+
+const albionService = require("./games/albion")
+const genshinService = require("./games/genshinAnalysis")
+const hoyoCodesService = require("./games/hoyoCodes")
+const pokedexService = require("./games/pokedex")
+const gamesService = require("./games/rawg")
+
+const asteroidsService = require("./nasa/asteroids")
+const nasaService = require("./nasa/dailyPicture")
+const earthService = require("./nasa/earth")
+const nasaLibraryService = require("./nasa/library")
+const marsRoverService = require("./nasa/marsRover")
+const marsWeatherService = require("./nasa/marsWeather")
+const spaceWeatherService = require("./nasa/spaceWeather")
 
 const bibleService = require("./search/bible")
 const browserService = require("./search/browser")
+const criptoService = require("./search/cripto")
 const duckduckgoService = require("./search/duckduckgo")
 const httpService = require("./search/http")
-
-const criptoService = require("../api/cripto")
-const nasaService = require("./nasa/dailyPicture")
-const nasaLibraryService = require("./nasa/library")
-const earthService = require("./nasa/earth")
-const marsRoverService = require("./nasa/marsRover")
-const asteroidsService = require("./nasa/asteroids")
-const spaceWeatherService = require("./nasa/spaceWeather")
-const marsWeatherService = require("./nasa/marsWeather")
-const newsService = require("../api/news")
+const cinemaService = require("./search/tmdb")
 const weatherService = require("./search/weather")
 const wikipediaService = require("./search/wikipedia")
 
-const cinemaService = require("./search/tmdb")
-const gamesService = require("./search/rawg")
-const albionService = require("./entertainment/albion")
-const genshinService = require("../api/genshinAnalysis")
-const hoyoCodesService = require("../api/hoyoCodes")
-const pokedexService = require("./entertainment/pokedex")
-
-const ttsService = require("../api/tts")
-
-const adminService = require("../api/admin")
-
 const availableTools = {
-  selectAgentTool: agentService.selectAgent,
-
-  bibleTool: bibleService.searchBible,
-  browserTool: browserService.browseUrl,
-  duckduckgoTool: duckduckgoService.searchDuckDuckGo,
-  httpTool: httpService.executeHttpRequest,
-
-  criptoTool: criptoService.getCoinQuote,
-  nasaTool: nasaService.nasaDailyPicture,
-  nasaLibraryTool: nasaLibraryService.searchNasaLibrary,
-  earthTool: earthService.getEarthImages,
-  marsRoverTool: marsRoverService.getMarsRoverLatestPhotos,
-  asteroidsTool: asteroidsService.getNearEarthObjects,
-  spaceWeatherTool: spaceWeatherService.getSpaceWeatherEvents,
-  marsWeatherTool: marsWeatherService.getMarsWeather,
-  newsTool: newsService.searchNews,
-  weatherTool: weatherService.getWeatherByLocation,
-  wikiTool: wikipediaService.searchWikipedia,
-
-  cinemaTool: cinemaService.searchMedia,
-  gamesTool: gamesService.searchGames,
-  albionTool: albionService.getGoldPrice,
-  genshinTool: genshinService.genshinAnalysis,
-  hoyoCodesTool: hoyoCodesService.getHoyoCodes,
-  pokedexTool: pokedexService.getPokemonDetails,
-
   cancelSubscriptionTool: adminService.cancelSubscription,
   refundSubscriptionTool: adminService.refundSubscription,
   reactivateSubscriptionTool: adminService.reactivateSubscription,
   syncSubscriptionTool: adminService.syncSubscription,
+  selectAgentTool: agentService.selectAgent,
+  newsTool: newsService.searchNews,
 
   ttsTool: ttsService.textToSpeech,
+
+  albionTool: albionService.getGoldPrice,
+  genshinTool: genshinService.genshinAnalysis,
+  hoyoCodesTool: hoyoCodesService.getHoyoCodes,
+  pokedexTool: pokedexService.getPokemonDetails,
+  gamesTool: gamesService.searchGames,
+
+  asteroidsTool: asteroidsService.getNearEarthObjects,
+  nasaTool: nasaService.nasaDailyPicture,
+  earthTool: earthService.getEarthImages,
+  nasaLibraryTool: nasaLibraryService.searchNasaLibrary,
+  marsRoverTool: marsRoverService.getMarsRoverLatestPhotos,
+  marsWeatherTool: marsWeatherService.getMarsWeather,
+  spaceWeatherTool: spaceWeatherService.getSpaceWeatherEvents,
+
+  bibleTool: bibleService.searchBible,
+  browserTool: browserService.browseUrl,
+  criptoTool: criptoService.getCoinQuote,
+  duckduckgoTool: duckduckgoService.searchDuckDuckGo,
+  httpTool: httpService.executeHttpRequest,
+  cinemaTool: cinemaService.searchMedia,
+  weatherTool: weatherService.getWeatherByLocation,
+  wikiTool: wikipediaService.searchWikipedia,
 }
 
 const tools = [
-  agentService.selectAgentTool,
-
-  bibleService.bibleTool,
-  browserService.browserTool,
-  duckduckgoService.duckduckgoTool,
-  httpService.httpTool,
-
-  criptoService.criptoTool,
-  nasaService.nasaTool,
-  nasaLibraryService.nasaLibraryTool,
-  earthService.earthTool,
-  marsRoverService.marsRoverTool,
-  asteroidsService.asteroidsTool,
-  spaceWeatherService.spaceWeatherTool,
-  marsWeatherService.marsWeatherTool,
-
-  newsService.newsTool,
-  weatherService.weatherTool,
-  wikipediaService.wikiTool,
-
-  cinemaService.cinemaTool,
-  gamesService.gamesTool,
-  albionService.albionTool,
-  genshinService.genshinTool,
-  hoyoCodesService.hoyoCodesTool,
-  pokedexService.pokedexTool,
-
   adminService.cancelSubscriptionTool,
   adminService.refundSubscriptionTool,
   adminService.reactivateSubscriptionTool,
   adminService.syncSubscriptionTool,
+  agentService.selectAgentTool,
+  newsService.newsTool,
 
   ttsService.ttsTool,
+
+  albionService.albionTool,
+  genshinService.genshinTool,
+  hoyoCodesService.hoyoCodesTool,
+  pokedexService.pokedexTool,
+  gamesService.gamesTool,
+
+  asteroidsService.asteroidsTool,
+  nasaService.nasaTool,
+  earthService.earthTool,
+  nasaLibraryService.nasaLibraryTool,
+  marsRoverService.marsRoverTool,
+  marsWeatherService.marsWeatherTool,
+  spaceWeatherService.spaceWeatherTool,
+
+  bibleService.bibleTool,
+  browserService.browserTool,
+  criptoService.criptoTool,
+  duckduckgoService.duckduckgoTool,
+  httpService.httpTool,
+  cinemaService.cinemaTool,
+  weatherService.weatherTool,
+  wikipediaService.wikiTool,
 ]
 
 module.exports = { availableTools, tools }

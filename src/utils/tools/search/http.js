@@ -1,4 +1,5 @@
 const axios = require("axios")
+const createAppError = require("../../../utils/errors")
 
 const executeHttpRequest = async ({ config }) => {
   try {
@@ -11,8 +12,10 @@ const executeHttpRequest = async ({ config }) => {
     })
     return { data: response.data }
   } catch (error) {
-    console.error(`[HTTP_SERVICE] Erro ao consumir API "${config}":`, error.message)
-    throw new Error("TOOL_ERROR")
+    console.error(`[HTTP_SERVICE] Erro ao consumir API "${config?.url}":`, error.message)
+    const status = error.response?.status
+    const details = error.response?.data ? `Detalhes: ${JSON.stringify(error.response.data)}` : "O servidor pode estar indisponível ou a URL está incorreta."
+    throw createAppError(`A requisição HTTP para "${config.url}" falhou${status ? ` com status ${status}` : ""}. ${details}`, status || 503, "HTTP_REQUEST_FAILED")
   }
 }
 

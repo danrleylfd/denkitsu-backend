@@ -1,5 +1,6 @@
 const axios = require("axios")
 const cheerio = require("cheerio")
+const createAppError = require("../../../utils/errors")
 
 const searchDuckDuckGo = async ({ query }) => {
   try {
@@ -34,17 +35,15 @@ const searchDuckDuckGo = async ({ query }) => {
         results.push({ title, url, description })
       }
     })
-    if (results.length === 0 && summary_try_1 && !summary_try_2) {
-      return {
-        status: 404,
-        data: { message: "Nenhum resultado encontrado para a busca." }
-      }
+    if (results.length === 0 && !summary_try_1 && !summary_try_2) {
+      throw createAppError("Nenhum resultado de busca foi encontrado para o termo especificado.", 404, "DUCKDUCKGO_NO_RESULTS")
     }
     const finalData = { summary_try_1, summary_try_2, results: results.slice(0, 10) }
     return { status: 200, data: finalData }
   } catch (error) {
+    if (error.isOperational) throw error
     console.error(`[DUCKDUCKGO_SERVICE] Erro ao buscar por "${query}":`, error.message)
-    throw new Error("TOOL_ERROR")
+    throw createAppError("Falha ao conectar com o serviço de busca DuckDuckGo.", 503, "DUCKDUCKGO_API_ERROR")
   }
 }
 

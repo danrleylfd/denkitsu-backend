@@ -1,5 +1,6 @@
 const axios = require("axios")
 const cheerio = require("cheerio")
+const createAppError = require("../../../utils/errors")
 
 const browseUrl = async ({ url }) => {
   try {
@@ -11,11 +12,9 @@ const browseUrl = async ({ url }) => {
     const $ = cheerio.load(html)
     $("script, style, nav, footer, header, aside, form").remove()
     let mainContent = $("main").text() || $("article").text() || $("body").text()
-    const cleanedText = mainContent.replace(/\s\s+/g, ' ').trim()
+    const cleanedText = mainContent.replace(/\s\s+/g, " ").trim()
     const limitedText = cleanedText.substring(0, 15000)
-    if (!limitedText) {
-      throw new Error("Não foi possível extrair conteúdo de texto da página.")
-    }
+    if (!limitedText) throw createAppError("Não foi possível extrair conteúdo de texto da página. A página pode estar vazia ou ser renderizada dinamicamente.", 422, "BROWSER_EXTRACTION_FAILED")
     return {
       status: 200,
       data: {
@@ -24,8 +23,9 @@ const browseUrl = async ({ url }) => {
       },
     }
   } catch (error) {
+    if (error.isOperational) throw error
     console.error(`[BROWSER_SERVICE] Erro ao navegar na URL "${url}":`, error.message)
-    throw new Error("TOOL_ERROR")
+    throw createAppError("Falha ao acessar a URL. Verifique o link ou a página pode estar indisponível.", 503, "BROWSER_ACCESS_FAILED")
   }
 }
 
