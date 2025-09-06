@@ -26,7 +26,7 @@ const cleanAiOutput = (text = "") => {
 
 const generateOne = async (req, res) => {
   const { aiProvider = "groq", aiKey, searchTerm = "" } = req.body
-  const { data: newsData } = await searchNews(searchTerm)
+  const { data: newsData } = await searchNews({ searchTerm })
   if (!newsData || newsData.articles.length === 0) throw createAppError("Nenhuma notícia encontrada para o termo pesquisado.", 404, "NEWS_NOT_FOUND")
   const article = newsData.articles[0]
   const articleExists = await News.findOne({ source: article?.url })
