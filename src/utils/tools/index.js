@@ -14,7 +14,7 @@ const asteroidsService = require("./nasa/asteroids")
 const spaceWeatherService = require("./nasa/spaceWeather")
 const marsWeatherService = require("./nasa/marsWeather")
 const newsService = require("../api/news")
-const weatherService = require("../api/weather")
+const weatherService = require("./search/weather")
 const wikipediaService = require("./search/wikipedia")
 
 const cinemaService = require("./search/tmdb")
