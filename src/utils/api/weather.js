@@ -30,7 +30,7 @@ const weatherTool = {
   type: "function",
   function: {
     name: "weatherTool",
-    description: "Use essa tool para obter a previsão do tempo para uma cidade específica.",
+    description: "Use essa tool para obter a previsão do tempo para uma cidade específica, Use o formato Clima.",
     parameters: {
       type: "object",
       properties: {
