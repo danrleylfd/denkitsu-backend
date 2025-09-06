@@ -5,6 +5,7 @@ const Tool = require("../../models/tool")
 const Acquisition = require("../../models/acquisition")
 const { AGENTS_DEFINITIONS } = require("../../../utils/constants/definitions")
 const { availableTools, tools: builtInTools } = require("../../../utils/tools")
+const createAppError = require("../../../utils/errors")
 
 const cleanToolCallSyntax = (content) => {
   if (typeof content !== "string") return content
@@ -188,11 +189,13 @@ const executeToolCall = async (toolCall, allUserCustomTools, user) => {
     }
   } catch (error) {
     console.error(`[TOOL_EXECUTION_ERROR] Ferramenta: ${functionName}. Erro:`, error.message)
+    const errorMessage = error.isOperational ? error.message : `A ferramenta '${functionName}' falhou com um erro inesperado.`
+    const errorCode = error.isOperational ? error.errorCode : "TOOL_UNHANDLED_ERROR"
     return {
       tool_call_id: toolCall.id,
       role: "tool",
       name: functionName,
-      content: JSON.stringify({ error: `A ferramenta '${functionName}' falhou durante a execução. Motivo: ${error.message}` })
+      content: JSON.stringify({ error: { code: errorCode, message: errorMessage } })
     }
   }
 }
