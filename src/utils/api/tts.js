@@ -55,7 +55,11 @@ const ttsTool = {
         },
         voice: {
           type: "string",
-          description: "A voz a ser usada. Padrão: 'Fritz-PlayAI'",
+          description: `A voz a ser usada. O modelo de linguagem (Inglês ou Árabe) é selecionado automaticamente. Padrão: 'Fritz-PlayAI'. Vozes disponíveis:
+Inglês Masculinas: Atlas-PlayAI, Basil-PlayAI, Briggs-PlayAI, Calum-PlayAI, Chip-PlayAI, Cillian-PlayAI, Fritz-PlayAI, Mason-PlayAI, Mikail-PlayAI, Mitch-PlayAI, Thunder-PlayAI
+Inglês Femininas: Arista-PlayAI, Celeste-PlayAI, Cheyenne-PlayAI, Deedee-PlayAI, Gail-PlayAI, Indigo-PlayAI, Mamaw-PlayAI, Quinn-PlayAI
+Árabe Masculinas: Ahmad-PlayAI, Khalid-PlayAI, Nasser-PlayAI
+Árabe Femininas: Amira-PlayAI`,
           enum: [
             "Arista-PlayAI", "Atlas-PlayAI", "Basil-PlayAI", "Briggs-PlayAI",
             "Calum-PlayAI", "Celeste-PlayAI", "Cheyenne-PlayAI", "Chip-PlayAI",
