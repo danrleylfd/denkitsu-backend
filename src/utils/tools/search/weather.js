@@ -1,4 +1,5 @@
 const axios = require("axios")
+const createAppError = require("../../../utils/errors")
 
 const api = axios.create({
   baseURL: "https://api.openweathermap.org",
@@ -8,12 +9,13 @@ const api = axios.create({
 const getWeatherByLocation = async ({ location }) => {
   try {
     const { data: geoCodeData } = await api.get(`/geo/1.0/direct?q=${location}&limit=1&appid=${process.env.WEATHER_API_KEY}`)
-    if (geoCodeData.length === 0) throw new Error("LOCATION_NOT_FOUND")
+    if (geoCodeData.length === 0) throw createAppError("Não foi possível encontrar a localização especificada.", 404, "LOCATION_NOT_FOUND")
     const { lat, lon } = geoCodeData[0]
     return await api.get(`/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&lang=pt_br&appid=${process.env.WEATHER_API_KEY}`)
   } catch (error) {
+    if (error.isOperational) throw error
     console.error(`[WEATHER_SERVICE] Erro ao obter dados climáticos:`, error.message)
-    throw new Error("TOOL_ERROR")
+    throw createAppError("Não foi possível obter os dados climáticos no momento.", 503, "WEATHER_API_ERROR")
   }
 }
 
@@ -22,7 +24,7 @@ const getWeatherByCoordinates = async (lat, lon) => {
     return await api.get(`/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&lang=pt_br&appid=${process.env.WEATHER_API_KEY}`)
   } catch (error) {
     console.error(`[WEATHER_SERVICE] Erro ao obter dados climáticos:`, error.message)
-    throw new Error("TOOL_ERROR")
+    throw createAppError("Não foi possível obter os dados climáticos para as coordenadas fornecidas.", 503, "WEATHER_API_ERROR")
   }
 }
 

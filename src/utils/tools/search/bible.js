@@ -1,4 +1,5 @@
 const axios = require("axios")
+const createAppError = require("../../../utils/errors")
 
 const formatQuery = ({ query }) => {
   return query
@@ -13,34 +14,19 @@ const searchBible = async (query, translation = "almeida") => {
   try {
     const formattedQuery = formatQuery(query)
     console.log(`[TOOL_CALL] Buscando na Bíblia por: ${formattedQuery} (Tradução: ${translation})`)
-
-    const { data } = await axios.get(`https://bible-api.com/${formattedQuery}`, {
-      params: { translation },
-    })
-
-    if (!data || !data.verses) {
-      return {
-        status: 404,
-        data: { message: `Não foi possível encontrar a referência "${query}". Verifique se o livro, capítulo e versículo estão corretos.` },
-      }
-    }
-
+    const { data } = await axios.get(`https://bible-api.com/${formattedQuery}`, { params: { translation } })
+    if (!data || !data.verses) throw createAppError(`Não foi possível encontrar a referência "${query}". Verifique se o livro, capítulo e versículo estão corretos.`, 404, "BIBLE_REFERENCE_NOT_FOUND")
     const formattedResponse = {
       reference: data.reference,
       translation: data.translation_name,
       text: data.text.trim(),
     }
-
     return { status: 200, data: formattedResponse }
   } catch (error) {
+    if (error.isOperational) throw error
     console.error(`[BIBLE_SERVICE] Erro ao buscar por "${query}":`, error.response?.data || error.message)
-    if (error.response?.status === 404) {
-      return {
-        status: 404,
-        data: { message: `A referência "${query}" não foi encontrada. Verifique o nome do livro, capítulo e versículo.` },
-      }
-    }
-    throw new Error("TOOL_ERROR")
+    if (error.response?.status === 404) throw createAppError(`A referência "${query}" é inválida ou não foi encontrada. Verifique o nome do livro, capítulo e versículo.`, 404, "BIBLE_REFERENCE_NOT_FOUND")
+    throw createAppError("Não foi possível conectar ao serviço de busca da Bíblia no momento.", 503, "BIBLE_API_ERROR")
   }
 }
 
