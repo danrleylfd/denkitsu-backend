@@ -11,7 +11,7 @@ const sendMessageRules = () => {
       .withMessage("É necessário enviar ao menos uma mensagem."),
     body("aiProvider")
       .optional()
-      .isIn(["openrouter", "groq", "custom"])
+      .isIn(["openrouter", "groq", "gemini", "custom"])
       .withMessage("O provedor de IA selecionado é inválido."),
   ]
 }

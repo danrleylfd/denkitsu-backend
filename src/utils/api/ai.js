@@ -1,5 +1,7 @@
 const OpenAI = require("openai")
+const { GoogleGenerativeAI } = require("@google/generative-ai")
 const createAppError = require("../errors")
+const { transformToGemini, transformFromGemini } = require("../../app/views/ai/chatHelpers")
 
 const providerConfig = {
   groq: {
@@ -11,10 +13,19 @@ const providerConfig = {
     apiUrl: process.env.OPENROUTER_API_URL,
     apiKey: process.env.OPENROUTER_API_KEY,
     defaultModel: "deepseek/deepseek-r1-0528:free"
+  },
+  gemini: {
+    apiKey: process.env.GEMINI_API_KEY,
+    defaultModel: "gemini-1.5-flash"
   }
 }
 
 const createAIClientFactory = (provider, apiKey, customApiUrl) => {
+  if (provider === "gemini") {
+    const finalApiKey = apiKey || providerConfig.gemini?.apiKey
+    if (!finalApiKey) throw new Error("API key para Gemini não encontrada")
+    return new GoogleGenerativeAI(finalApiKey)
+  }
   const config = providerConfig[provider]
   const finalApiUrl = customApiUrl || config?.apiUrl
   if (!finalApiUrl) throw new Error(`Provedor de IA inválido ou URL não configurada: ${provider}`)
@@ -25,24 +36,57 @@ const createAIClientFactory = (provider, apiKey, customApiUrl) => {
 
 const ask = async (aiProvider, aiKey, prompts, options = {}) => {
   const { customApiUrl, ...restOptions } = options
+  const timestampsMsg = { role: "system", content: `O sistema informa a data atual em formato ISO: ${new Date().toISOString()}, converta para horário de Brasília conforme necessidade do usuário, não mostre se o usuário não solicitar, use como referência temporal quando o usuário mencionar alguma data ou quando alguma tool fornecer uma data.` }
+  const finalPrompts = [timestampsMsg, ...prompts]
+
+  if (aiProvider === "gemini") {
+    const { model: modelName, stream, ...props } = restOptions
+    const geminiClient = createAIClientFactory(aiProvider, aiKey)
+    const geminiModel = geminiClient.getGenerativeModel({
+      model: modelName || providerConfig.gemini.defaultModel,
+      tools: props.tools
+    })
+    const history = transformToGemini(finalPrompts.filter(m => m.role !== "system"))
+    const lastMessage = history.pop()
+
+    try {
+      const chat = geminiModel.startChat({ history })
+      if (stream) {
+        const streamResult = await chat.sendMessageStream(lastMessage.parts)
+        // O streaming do Gemini será tratado diretamente no `sendWithStream` para simplicidade agora.
+        // Esta função se concentrará na resposta sem streaming para Gemini.
+        throw new Error("Streaming para Gemini deve ser tratado em uma função dedicada.")
+      }
+      const result = await chat.sendMessage(lastMessage.parts)
+      const openAIResponse = transformFromGemini(result.response)
+      return { status: 200, data: { choices: [{ message: openAIResponse }] } }
+    } catch (error) {
+       console.error(`Erro ao chamar a API ${aiProvider}:`, {
+        message: error.message,
+        stack: error.stack
+      })
+      throw new Error("API_REQUEST_FAILED")
+    }
+  }
+
+  // Lógica existente para OpenAI e compatíveis
   const openai = createAIClientFactory(aiProvider, aiKey, customApiUrl)
   const { model, stream, ...props } = restOptions
   const config = providerConfig[aiProvider]
   const finalModel = model || config?.defaultModel
-  const timestampsMsg = { role: "system", content: `O sistema informa a data atual em formato ISO: ${new Date().toISOString()}, converta para horário de Brasília conforme necessidade do usuário, não mostre se o usuário não solicitar, use como referência temporal quando o usuário mencionar alguma data ou quando alguma tool fornecer uma data.` }
+
   try {
     if (stream) {
-      const streamResponse = await openai.chat.completions.create({
+      return await openai.chat.completions.create({
         model: finalModel,
-        messages: [timestampsMsg, ...prompts],
+        messages: finalPrompts,
         stream: true,
         ...props
       })
-      return streamResponse
     }
     const response = await openai.chat.completions.create({
       model: finalModel,
-      messages: [timestampsMsg, ...prompts],
+      messages: finalPrompts,
       stream: false,
       ...props
     })
@@ -87,20 +131,35 @@ const getModels = async (aiProvider, apiUrl, apiKey) => {
   if (aiProvider === "custom" && !apiKey) throw createAppError("API Key não fornecida para provedor customizado.", 400, "CUSTOM_API_KEY_MISSING")
   if (aiProvider === "custom" && !apiUrl) throw createAppError("API URL não fornecida para provedor customizado.", 400, "CUSTOM_API_URL_MISSING")
   if (aiProvider === "custom") providerConfig["custom"] = { apiUrl, apiKey, defaultModel: "auto" }
+
   const models = []
   if (aiProvider === "custom") models.push({ id: "auto", supports_tools: true, supports_images: true, supports_files: true, aiProvider: "custom" })
+
+  const geminiHardcodedModels = [
+    { id: "gemini-1.5-pro", supports_tools: true, supports_images: true, supports_files: true, aiProvider: "gemini" },
+    { id: "gemini-1.5-flash", supports_tools: true, supports_images: true, supports_files: true, aiProvider: "gemini" }
+  ]
+  if (aiProvider === "gemini") models.push(...geminiHardcodedModels)
+
+
   for (const [provider, config] of Object.entries(providerConfig)) {
+    if (provider === "gemini") continue
     const openai = createAIClientFactory(provider, apiKey || config.apiKey, config.apiUrl)
-    const response = await openai.models.list()
-    const updatedModels = response.data.map((model) => ({
-      id: model.id,
-      supports_tools: provider === "openrouter" ? checkToolCompatibility(model) : (provider === "groq") ? true : false,
-      supports_images: checkImageCompatibility(model),
-      supports_files: checkFileCompatibility(model),
-      aiProvider: provider
-    }))
-    models.push(...updatedModels)
+    try {
+      const response = await openai.models.list()
+      const updatedModels = response.data.map((model) => ({
+        id: model.id,
+        supports_tools: provider === "openrouter" ? checkToolCompatibility(model) : (provider === "groq") ? true : false,
+        supports_images: checkImageCompatibility(model),
+        supports_files: checkFileCompatibility(model),
+        aiProvider: provider
+      }))
+      models.push(...updatedModels)
+    } catch (error) {
+       console.warn(`[AI_UTILS] Não foi possível carregar modelos para o provedor ${provider}.`)
+    }
   }
+
   const openRouterModels = models
     .filter((item) => item.id && item.aiProvider === "openrouter")
     .sort((a, b) => a.id.localeCompare(b.id))
@@ -116,7 +175,11 @@ const getModels = async (aiProvider, apiUrl, apiKey) => {
   const customModels = models
     .filter((item) => item.aiProvider === "custom")
     .sort((a, b) => a.id.localeCompare(b.id))
-  const prettyModels = { freeModels, openRouterModels, payModels, groqModels, customModels }
+  const geminiModels = models
+    .filter((item) => item.aiProvider === "gemini")
+    .sort((a, b) => a.id.localeCompare(b.id))
+
+  const prettyModels = { freeModels, openRouterModels, payModels, groqModels, customModels, geminiModels }
   return prettyModels
 }
 

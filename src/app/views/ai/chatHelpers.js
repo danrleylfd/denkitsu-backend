@@ -112,8 +112,13 @@ const buildToolOptions = async (aiProvider, use_tools = [], userId, mode) => {
     }))
     const combinedTools = [...(toolOptions.tools || []), ...filteredBuiltInTools, ...customToolSchemas]
     if (combinedTools.length > 0) {
-      toolOptions.tools = combinedTools
-      toolOptions.tool_choice = "auto"
+      if (aiProvider === "gemini") {
+        toolOptions.tool_config = { function_calling_config: { mode: "AUTO" } }
+        toolOptions.tools = combinedTools.map(t => ({ function_declarations: [t.function] })).flat()
+      } else {
+        toolOptions.tools = combinedTools
+        toolOptions.tool_choice = "auto"
+      }
     }
   }
   return toolOptions
@@ -205,11 +210,71 @@ const processToolCalls = async (toolCalls, user) => {
   return Promise.all(toolResultPromises)
 }
 
+const transformToGemini = (messages) => {
+  const geminiContents = []
+  let systemPrompt = ""
+
+  messages.forEach(msg => {
+    if (msg.role === "system") {
+      systemPrompt += `${msg.content}\n\n`
+      return
+    }
+
+    const role = msg.role === "assistant" ? "model" : "user"
+    let parts = []
+
+    if (role === "user" && systemPrompt) {
+      parts.push({ text: `${systemPrompt}${msg.content}` })
+      systemPrompt = "" // Consumir o prompt do sistema apenas uma vez
+    } else if (msg.content) {
+      parts.push({ text: msg.content })
+    }
+
+    if (msg.tool_calls) {
+      parts.push(...msg.tool_calls.map(tc => ({ functionCall: tc.function })))
+    }
+
+    if (msg.role === "tool") {
+      parts = [{ functionResponse: { name: msg.name, response: { content: msg.content } } }]
+    }
+
+    geminiContents.push({ role, parts })
+  })
+
+  return geminiContents
+}
+
+const transformFromGemini = (geminiResponse) => {
+  const candidate = geminiResponse?.candidates?.[0]
+  if (!candidate) return { role: "assistant", content: "" }
+
+  const content = candidate.content?.parts?.find(p => p.text)?.text || ""
+  const tool_calls = candidate.content?.parts
+    .filter(p => p.functionCall)
+    .map((p, i) => ({
+      id: `call_${i}`,
+      type: "function",
+      function: {
+        name: p.functionCall.name,
+        arguments: JSON.stringify(p.functionCall.args)
+      }
+    }))
+
+  return {
+    role: "assistant",
+    content: content || null,
+    tool_calls: tool_calls?.length > 0 ? tool_calls : undefined
+  }
+}
+
+
 module.exports = {
   cleanToolCallSyntax,
   extractReasoning,
   getSystemPrompt,
   buildToolOptions,
   processToolCalls,
-  processStreamAndExtractReasoning
+  processStreamAndExtractReasoning,
+  transformToGemini,
+  transformFromGemini
 }
