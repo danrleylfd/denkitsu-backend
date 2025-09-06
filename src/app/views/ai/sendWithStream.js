@@ -1,3 +1,4 @@
+// Backend/src/app/views/ai/sendWithStream.js
 const { ask } = require("../../../utils/api/ai")
 const { sanitizeMessages } = require("../../../utils/helpers/ai")
 const {
@@ -55,6 +56,21 @@ const sendWithStream = async (req, res, next) => {
       res.write(`data: ${JSON.stringify(statusUpdate)}\n\n`)
     }
     const toolResultMessages = await processToolCalls(finalToolCalls, user)
+
+    const ttsCall = finalToolCalls.find(c => c.function.name === "ttsTool")
+    if (ttsCall && finalToolCalls.length === 1) {
+      const ttsResult = toolResultMessages.find(r => r.tool_call_id === ttsCall.id)
+      if (ttsResult) {
+        const finalChunk = {
+          choices: [{
+            delta: { role: "assistant", content: ttsResult.content }
+          }]
+        }
+        res.write(`data: ${JSON.stringify(finalChunk)}\n\n`)
+        return res.end()
+      }
+    }
+
     const routerToolCallResult = toolResultMessages.find(r => r.name === "selectAgentTool")
     if (routerToolCallResult) {
       const resultData = JSON.parse(routerToolCallResult.content)
@@ -69,7 +85,7 @@ const sendWithStream = async (req, res, next) => {
       }
     } else messages.push(...toolResultMessages)
     if (initialReasoningSent) res.write(`data: ${JSON.stringify({ choices: [{ delta: { reasoning: "\n\n...\n\n" } }] })}\n\n`)
-    const secondCallOptions = { model, stream: true, customApiUrl }
+    const secondCallOptions = { model, stream: true, customApiUrl, ...toolOptions }
     const finalResponseStream = await ask(aiProvider, aiKey, sanitizeMessages(messages), secondCallOptions)
     const finalProcessedStream = processStreamAndExtractReasoning(finalResponseStream)
     for await (const finalChunk of finalProcessedStream) {
