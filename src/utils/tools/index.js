@@ -1,6 +1,5 @@
 const adminService = require("../api/admin")
 const agentService = require("../api/agent")
-const newsService = require("../api/news")
 
 const ttsService = require("./audio/tts")
 
@@ -23,7 +22,8 @@ const browserService = require("./search/browser")
 const criptoService = require("./search/cripto")
 const duckduckgoService = require("./search/duckduckgo")
 const httpService = require("./search/http")
-const cinemaService = require("./search/tmdb")
+const newsService = require("./search/news")
+const tmdbService = require("./search/tmdb")
 const weatherService = require("./search/weather")
 const wikipediaService = require("./search/wikipedia")
 
@@ -33,7 +33,6 @@ const availableTools = {
   reactivateSubscriptionTool: adminService.reactivateSubscription,
   syncSubscriptionTool: adminService.syncSubscription,
   selectAgentTool: agentService.selectAgent,
-  newsTool: newsService.searchNews,
 
   ttsTool: ttsService.textToSpeech,
 
@@ -56,7 +55,8 @@ const availableTools = {
   criptoTool: criptoService.getCoinQuote,
   duckduckgoTool: duckduckgoService.searchDuckDuckGo,
   httpTool: httpService.executeHttpRequest,
-  cinemaTool: cinemaService.searchMedia,
+  newsTool: newsService.searchNews,
+  tmdbTool: tmdbService.searchMedia,
   weatherTool: weatherService.getWeatherByLocation,
   wikiTool: wikipediaService.searchWikipedia,
 }
@@ -67,7 +67,6 @@ const tools = [
   adminService.reactivateSubscriptionTool,
   adminService.syncSubscriptionTool,
   agentService.selectAgentTool,
-  newsService.newsTool,
 
   ttsService.ttsTool,
 
@@ -90,7 +89,8 @@ const tools = [
   criptoService.criptoTool,
   duckduckgoService.duckduckgoTool,
   httpService.httpTool,
-  cinemaService.cinemaTool,
+  newsService.newsTool,
+  tmdbService.tmdbTool,
   weatherService.weatherTool,
   wikipediaService.wikiTool,
 ]
