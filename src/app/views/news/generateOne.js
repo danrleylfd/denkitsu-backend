@@ -1,5 +1,5 @@
 const News = require("../../models/news")
-const { searchNews } = require("../../../utils/tools/news")
+const { searchNews } = require("../../../utils/tools/search/news")
 const { ask } = require("../../../utils/api/ai")
 const prompts = require("../../../utils/prompts")
 
