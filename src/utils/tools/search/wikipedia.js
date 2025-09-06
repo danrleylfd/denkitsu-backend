@@ -1,4 +1,5 @@
 const axios = require("axios")
+const createAppError = require("../../../utils/errors")
 
 const searchWikipedia = async ({ query }) => {
   try {
@@ -15,7 +16,7 @@ const searchWikipedia = async ({ query }) => {
     return { status: 200, data: summary }
   } catch (error) {
     console.error(`[WIKIPEDIA_SERVICE] Erro ao buscar o tópico "${query}":`, error.response?.data || error.message)
-    throw new Error("TOOL_ERROR")
+    throw createAppError("Não foi possível conectar ao serviço da Wikipedia ou o tópico não foi encontrado.", 503, "WIKIPEDIA_API_ERROR")
   }
 }
 
