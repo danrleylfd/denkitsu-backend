@@ -11,7 +11,6 @@ const VideoSchema = new mongoose.Schema(
 )
 
 VideoSchema.pre("save", async function (next) {
-  // console.log(this.content, this.thumbnail)
   next()
 })
 

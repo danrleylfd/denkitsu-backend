@@ -18,7 +18,6 @@ const createCustomerPortal = async (req, res) => {
 
 const createCheckoutSession = async (req, res) => {
   const { user } = req
-  console.log(user)
   if (user.subscriptionCancelAtPeriodEnd) {
     const updatedUser = await stripeService.reactivate(user)
     return res.status(200).json({ type: "reactivation", user: updatedUser })

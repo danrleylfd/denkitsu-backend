@@ -14,7 +14,6 @@ const textToSpeech = async ({ model = "playai-tts", response_format = "wav", tex
       input: text,
       response_format
     })
-    console.log(response)
     const arrayBuffer = await response.arrayBuffer()
     const buffer = Buffer.from(arrayBuffer)
     const audioBase64 = buffer.toString('base64')
@@ -27,7 +26,7 @@ const textToSpeech = async ({ model = "playai-tts", response_format = "wav", tex
       }
     }
   } catch (error) {
-    console.error(`[TTS_SERVICE] Erro ao converter texto em áudio:`, error.message, text)
+    console.error(`[TTS_SERVICE] Erro ao converter texto em áudio:`, error.message)
     throw new Error("TOOL_ERROR")
   }
 }

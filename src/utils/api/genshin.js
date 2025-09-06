@@ -81,7 +81,6 @@ const filterReferenceData = (data) => {
       description: t.description.replace(/<[^>]+>/g, ""),
     }))
   }
-  console.log(result)
   return result
 }
 
@@ -176,7 +175,6 @@ const filterPlayerData = (playerData) => {
       }))
     }
   }
-  console.log(result)
   return result
 }
 
