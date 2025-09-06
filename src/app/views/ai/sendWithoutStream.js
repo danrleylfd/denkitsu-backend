@@ -18,15 +18,21 @@ const sendWithoutStream = async (req, res) => {
   const { data } = await ask(aiProvider, aiKey, messages, requestOptions)
   let responseMessage = data.choices[0].message
   responseMessage.content = cleanToolCallSyntax(responseMessage.content)
-
   if (responseMessage.tool_calls) {
     const ttsCall = responseMessage.tool_calls.find(c => c.function.name === "ttsTool")
     const toolResultMessages = await processToolCalls(responseMessage.tool_calls, user)
-
     if (ttsCall && responseMessage.tool_calls.length === 1) {
       const ttsResult = toolResultMessages.find(r => r.tool_call_id === ttsCall.id)
       if (ttsResult) {
-        const finalMessage = { role: "assistant", content: ttsResult.content }
+        const audioData = JSON.parse(ttsResult.content)
+        const finalMessage = {
+          role: "assistant",
+          content: "Áudio gerado.",
+          audio: {
+            data: audioData.audio,
+            format: audioData.format || "wav"
+          }
+        }
         return res.status(200).json({
           id: data.id,
           object: "chat.completion",
@@ -37,7 +43,6 @@ const sendWithoutStream = async (req, res) => {
         })
       }
     }
-
     const routerToolCall = responseMessage.tool_calls.find(tc => tc.function.name === "selectAgentTool")
     if (routerToolCall) {
       const args = JSON.parse(routerToolCall.function.arguments)
@@ -57,7 +62,6 @@ const sendWithoutStream = async (req, res) => {
     finalMessage.reasoning = `${initialReasoning}\n\n${finalExtractedReasoning}`.trim()
     return res.status(200).json({ ...finalResponse.data, tool_calls: responseMessage.tool_calls || [] })
   }
-
   const existingReasoning = responseMessage.reasoning || ""
   const { content, reasoning: extractedReasoning } = extractReasoning(responseMessage.content)
   responseMessage.content = content

@@ -1,4 +1,3 @@
-// Backend/src/app/views/ai/sendWithStream.js
 const { ask } = require("../../../utils/api/ai")
 const { sanitizeMessages } = require("../../../utils/helpers/ai")
 const {
@@ -56,21 +55,27 @@ const sendWithStream = async (req, res, next) => {
       res.write(`data: ${JSON.stringify(statusUpdate)}\n\n`)
     }
     const toolResultMessages = await processToolCalls(finalToolCalls, user)
-
     const ttsCall = finalToolCalls.find(c => c.function.name === "ttsTool")
     if (ttsCall && finalToolCalls.length === 1) {
       const ttsResult = toolResultMessages.find(r => r.tool_call_id === ttsCall.id)
       if (ttsResult) {
+        const audioData = JSON.parse(ttsResult.content)
         const finalChunk = {
           choices: [{
-            delta: { role: "assistant", content: ttsResult.content }
+            delta: {
+              role: "assistant",
+              content: "Áudio gerado.",
+              audio: {
+                data: audioData.audio,
+                format: audioData.format || "wav"
+              }
+            }
           }]
         }
         res.write(`data: ${JSON.stringify(finalChunk)}\n\n`)
         return res.end()
       }
     }
-
     const routerToolCallResult = toolResultMessages.find(r => r.name === "selectAgentTool")
     if (routerToolCallResult) {
       const resultData = JSON.parse(routerToolCallResult.content)
