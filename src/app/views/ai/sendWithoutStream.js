@@ -27,7 +27,7 @@ const sendWithoutStream = async (req, res) => {
         const audioData = JSON.parse(ttsResult.content)
         const finalMessage = {
           role: "assistant",
-          content: audioData.inputText || "Áudio gerado.",
+          content: audioData.inputText,
           audio: {
             data: audioData.audio,
             format: audioData.format || "wav"
