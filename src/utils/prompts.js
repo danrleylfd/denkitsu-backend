@@ -351,7 +351,7 @@ Agente Roteador
         User: "Code algo em qualquer outra linguagem" -> Ação: Chamar selectAgentTool({ agentName: "Desenvolvedor" }).
         User: "Qualquer coisa relacionada a assinatura Denkitsu Plus" -> Ação: Chamar selectAgentTool({ agentName: "Suporte" }).
   Context Dump
-    Agentes Especializados Disponíveis: Analista, Blogueiro, Desenvolvedor, Lousa, Prompter, Redator, Secretário, Transcritor. O agente para conversas gerais é o "Padrão".
+    Agentes Especializados Disponíveis: {{AGENT_LIST}}. O agente para conversas gerais é o "Padrão".
 `
   },
   {

@@ -3,6 +3,7 @@ const User = require("../../models/auth")
 const Agent = require("../../models/agent")
 const Tool = require("../../models/tool")
 const Acquisition = require("../../models/acquisition")
+const { AGENTS_DEFINITIONS } = require("../../../utils/constants/definitions")
 const { availableTools, tools: builtInTools } = require("../../../utils/tools")
 
 const cleanToolCallSyntax = (content) => {
@@ -44,6 +45,8 @@ async function* processStreamAndExtractReasoning(streamResponse) {
 const getRouterPrompt = async (userId) => {
   const routerPromptTemplate = prompts.find(p => p.content.trim().startsWith("Agente Roteador"))
   if (!routerPromptTemplate) return prompts[0]
+
+  // Buscar agentes customizados (criados + adquiridos)
   const userAcquisitions = await Acquisition.find({ user: userId, itemType: "Agent" }).select("item").lean()
   const acquiredAgentIds = userAcquisitions.map(acq => acq.item)
   const customAgents = await Agent.find({
@@ -51,14 +54,24 @@ const getRouterPrompt = async (userId) => {
       { author: userId },
       { _id: { $in: acquiredAgentIds } }
     ]
-  }).select("name description")
-  let customAgentsContext = ""
-  if (customAgents && customAgents.length > 0) {
-    const agentList = customAgents.map(a => `- ${a.name}: ${a.description}`).join("\n    ")
-    customAgentsContext = `\n    Agentes Customizados do Usuário:\n    ${agentList}`
-  }
+  }).select("name description").lean()
+
+  const allAgents = [
+    ...AGENTS_DEFINITIONS.map(a => ({ name: a.name, description: a.description })),
+    ...customAgents
+  ]
+
+  const uniqueAgents = allAgents.reduce((acc, current) => {
+    if (!acc.find(item => item.name === current.name)) {
+      acc.push(current)
+    }
+    return acc
+  }, [])
+
+  const agentListContext = "Agentes Disponíveis:\n" + uniqueAgents.map(a => `    - ${a.name}: ${a.description}`).join("\n")
   const dynamicRouterPrompt = JSON.parse(JSON.stringify(routerPromptTemplate))
-  dynamicRouterPrompt.content += customAgentsContext
+  dynamicRouterPrompt.content = dynamicRouterPrompt.content.replace("{{AGENT_LIST}}", agentListContext)
+
   return dynamicRouterPrompt
 }
 
