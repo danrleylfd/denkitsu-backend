@@ -41,7 +41,7 @@ const ttsTool = {
       properties: {
         model: {
           type: "string",
-          description: "O modelo TTS a ser usado. Padrão: 'playai-tts'",
+          description: "O modelo TTS a ser usado. Use 'playai-tts' para inglês e 'playai-tts-arabic' para árabe.",
           enum: ["playai-tts", "playai-tts-arabic"]
         },
         response_format: {
@@ -55,7 +55,7 @@ const ttsTool = {
         },
         voice: {
           type: "string",
-          description: `A voz a ser usada. O modelo de linguagem (Inglês ou Árabe) é selecionado automaticamente. Padrão: 'Fritz-PlayAI'. Vozes disponíveis:
+          description: `A voz a ser usada. Vozes disponíveis:
 Inglês Masculinas: Atlas-PlayAI, Basil-PlayAI, Briggs-PlayAI, Calum-PlayAI, Chip-PlayAI, Cillian-PlayAI, Fritz-PlayAI, Mason-PlayAI, Mikail-PlayAI, Mitch-PlayAI, Thunder-PlayAI
 Inglês Femininas: Arista-PlayAI, Celeste-PlayAI, Cheyenne-PlayAI, Deedee-PlayAI, Gail-PlayAI, Indigo-PlayAI, Mamaw-PlayAI, Quinn-PlayAI
 Árabe Masculinas: Ahmad-PlayAI, Khalid-PlayAI, Nasser-PlayAI
@@ -70,7 +70,7 @@ Inglês Femininas: Arista-PlayAI, Celeste-PlayAI, Cheyenne-PlayAI, Deedee-PlayAI
           ]
         }
       },
-      required: ["text"]
+      required: ["text", "model"]
     }
   }
 }
