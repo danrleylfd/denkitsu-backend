@@ -1,4 +1,5 @@
 const OpenAI = require("openai")
+const createAppError = require("../../errors")
 
 const openai = new OpenAI({
   apiKey: process.env.GROQ_API_KEY,
@@ -28,7 +29,7 @@ const textToSpeech = async ({ model = "playai-tts", response_format = "wav", tex
     }
   } catch (error) {
     console.error(`[TTS_SERVICE] Erro ao converter texto em áudio:`, error.message)
-    throw new Error("TOOL_ERROR")
+    throw createAppError("Não foi possível converter o texto em áudio no momento.", 503, "TTS_API_ERROR")
   }
 }
 

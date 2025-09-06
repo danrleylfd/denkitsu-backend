@@ -1,5 +1,5 @@
 const axios = require("axios")
-const createAppError = require("../../../utils/errors")
+const createAppError = require("../../errors")
 
 const api = axios.create({
   baseURL: "https://api.openweathermap.org",

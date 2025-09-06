@@ -1,6 +1,6 @@
 const axios = require("axios")
 const cheerio = require("cheerio")
-const createAppError = require("../../../utils/errors")
+const createAppError = require("../../errors")
 
 const searchDuckDuckGo = async ({ query }) => {
   try {

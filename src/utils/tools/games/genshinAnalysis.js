@@ -1,4 +1,5 @@
 const axios = require("axios")
+const createAppError = require("../../errors")
 
 const filterReferenceData = (data) => {
   if (!data) return null
@@ -187,13 +188,13 @@ const genshinAnalysis = async ({ characterName, uid }) => {
     const listResponse = await axios.get(`${AMBR_API_BASE_URL}/avatar`)
     const characterItems = listResponse.data?.data?.items
     if (!characterItems) {
-      throw new Error("Estrutura da lista de avatares da API Ambr mudou.")
+      throw createAppError("A estrutura de dados da API de referência (Ambr) mudou. A ferramenta precisa de manutenção.", 500, "GENSHIN_API_STRUCTURE_CHANGED")
     }
     const characterEntry = Object.entries(characterItems).find(
       ([id, char]) => char.name.toLowerCase() === characterName.toLowerCase()
     )
     if (!characterEntry) {
-      return { status: 404, data: { message: `Não foi possível encontrar o personagem '${characterName}'. Verifique se o nome está correto e completo.` } }
+      throw createAppError(`Não foi possível encontrar o personagem '${characterName}'. Verifique se o nome está correto e completo.`, 404, "GENSHIN_CHARACTER_NOT_FOUND")
     }
     const characterId = characterEntry[0]
     console.log(`[TOOL_HELPER] ID de ${characterName} encontrado: ${characterId}`)
@@ -205,11 +206,11 @@ const genshinAnalysis = async ({ characterName, uid }) => {
     })
     const [referenceResponse, playerResponse] = await Promise.all([referenceBuildPromise, playerBuildPromise])
     if (!playerResponse.data.avatarInfoList) {
-      return { status: 403, data: { message: `Não foi possível acessar os dados do UID ${uid}. O perfil pode ser privado ou não ter personagens na Vitrine.` } }
+      throw createAppError(`Não foi possível acessar os dados do UID ${uid}. O perfil pode ser privado ou não ter personagens na Vitrine.`, 403, "GENSHIN_PROFILE_PRIVATE_OR_EMPTY")
     }
     const playerData = playerResponse.data.avatarInfoList.find((char) => char.avatarId.toString() === characterId)
     if (!playerData) {
-      return { status: 404, data: { message: `Personagem '${characterName}' não encontrado na Vitrine de Personagens do UID ${uid}.` } }
+      throw createAppError(`Personagem '${characterName}' não encontrado na Vitrine de Personagens do UID ${uid}.`, 404, "GENSHIN_CHARACTER_NOT_IN_SHOWCASE")
     }
     const responseData = {
       characterGameInfo: filterReferenceData(referenceResponse.data.data),
@@ -218,8 +219,9 @@ const genshinAnalysis = async ({ characterName, uid }) => {
     console.log(`[TOOL_CALL] Análise concluída. Retornando dados combinados.`)
     return { status: 200, data: responseData }
   } catch (error) {
+    if (error.isOperational) throw error
     console.error("[GENSHIN_SERVICE] Erro durante a execução:", error.message)
-    throw new Error("TOOL_ERROR")
+    throw createAppError("Ocorreu um erro ao conectar com os serviços de dados do Genshin Impact.", 503, "GENSHIN_API_ERROR")
   }
 }
 

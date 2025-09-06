@@ -1,5 +1,5 @@
 const axios = require("axios")
-const createAppError = require("../../../utils/errors")
+const createAppError = require("../../errors")
 
 const POKEAPI_BASE_URL = "https://pokeapi.co/api/v2"
 

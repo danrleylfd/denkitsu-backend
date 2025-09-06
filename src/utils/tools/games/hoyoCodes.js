@@ -1,15 +1,11 @@
 const axios = require("axios")
+const createAppError = require("../../errors")
 
 const getHoyoCodes = async ({ game }) => {
   try {
     console.log(`[TOOL_CALL] Buscando códigos para o jogo: ${game}`)
     const { data } = await axios.get(`https://hoyo-codes.seria.moe/codes?game=${game}`)
-    if (!data || !data.codes || data.codes.length === 0) {
-      return {
-        status: 404,
-        data: { message: `Nenhum código ativo encontrado para ${game} no momento.` }
-      }
-    }
+    if (!data || !data.codes || data.codes.length === 0) throw createAppError(`Nenhum código de resgate ativo foi encontrado para ${game} no momento.`, 404, "HOYO_CODES_NOT_FOUND")
     const redeemUrlMap = {
       genshin: "https://genshin.hoyoverse.com/en/gift",
       hkrpg: "https://hsr.hoyoverse.com/gift",
@@ -27,8 +23,9 @@ const getHoyoCodes = async ({ game }) => {
       }))
     return { status: 200, data: { codes: activeCodes } }
   } catch (error) {
+    if (error.isOperational) throw error
     console.error("[HOYO_CODES_SERVICE] Erro ao buscar códigos:", error.message)
-    throw new Error("TOOL_ERROR")
+    throw createAppError("Falha ao conectar com o serviço de busca de códigos da Hoyoverse.", 503, "HOYO_API_ERROR")
   }
 }
 
