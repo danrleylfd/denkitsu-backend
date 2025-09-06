@@ -113,8 +113,8 @@ const buildToolOptions = async (aiProvider, use_tools = [], userId, mode) => {
     const combinedTools = [...(toolOptions.tools || []), ...filteredBuiltInTools, ...customToolSchemas]
     if (combinedTools.length > 0) {
       if (aiProvider === "gemini") {
-        toolOptions.tool_config = { function_calling_config: { mode: "AUTO" } }
-        toolOptions.tools = combinedTools.map(t => ({ function_declarations: [t.function] })).flat()
+        toolOptions.toolConfig = { function_calling_config: { mode: "AUTO" } }
+        toolOptions.tools = [{ functionDeclarations: combinedTools.map(t => t.function) }]
       } else {
         toolOptions.tools = combinedTools
         toolOptions.tool_choice = "auto"
@@ -214,31 +214,52 @@ const transformToGemini = (messages) => {
   const geminiContents = []
   let systemPrompt = ""
 
-  messages.forEach(msg => {
-    if (msg.role === "system") {
-      systemPrompt += `${msg.content}\n\n`
-      return
-    }
+  messages.filter(m => m.role === "system").forEach(m => {
+    systemPrompt += `${m.content}\n\n`
+  })
 
+  const operationalMessages = messages.filter(m => m.role !== "system")
+
+  operationalMessages.forEach((msg, index) => {
     const role = msg.role === "assistant" ? "model" : "user"
     let parts = []
+    const content = msg.content
 
-    if (role === "user" && systemPrompt) {
-      parts.push({ text: `${systemPrompt}${msg.content}` })
-      systemPrompt = "" // Consumir o prompt do sistema apenas uma vez
-    } else if (msg.content) {
-      parts.push({ text: msg.content })
+    if (Array.isArray(content)) {
+      content.forEach(part => {
+        if (part.type === "text") {
+          let textContent = part.content
+          if (role === "user" && index === 0 && systemPrompt) {
+            textContent = `${systemPrompt}${textContent}`
+            systemPrompt = ""
+          }
+          parts.push({ text: textContent })
+        }
+      })
+    } else if (typeof content === "string") {
+      let textContent = content
+      if (role === "user" && index === 0 && systemPrompt) {
+        textContent = `${systemPrompt}${textContent}`
+        systemPrompt = ""
+      }
+      parts.push({ text: textContent })
     }
 
     if (msg.tool_calls) {
-      parts.push(...msg.tool_calls.map(tc => ({ functionCall: tc.function })))
+      parts.push(...msg.tool_calls.map(tc => ({ functionCall: { name: tc.function.name, args: JSON.parse(tc.function.arguments) } })))
     }
 
     if (msg.role === "tool") {
-      parts = [{ functionResponse: { name: msg.name, response: { content: msg.content } } }]
+      try {
+        parts = [{ functionResponse: { name: msg.name, response: { content: JSON.parse(msg.content) } } }]
+      } catch (e) {
+        parts = [{ functionResponse: { name: msg.name, response: { content: msg.content } } }]
+      }
     }
 
-    geminiContents.push({ role, parts })
+    if (parts.length > 0) {
+      geminiContents.push({ role, parts })
+    }
   })
 
   return geminiContents
@@ -266,7 +287,6 @@ const transformFromGemini = (geminiResponse) => {
     tool_calls: tool_calls?.length > 0 ? tool_calls : undefined
   }
 }
-
 
 module.exports = {
   cleanToolCallSyntax,

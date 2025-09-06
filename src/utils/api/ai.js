@@ -16,7 +16,7 @@ const providerConfig = {
   },
   gemini: {
     apiKey: process.env.GEMINI_API_KEY,
-    defaultModel: "gemini-2.5-pro"
+    defaultModel: "gemini-1.5-flash"
   }
 }
 
@@ -44,10 +44,12 @@ const ask = async (aiProvider, aiKey, prompts, options = {}) => {
     const geminiClient = createAIClientFactory(aiProvider, aiKey)
     const geminiModel = geminiClient.getGenerativeModel({
       model: modelName || providerConfig.gemini.defaultModel,
-      tools: props.tools
+      tools: props.tools,
+      toolConfig: props.toolConfig
     })
-    const history = transformToGemini(finalPrompts.filter(m => m.role !== "system"))
-    const lastMessage = history.pop()
+    const geminiContents = transformToGemini(finalPrompts)
+    const history = geminiContents.length > 1 ? geminiContents.slice(0, -1) : []
+    const lastMessage = geminiContents.length > 0 ? geminiContents[geminiContents.length - 1] : { role: "user", parts: [{ text: "" }] }
 
     try {
       const chat = geminiModel.startChat({ history })
