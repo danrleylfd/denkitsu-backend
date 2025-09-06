@@ -1,28 +1,28 @@
 const agentService = require("../api/agent")
 
-const bibleService = require("../api/bible")
-const browserService = require("../api/browser")
-const duckduckgoService = require("../api/duckduckgo")
-const httpService = require("../api/http")
+const bibleService = require("./search/bible")
+const browserService = require("./search/browser")
+const duckduckgoService = require("./search/duckduckgo")
+const httpService = require("./search/http")
 
 const criptoService = require("../api/cripto")
-const nasaService = require("../api/nasa")
-const nasaLibraryService = require("../api/nasaLibrary")
-const earthService = require("../api/earth")
-const marsRoverService = require("../api/marsRover")
-const asteroidsService = require("../api/asteroids")
+const nasaService = require("./nasa/dailyPicture")
+const nasaLibraryService = require("./nasa/library")
+const earthService = require("./nasa/earth")
+const marsRoverService = require("./nasa/marsRover")
+const asteroidsService = require("./nasa/asteroids")
 const spaceWeatherService = require("../api/spaceWeather")
-const marsWeatherService = require("../api/marsWeather")
+const marsWeatherService = require("./nasa/marsWeather")
 const newsService = require("../api/news")
 const weatherService = require("../api/weather")
-const wikipediaService = require("../api/wikipedia")
+const wikipediaService = require("./search/wikipedia")
 
-const cinemaService = require("../api/tmdb")
-const gamesService = require("../api/rawg")
-const albionService = require("../api/albion")
-const genshinService = require("../api/genshin")
+const cinemaService = require("./search/tmdb")
+const gamesService = require("./search/rawg")
+const albionService = require("./entertainment/albion")
+const genshinService = require("../api/genshinAnalysis")
 const hoyoCodesService = require("../api/hoyoCodes")
-const pokedexService = require("../api/pokedex")
+const pokedexService = require("./entertainment/pokedex")
 
 const ttsService = require("../api/tts")
 
@@ -51,7 +51,7 @@ const availableTools = {
   cinemaTool: cinemaService.searchMedia,
   gamesTool: gamesService.searchGames,
   albionTool: albionService.getGoldPrice,
-  genshinTool: genshinService.getPlayerBuild,
+  genshinTool: genshinService.genshinAnalysis,
   hoyoCodesTool: hoyoCodesService.getHoyoCodes,
   pokedexTool: pokedexService.getPokemonDetails,
 
