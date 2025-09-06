@@ -8,8 +8,7 @@ const api = axios.create({
 const formatWeatherData = (data) => {
   const formatHour = (timestamp) => new Date(timestamp * 1000).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", timeZone: data.timezone })
   const formatDate = (timestamp) => new Date(timestamp * 1000).toLocaleDateString("pt-BR", { weekday: "long", timeZone: data.timezone })
-
-  return {
+  const prettyData = {
     timezone: data.timezone,
     current: {
       timestamp: new Date(data.current.dt * 1000).toLocaleString("pt-BR", { timeZone: data.timezone }),
@@ -49,11 +48,14 @@ const formatWeatherData = (data) => {
       sunset: formatHour(day.sunset)
     }))
   }
+  console.log(prettyData)
+  return prettyData
 }
 
 const _getWeatherData = async (lat, lon) => {
   try {
     const { data } = await api.get(`/data/3.0/onecall?lat=${lat}&lon=${lon}&exclude=minutely,alerts&units=metric&lang=pt_br&appid=${process.env.WEATHER_API_KEY}`)
+    console.log(data)
     return { status: 200, data: formatWeatherData(data) }
   } catch (error) {
     console.error(`[WEATHER_SERVICE] Erro ao obter dados climáticos via One Call API:`, error.message)
@@ -65,6 +67,7 @@ const getWeatherByLocation = async ({ location }) => {
   try {
     const { data: geoCodeData } = await api.get(`/geo/1.0/direct?q=${location}&limit=1&appid=${process.env.WEATHER_API_KEY}`)
     if (geoCodeData.length === 0) throw new Error("LOCATION_NOT_FOUND")
+    console.log(geoCodeData)
     const { lat, lon } = geoCodeData[0]
     return await _getWeatherData(lat, lon)
   } catch (error) {

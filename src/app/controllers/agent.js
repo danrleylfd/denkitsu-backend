@@ -20,7 +20,6 @@ const readPublished = require("../views/agent/readPublished")
 const acquireOne = require("../views/agent/acquireOne")
 const unacquireOne = require("../views/agent/unacquireOne")
 
-
 routes.post("/", createOrUpdateAgentRules(), validate, asyncHandler(createOne))
 
 routes.get("/", asyncHandler(readMany))
