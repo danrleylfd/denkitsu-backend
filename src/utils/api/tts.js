@@ -20,9 +20,10 @@ const textToSpeech = async ({ model = "playai-tts", response_format = "wav", tex
     return {
       status: 200,
       data: {
+        inputText: text,
+        voice,
         audio: audioBase64,
         format: response_format,
-        voice: voice
       }
     }
   } catch (error) {
