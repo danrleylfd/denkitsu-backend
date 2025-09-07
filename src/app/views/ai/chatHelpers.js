@@ -212,37 +212,21 @@ const processToolCalls = async (toolCalls, user) => {
 
 const transformToGemini = (messages) => {
   const geminiContents = []
-  let systemPrompt = ""
-
-  messages.filter(m => m.role === "system").forEach(m => {
-    systemPrompt += `${m.content}\n\n`
-  })
-
   const operationalMessages = messages.filter(m => m.role !== "system")
 
-  operationalMessages.forEach((msg, index) => {
+  operationalMessages.forEach((msg) => {
     const role = msg.role === "assistant" ? "model" : "user"
-    let parts = []
+    const parts = []
     const content = msg.content
 
     if (Array.isArray(content)) {
       content.forEach(part => {
         if (part.type === "text") {
-          let textContent = part.content
-          if (role === "user" && index === 0 && systemPrompt) {
-            textContent = `${systemPrompt}${textContent}`
-            systemPrompt = ""
-          }
-          parts.push({ text: textContent })
+          parts.push({ text: part.content })
         }
       })
     } else if (typeof content === "string") {
-      let textContent = content
-      if (role === "user" && index === 0 && systemPrompt) {
-        textContent = `${systemPrompt}${textContent}`
-        systemPrompt = ""
-      }
-      parts.push({ text: textContent })
+      parts.push({ text: content })
     }
 
     if (parts.length > 0) {

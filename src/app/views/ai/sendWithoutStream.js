@@ -16,7 +16,7 @@ const handleGeminiNonStream = async (req, res, next) => {
   const { userID, user } = req
   const systemPrompt = await getSystemPrompt(mode, userID)
 
-  const allMessages = [systemPrompt, ...userPrompts]
+  const allMessages = [...userPrompts]
   const initialHistory = allMessages.slice(0, -1)
   const lastMessage = allMessages[allMessages.length - 1]
 
@@ -24,6 +24,9 @@ const handleGeminiNonStream = async (req, res, next) => {
   const geminiClient = createAIClientFactory("gemini", aiKey)
   const geminiModel = geminiClient.getGenerativeModel({
     model: modelName || "gemini-1.5-flash",
+    systemInstruction: {
+      parts: [{ text: systemPrompt.content }]
+    },
     ...toolOptions
   })
 
