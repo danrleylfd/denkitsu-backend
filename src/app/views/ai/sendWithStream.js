@@ -4,57 +4,35 @@ const {
   getSystemPrompt,
   buildToolOptions,
   processToolCalls,
-  processStreamAndExtractReasoning,
-  transformToGemini,
-  transformFromGemini
+  processStreamAndExtractReasoning
 } = require("./chatHelpers")
-const { createAIClientFactory } = require("../../../utils/api/ai")
-
 
 const handleGeminiStream = async (req, res, next) => {
-  const { model: modelName, messages: userPrompts, aiKey, use_tools = [], mode, customApiUrl } = req.body
+  const { model, messages: userPrompts, aiKey, use_tools = [], mode, customProviderUrl } = req.body
   const { userID, user } = req
+
   const systemPrompt = await getSystemPrompt(mode, userID)
-
-  const allMessages = [systemPrompt, ...userPrompts]
-  const initialHistory = allMessages.slice(0, -1)
-  const lastMessage = allMessages[allMessages.length - 1]
-
+  let messages = [systemPrompt, ...userPrompts]
   const toolOptions = await buildToolOptions("gemini", use_tools, userID, mode)
-  const geminiClient = createAIClientFactory("gemini", aiKey)
-  const geminiModel = geminiClient.getGenerativeModel({
-    model: modelName || "gemini-1.5-flash",
-    ...toolOptions
-  })
+  const requestOptions = { model, stream: true, customProviderUrl, ...toolOptions }
 
-  const chat = geminiModel.startChat({
-    history: transformToGemini(initialHistory)
-  })
-
-  const lastMessageTransformed = transformToGemini([lastMessage])[0]
-  const result1 = await chat.sendMessageStream(lastMessageTransformed.parts)
+  const streamResult1 = await ask("gemini", aiKey, messages, requestOptions)
 
   let aggregatedToolCalls = []
-  let fullResponseText = ""
-
-  for await (const chunk of result1.stream) {
+  for await (const chunk of streamResult1.stream) {
     const text = chunk.text()
     if (text) {
-      fullResponseText += text
-      const openAIDelta = { choices: [{ delta: { content: text } }] }
-      res.write(`data: ${JSON.stringify(openAIDelta)}\n\n`)
+      res.write(`data: ${JSON.stringify({ choices: [{ delta: { content: text } }] })}\n\n`)
     }
     if (chunk.functionCalls) {
       chunk.functionCalls().forEach((fc, i) => {
-        const openAIToolCall = {
-          index: aggregatedToolCalls.length,
+        const toolCall = {
           id: `call_${Date.now()}_${i}`,
           type: "function",
           function: { name: fc.name, arguments: JSON.stringify(fc.args) }
         }
-        aggregatedToolCalls.push(openAIToolCall)
-        const toolChunk = { choices: [{ delta: { tool_calls: [{ index: openAIToolCall.index, function: { name: fc.name, arguments: "" } }] } }] }
-        res.write(`data: ${JSON.stringify(toolChunk)}\n\n`)
+        aggregatedToolCalls.push(toolCall)
+        res.write(`data: ${JSON.stringify({ choices: [{ delta: { tool_calls: [{ index: i, ...toolCall }] } }] })}\n\n`)
       })
     }
   }
@@ -68,39 +46,26 @@ const handleGeminiStream = async (req, res, next) => {
     const newSystemPrompt = await getSystemPrompt(newAgentName, userID)
     const newMessages = [newSystemPrompt, ...userPrompts]
 
-    const switchNotification = {
-      choices: [{ delta: { reasoning: `<think>Roteador selecionou o Agente ${newAgentName}. Trocando contexto e continuando o fluxo.</think>` } }]
-    }
+    const switchNotification = { choices: [{ delta: { reasoning: `<think>Roteador selecionou o Agente ${newAgentName}. Trocando contexto e continuando o fluxo.</think>` } }] }
     res.write(`data: ${JSON.stringify(switchNotification)}\n\n`)
 
-    // Inicia um novo chat com o novo contexto
-    const newChat = geminiModel.startChat({ history: transformToGemini([newSystemPrompt]) })
-    const finalUserMessage = transformToGemini(userPrompts)[0]
-    const finalStream = await newChat.sendMessageStream(finalUserMessage.parts)
-
-    for await (const chunk of finalStream.stream) {
-      const text = chunk.text()
-      if (text) {
-        res.write(`data: ${JSON.stringify({ choices: [{ delta: { content: text } }] })}\n\n`)
+    const finalStreamResponse = await ask("gemini", aiKey, sanitizeMessages(newMessages), requestOptions)
+    for await (const chunk of finalStreamResponse.stream) {
+      if (chunk.text()) {
+        res.write(`data: ${JSON.stringify({ choices: [{ delta: { content: chunk.text() } }] })}\n\n`)
       }
     }
     return res.end()
   }
 
+  messages.push({ role: "assistant", tool_calls: aggregatedToolCalls })
   const toolResultMessages = await processToolCalls(aggregatedToolCalls, user)
-  const functionResponseParts = toolResultMessages.map(toolMsg => ({
-    functionResponse: {
-      name: toolMsg.name,
-      response: JSON.parse(toolMsg.content)
-    }
-  }))
+  messages.push(...toolResultMessages)
 
-  const result2 = await chat.sendMessageStream(functionResponseParts)
-
-  for await (const chunk of result2.stream) {
-    const text = chunk.text()
-    if (text) {
-      res.write(`data: ${JSON.stringify({ choices: [{ delta: { content: text } }] })}\n\n`)
+  const finalStreamResponse = await ask("gemini", aiKey, sanitizeMessages(messages), requestOptions)
+  for await (const chunk of finalStreamResponse.stream) {
+    if (chunk.text()) {
+      res.write(`data: ${JSON.stringify({ choices: [{ delta: { content: chunk.text() } }] })}\n\n`)
     }
   }
 
