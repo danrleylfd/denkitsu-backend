@@ -48,7 +48,8 @@ const askGemini = async (aiKey, finalPrompts, restOptions) => {
 
   try {
     if (stream) {
-      return await geminiModel.generateContentStream(request)
+      const streamResult = await geminiModel.generateContentStream(request)
+      return streamResult
     }
     const result = await geminiModel.generateContent(request)
     const openAIResponse = transformFromGemini(result.response)
@@ -189,8 +190,4 @@ const getModels = async (aiProvider, apiUrl, apiKey) => {
   return prettyModels
 }
 
-module.exports = {
-  ask,
-  getModels,
-  createAIClientFactory
-}
+module.exports = { ask, getModels, createAIClientFactory }

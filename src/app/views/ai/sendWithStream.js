@@ -8,70 +8,71 @@ const {
 } = require("./chatHelpers")
 
 const handleGeminiStream = async (req, res, next) => {
-  const { model, messages: userPrompts, aiKey, use_tools = [], mode, customProviderUrl } = req.body
+  const { model, messages: userPrompts, aiKey, use_tools = [], mode, customApiUrl } = req.body
   const { userID, user } = req
-
   const systemPrompt = await getSystemPrompt(mode, userID)
   let messages = [systemPrompt, ...userPrompts]
   const toolOptions = await buildToolOptions("gemini", use_tools, userID, mode)
-  const requestOptions = { model, stream: true, customProviderUrl, ...toolOptions }
+  const requestOptions = { model, stream: true, customApiUrl, ...toolOptions }
 
-  const streamResult1 = await ask("gemini", aiKey, messages, requestOptions)
-
+  const streamResponse = await ask("gemini", aiKey, messages, requestOptions)
   let aggregatedToolCalls = []
-  for await (const chunk of streamResult1.stream) {
+
+  for await (const chunk of streamResponse.stream) {
     const text = chunk.text()
     if (text) {
-      res.write(`data: ${JSON.stringify({ choices: [{ delta: { content: text } }] })}\n\n`)
+      const openAIDelta = { choices: [{ delta: { content: text } }] }
+      res.write(`data: ${JSON.stringify(openAIDelta)}\n\n`)
     }
     if (chunk.functionCalls) {
       chunk.functionCalls().forEach((fc, i) => {
-        const toolCall = {
+        const openAIToolCall = {
+          index: aggregatedToolCalls.length,
           id: `call_${Date.now()}_${i}`,
           type: "function",
           function: { name: fc.name, arguments: JSON.stringify(fc.args) }
         }
-        aggregatedToolCalls.push(toolCall)
-        res.write(`data: ${JSON.stringify({ choices: [{ delta: { tool_calls: [{ index: i, ...toolCall }] } }] })}\n\n`)
+        aggregatedToolCalls.push(openAIToolCall)
+        const toolChunk = { choices: [{ delta: { tool_calls: [{ index: openAIToolCall.index, function: { name: fc.name, arguments: "" } }] } }] }
+        res.write(`data: ${JSON.stringify(toolChunk)}\n\n`)
       })
     }
   }
 
   if (aggregatedToolCalls.length === 0) return res.end()
 
-  const routerToolCall = aggregatedToolCalls.find(tc => tc.function.name === "selectAgentTool")
-  if (routerToolCall) {
-    const args = JSON.parse(routerToolCall.function.arguments)
-    const newAgentName = args.agentName
-    const newSystemPrompt = await getSystemPrompt(newAgentName, userID)
-    const newMessages = [newSystemPrompt, ...userPrompts]
-
-    const switchNotification = { choices: [{ delta: { reasoning: `<think>Roteador selecionou o Agente ${newAgentName}. Trocando contexto e continuando o fluxo.</think>` } }] }
-    res.write(`data: ${JSON.stringify(switchNotification)}\n\n`)
-
-    const finalStreamResponse = await ask("gemini", aiKey, sanitizeMessages(newMessages), requestOptions)
-    for await (const chunk of finalStreamResponse.stream) {
-      if (chunk.text()) {
-        res.write(`data: ${JSON.stringify({ choices: [{ delta: { content: chunk.text() } }] })}\n\n`)
-      }
-    }
-    return res.end()
-  }
-
   messages.push({ role: "assistant", tool_calls: aggregatedToolCalls })
   const toolResultMessages = await processToolCalls(aggregatedToolCalls, user)
-  messages.push(...toolResultMessages)
 
-  const finalStreamResponse = await ask("gemini", aiKey, sanitizeMessages(messages), requestOptions)
+  const routerToolCallResult = toolResultMessages.find(r => r.name === "selectAgentTool")
+  if (routerToolCallResult) {
+    const resultData = JSON.parse(routerToolCallResult.content)
+    if (resultData.action === "SWITCH_AGENT" && resultData.agent) {
+      const newAgentName = resultData.agent
+      const newSystemPrompt = await getSystemPrompt(newAgentName, userID)
+      messages = [newSystemPrompt, ...userPrompts] // Reinicia o histórico com o novo agente
+      const switchNotification = {
+        choices: [{ delta: { reasoning: `<think>Roteador selecionou o Agente ${newAgentName}. Trocando contexto e continuando o fluxo.</think>` } }]
+      }
+      res.write(`data: ${JSON.stringify(switchNotification)}\n\n`)
+    }
+  } else {
+    messages.push(...toolResultMessages)
+  }
+
+  const secondCallOptions = { ...requestOptions, stream: true }
+  const finalStreamResponse = await ask("gemini", aiKey, sanitizeMessages(messages), secondCallOptions)
+
   for await (const chunk of finalStreamResponse.stream) {
-    if (chunk.text()) {
-      res.write(`data: ${JSON.stringify({ choices: [{ delta: { content: chunk.text() } }] })}\n\n`)
+    const text = chunk.text()
+    if (text) {
+      const openAIDelta = { choices: [{ delta: { content: text } }] }
+      res.write(`data: ${JSON.stringify(openAIDelta)}\n\n`)
     }
   }
 
   return res.end()
 }
-
 
 const handleOpenAIStream = async (req, res, next) => {
   const { aiProvider, model, messages: userPrompts, aiKey, use_tools = [], mode, customApiUrl } = req.body
@@ -176,7 +177,20 @@ const handleOpenAIStream = async (req, res, next) => {
 
 const sendWithStream = async (req, res, next) => {
   try {
-    const { aiProvider } = req.body
+    const { aiProvider, model, messages: userPrompts, aiKey, use_tools = [], mode, customApiUrl } = req.body
+    const { userID, user } = req
+    res.setHeader("Content-Type", "text/event-stream")
+    res.setHeader("Cache-Control", "no-cache")
+    res.setHeader("Connection", "keep-alive")
+
+    const systemPrompt = await getSystemPrompt(mode, userID)
+    let messages = [systemPrompt, ...userPrompts]
+    const toolOptions = await buildToolOptions(aiProvider, use_tools, userID, mode)
+    const requestOptions = { model, stream: true, customApiUrl, ...toolOptions }
+
+    const handlerArgs = {
+      res, aiProvider, aiKey, messages, requestOptions, user, userPrompts, userID, model, customApiUrl
+    }
 
     if (aiProvider === "gemini") {
       await handleGeminiStream(req, res, next)
