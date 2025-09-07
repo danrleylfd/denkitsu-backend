@@ -7,7 +7,10 @@ const prepareInitialAIRequest = async (req, res, next) => {
   const { userID } = req
 
   const systemPrompt = await getSystemPrompt(mode, userID)
-  const messages = [systemPrompt, ...userPrompts]
+  // CORREÇÃO: Filtra qualquer system message anterior para evitar duplicidade
+  const userOnlyMessages = userPrompts.filter(msg => msg.role !== "system")
+  const messages = [systemPrompt, ...userOnlyMessages]
+
   const toolOptions = await buildToolOptions(req.body.aiProvider, use_tools, userID, mode)
   const requestOptions = { model, stream: req.body.stream, customApiUrl: req.body.customApiUrl, ...toolOptions }
 
