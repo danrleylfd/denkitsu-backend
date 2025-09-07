@@ -5,38 +5,65 @@ const {
   extractReasoning,
   getSystemPrompt,
   buildToolOptions,
-  processToolCalls
+  processToolCalls,
+  transformToGemini,
+  transformFromGemini
 } = require("./chatHelpers")
+const { createAIClientFactory } = require("../../../utils/api/ai")
 
-const handleGeminiNonStream = async (req, res) => {
-  const { model, messages: userPrompts, aiKey, use_tools = [], mode, customProviderUrl } = req.body
+const handleGeminiNonStream = async (req, res, next) => {
+  const { model: modelName, messages: userPrompts, aiKey, use_tools = [], mode, customProviderUrl } = req.body
   const { userID, user } = req
   const systemPrompt = await getSystemPrompt(mode, userID)
-  let messages = [systemPrompt, ...userPrompts]
+
+  const allMessages = [systemPrompt, ...userPrompts]
+  const initialHistory = allMessages.slice(0, -1)
+  const lastMessage = allMessages[allMessages.length - 1]
+
   const toolOptions = await buildToolOptions("gemini", use_tools, userID, mode)
-  const requestOptions = { model, stream: false, customProviderUrl, ...toolOptions }
+  const geminiClient = createAIClientFactory("gemini", aiKey)
+  const geminiModel = geminiClient.getGenerativeModel({
+    model: modelName || "gemini-1.5-flash",
+    ...toolOptions
+  })
 
-  const { data } = await ask("gemini", aiKey, messages, requestOptions)
-  let responseMessage = data.choices[0].message
+  const chat = geminiModel.startChat({
+    history: transformToGemini(initialHistory)
+  })
 
-  if (responseMessage.tool_calls) {
-    const routerToolCall = responseMessage.tool_calls.find(tc => tc.function.name === "selectAgentTool")
+  const lastMessageTransformed = transformToGemini([lastMessage])[0]
+  const result1 = await chat.sendMessage(lastMessageTransformed.parts)
+  let response1 = result1.response
+
+  const functionCalls = response1.candidates[0].content.parts.filter(p => p.functionCall)
+
+  if (functionCalls.length > 0) {
+    const openAIToolCalls = transformFromGemini(response1).tool_calls
+
+    const routerToolCall = openAIToolCalls.find(tc => tc.function.name === "selectAgentTool")
     if (routerToolCall) {
       const args = JSON.parse(routerToolCall.function.arguments)
       return res.status(200).json({
         next_action: { type: "SWITCH_AGENT", agent: args.agentName },
-        original_message: responseMessage
+        original_message: transformFromGemini(response1)
       })
     }
 
-    const toolResultMessages = await processToolCalls(responseMessage.tool_calls, user)
-    messages.push(responseMessage)
-    messages.push(...toolResultMessages)
-    const finalResponse = await ask("gemini", aiKey, sanitizeMessages(messages), { model, stream: false, customProviderUrl, ...toolOptions })
-    return res.status(200).json({ ...finalResponse.data, tool_calls: responseMessage.tool_calls || [] })
+    const toolResultMessages = await processToolCalls(openAIToolCalls, user)
+    const functionResponseParts = toolResultMessages.map(toolMsg => ({
+      functionResponse: {
+        name: toolMsg.name,
+        response: JSON.parse(toolMsg.content)
+      }
+    }))
+
+    const result2 = await chat.sendMessage(functionResponseParts)
+    const finalResponse = transformFromGemini(result2.response)
+    return res.status(200).json({ choices: [{ message: finalResponse }] })
   }
 
-  return res.status(200).json({ ...data, tool_calls: responseMessage.tool_calls || [] })
+  const finalResponse = transformFromGemini(response1)
+  return res.status(200).json({ choices: [{ message: finalResponse }] })
 }
 
 const handleOpenAINonStream = async (req, res) => {

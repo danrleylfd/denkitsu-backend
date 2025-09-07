@@ -245,15 +245,6 @@ const transformToGemini = (messages) => {
       parts.push({ text: textContent })
     }
 
-    if (msg.tool_calls) {
-      parts.push(...msg.tool_calls.map(tc => ({ functionCall: { name: tc.function.name, args: JSON.parse(tc.function.arguments) } })))
-    }
-
-    if (msg.role === "tool") {
-      const responsePayload = { status: "OK", content: msg.content }
-      parts = [{ functionResponse: { name: msg.name, response: responsePayload } }]
-    }
-
     if (parts.length > 0) {
       geminiContents.push({ role, parts })
     }

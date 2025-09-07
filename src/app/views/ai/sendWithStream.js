@@ -4,23 +4,43 @@ const {
   getSystemPrompt,
   buildToolOptions,
   processToolCalls,
-  processStreamAndExtractReasoning
+  processStreamAndExtractReasoning,
+  transformToGemini,
+  transformFromGemini
 } = require("./chatHelpers")
+const { createAIClientFactory } = require("../../../utils/api/ai")
+
 
 const handleGeminiStream = async (req, res, next) => {
-  const { model, messages: userPrompts, aiKey, use_tools = [], mode, customApiUrl } = req.body
+  const { model: modelName, messages: userPrompts, aiKey, use_tools = [], mode, customApiUrl } = req.body
   const { userID, user } = req
   const systemPrompt = await getSystemPrompt(mode, userID)
-  let messages = [systemPrompt, ...userPrompts]
+
+  const allMessages = [systemPrompt, ...userPrompts]
+  const initialHistory = allMessages.slice(0, -1)
+  const lastMessage = allMessages[allMessages.length - 1]
+
   const toolOptions = await buildToolOptions("gemini", use_tools, userID, mode)
-  const requestOptions = { model, stream: true, customApiUrl, ...toolOptions }
+  const geminiClient = createAIClientFactory("gemini", aiKey)
+  const geminiModel = geminiClient.getGenerativeModel({
+    model: modelName || "gemini-1.5-flash",
+    ...toolOptions
+  })
 
-  const streamResponse = await ask("gemini", aiKey, messages, requestOptions)
+  const chat = geminiModel.startChat({
+    history: transformToGemini(initialHistory)
+  })
+
+  const lastMessageTransformed = transformToGemini([lastMessage])[0]
+  const result1 = await chat.sendMessageStream(lastMessageTransformed.parts)
+
   let aggregatedToolCalls = []
+  let fullResponseText = ""
 
-  for await (const chunk of streamResponse.stream) {
+  for await (const chunk of result1.stream) {
     const text = chunk.text()
     if (text) {
+      fullResponseText += text
       const openAIDelta = { choices: [{ delta: { content: text } }] }
       res.write(`data: ${JSON.stringify(openAIDelta)}\n\n`)
     }
@@ -41,38 +61,52 @@ const handleGeminiStream = async (req, res, next) => {
 
   if (aggregatedToolCalls.length === 0) return res.end()
 
-  messages.push({ role: "assistant", tool_calls: aggregatedToolCalls })
-  const toolResultMessages = await processToolCalls(aggregatedToolCalls, user)
+  const routerToolCall = aggregatedToolCalls.find(tc => tc.function.name === "selectAgentTool")
+  if (routerToolCall) {
+    const args = JSON.parse(routerToolCall.function.arguments)
+    const newAgentName = args.agentName
+    const newSystemPrompt = await getSystemPrompt(newAgentName, userID)
+    const newMessages = [newSystemPrompt, ...userPrompts]
 
-  const routerToolCallResult = toolResultMessages.find(r => r.name === "selectAgentTool")
-  if (routerToolCallResult) {
-    const resultData = JSON.parse(routerToolCallResult.content)
-    if (resultData.action === "SWITCH_AGENT" && resultData.agent) {
-      const newAgentName = resultData.agent
-      const newSystemPrompt = await getSystemPrompt(newAgentName, userID)
-      messages = [newSystemPrompt, ...userPrompts] // Reinicia o histórico com o novo agente
-      const switchNotification = {
-        choices: [{ delta: { reasoning: `<think>Roteador selecionou o Agente ${newAgentName}. Trocando contexto e continuando o fluxo.</think>` } }]
-      }
-      res.write(`data: ${JSON.stringify(switchNotification)}\n\n`)
+    const switchNotification = {
+      choices: [{ delta: { reasoning: `<think>Roteador selecionou o Agente ${newAgentName}. Trocando contexto e continuando o fluxo.</think>` } }]
     }
-  } else {
-    messages.push(...toolResultMessages)
+    res.write(`data: ${JSON.stringify(switchNotification)}\n\n`)
+
+    // Inicia um novo chat com o novo contexto
+    const newChat = geminiModel.startChat({ history: transformToGemini([newSystemPrompt]) })
+    const finalUserMessage = transformToGemini(userPrompts)[0]
+    const finalStream = await newChat.sendMessageStream(finalUserMessage.parts)
+
+    for await (const chunk of finalStream.stream) {
+      const text = chunk.text()
+      if (text) {
+        res.write(`data: ${JSON.stringify({ choices: [{ delta: { content: text } }] })}\n\n`)
+      }
+    }
+    return res.end()
   }
 
-  const secondCallOptions = { ...requestOptions, stream: true }
-  const finalStreamResponse = await ask("gemini", aiKey, sanitizeMessages(messages), secondCallOptions)
+  const toolResultMessages = await processToolCalls(aggregatedToolCalls, user)
+  const functionResponseParts = toolResultMessages.map(toolMsg => ({
+    functionResponse: {
+      name: toolMsg.name,
+      response: JSON.parse(toolMsg.content)
+    }
+  }))
 
-  for await (const chunk of finalStreamResponse.stream) {
+  const result2 = await chat.sendMessageStream(functionResponseParts)
+
+  for await (const chunk of result2.stream) {
     const text = chunk.text()
     if (text) {
-      const openAIDelta = { choices: [{ delta: { content: text } }] }
-      res.write(`data: ${JSON.stringify(openAIDelta)}\n\n`)
+      res.write(`data: ${JSON.stringify({ choices: [{ delta: { content: text } }] })}\n\n`)
     }
   }
 
   return res.end()
 }
+
 
 const handleOpenAIStream = async (req, res, next) => {
   const { aiProvider, model, messages: userPrompts, aiKey, use_tools = [], mode, customApiUrl } = req.body
@@ -177,20 +211,7 @@ const handleOpenAIStream = async (req, res, next) => {
 
 const sendWithStream = async (req, res, next) => {
   try {
-    const { aiProvider, model, messages: userPrompts, aiKey, use_tools = [], mode, customApiUrl } = req.body
-    const { userID, user } = req
-    res.setHeader("Content-Type", "text/event-stream")
-    res.setHeader("Cache-Control", "no-cache")
-    res.setHeader("Connection", "keep-alive")
-
-    const systemPrompt = await getSystemPrompt(mode, userID)
-    let messages = [systemPrompt, ...userPrompts]
-    const toolOptions = await buildToolOptions(aiProvider, use_tools, userID, mode)
-    const requestOptions = { model, stream: true, customApiUrl, ...toolOptions }
-
-    const handlerArgs = {
-      res, aiProvider, aiKey, messages, requestOptions, user, userPrompts, userID, model, customApiUrl
-    }
+    const { aiProvider } = req.body
 
     if (aiProvider === "gemini") {
       await handleGeminiStream(req, res, next)
