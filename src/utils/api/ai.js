@@ -139,6 +139,7 @@ const getModels = async (aiProvider, apiUrl, apiKey) => {
     { id: "gemini-1.5-flash", supports_tools: true, supports_images: true, supports_files: true, aiProvider: "gemini" },
     { id: "gemini-1.5-pro", supports_tools: true, supports_images: true, supports_files: true, aiProvider: "gemini" },
     { id: "gemini-2.5-flash", supports_tools: true, supports_images: true, supports_files: true, aiProvider: "gemini" },
+    { id: "gemini-2.5-pro", supports_tools: true, supports_images: true, supports_files: true, aiProvider: "gemini" },
   ]
   if (aiProvider === "gemini") models.push(...geminiHardcodedModels)
 

@@ -250,12 +250,13 @@ const transformToGemini = (messages) => {
     }
 
     if (msg.role === "tool") {
-      let responsePayload
+      let parsedContent
       try {
-        responsePayload = JSON.parse(msg.content)
+        parsedContent = JSON.parse(msg.content)
       } catch (e) {
-        responsePayload = { result: msg.content }
+        parsedContent = msg.content
       }
+      const responsePayload = (typeof parsedContent === "object" && parsedContent !== null) ? parsedContent : { result: parsedContent }
       parts = [{ functionResponse: { name: msg.name, response: responsePayload } }]
     }
 

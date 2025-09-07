@@ -4,8 +4,7 @@ const {
   getSystemPrompt,
   buildToolOptions,
   processToolCalls,
-  processStreamAndExtractReasoning,
-  transformFromGemini
+  processStreamAndExtractReasoning
 } = require("./chatHelpers")
 
 const sendWithStream = async (req, res, next) => {
@@ -24,48 +23,45 @@ const sendWithStream = async (req, res, next) => {
     if (aiProvider === "gemini") {
       const streamResponse = await ask(aiProvider, aiKey, messages, requestOptions)
       let aggregatedToolCalls = []
-      let fullResponseText = ""
 
       for await (const chunk of streamResponse.stream) {
         const text = chunk.text()
         if (text) {
-          fullResponseText += text
           const openAIDelta = { choices: [{ delta: { content: text } }] }
           res.write(`data: ${JSON.stringify(openAIDelta)}\n\n`)
         }
         if (chunk.functionCalls) {
-          const openAIToolDeltas = chunk.functionCalls().map((fc, i) => ({
-            index: i,
-            id: `call_${i}`,
-            type: "function",
-            function: { name: fc.name, arguments: JSON.stringify(fc.args) }
-          }))
+          chunk.functionCalls().forEach((fc, i) => {
+            const openAIToolCall = {
+              index: aggregatedToolCalls.length,
+              id: `call_${Date.now()}_${i}`,
+              type: "function",
+              function: { name: fc.name, arguments: JSON.stringify(fc.args) }
+            }
+            aggregatedToolCalls.push(openAIToolCall)
 
-          aggregatedToolCalls.push(...openAIToolDeltas)
-          const toolChunk = { choices: [{ delta: { tool_calls: openAIToolDeltas.map(t => ({ index: t.index, function: { name: t.function.name, arguments: "" } })) } }] }
-          res.write(`data: ${JSON.stringify(toolChunk)}\n\n`)
+            const toolChunk = { choices: [{ delta: { tool_calls: [{ index: openAIToolCall.index, function: { name: fc.name, arguments: "" } }] } }] }
+             res.write(`data: ${JSON.stringify(toolChunk)}\n\n`)
+          })
         }
       }
 
       if (aggregatedToolCalls.length === 0) return res.end()
 
-      const finalToolCalls = aggregatedToolCalls.map(call => ({
-        id: call.id,
-        type: "function",
-        function: { name: call.function.name, arguments: call.function.arguments }
-      }))
-      messages.push({ role: "assistant", tool_calls: finalToolCalls })
-      const toolResultMessages = await processToolCalls(finalToolCalls, user)
+      messages.push({ role: "assistant", tool_calls: aggregatedToolCalls })
+      const toolResultMessages = await processToolCalls(aggregatedToolCalls, user)
       messages.push(...toolResultMessages)
 
-      const secondCallOptions = { ...requestOptions, stream: false }
-      const finalResponse = await ask(aiProvider, aiKey, sanitizeMessages(messages), secondCallOptions)
+      const secondCallOptions = { ...requestOptions, stream: true }
+      const finalStreamResponse = await ask(aiProvider, aiKey, sanitizeMessages(messages), secondCallOptions)
 
-      const finalMessage = finalResponse.data.choices[0].message
-      finalMessage.content = finalMessage.content || ""
-
-      const finalChunk = { choices: [{ delta: { content: finalMessage.content } }] }
-      res.write(`data: ${JSON.stringify(finalChunk)}\n\n`)
+      for await (const chunk of finalStreamResponse.stream) {
+        const text = chunk.text()
+        if (text) {
+          const openAIDelta = { choices: [{ delta: { content: text } }] }
+          res.write(`data: ${JSON.stringify(openAIDelta)}\n\n`)
+        }
+      }
 
       return res.end()
     }
