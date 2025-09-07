@@ -223,10 +223,15 @@ const transformToGemini = (messages) => {
       if (typeof msg.content === "string") {
         if (msg.content.trim()) parts.push({ text: msg.content })
       } else if (Array.isArray(msg.content)) {
-        // Lógica para imagens (ainda não implementada, mas evita erros)
         msg.content.forEach(part => {
-          if (part.type === "text" && part.content.trim()) {
+          // FIX: Adicionado check de existência para part.content antes do .trim()
+          if (part.type === "text" && part.content && part.content.trim()) {
             parts.push({ text: part.content })
+          }
+          // Lógica para imagens (ainda não implementada, mas o stub está aqui para evitar erros)
+          if (part.type === "image_url") {
+            // No futuro: converter URL para base64 e adicionar como inlineData
+            // Por agora, ignoramos para não quebrar.
           }
         })
       }
