@@ -1,4 +1,4 @@
-const { ask } = require("../../../utils/api/ai")
+const { ask, createAIClientFactory } = require("../../../utils/api/ai")
 const { sanitizeMessages } = require("../../../utils/helpers/ai")
 const {
   cleanToolCallSyntax,
@@ -9,7 +9,6 @@ const {
   transformToGemini,
   transformFromGemini
 } = require("./chatHelpers")
-const { createAIClientFactory } = require("../../../utils/api/ai")
 
 const handleGeminiNonStream = async (req, res, next) => {
   const { model: modelName, messages: userPrompts, aiKey, use_tools = [], mode, customProviderUrl } = req.body
