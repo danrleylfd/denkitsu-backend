@@ -37,6 +37,12 @@ const handleGeminiStream = async (req, res, next) => {
 
     const lastMessageTransformed = transformToGemini([lastMessage])[0]
 
+    // FIX: Adicionada validação para previnir crash com prompts vazios ou não-suportados.
+    if (!lastMessageTransformed || !lastMessageTransformed.parts || lastMessageTransformed.parts.length === 0) {
+      // Para stream, apenas encerramos a conexão.
+      return res.end()
+    }
+
     // Step 1: Envia a mensagem e aguarda a resposta completa em buffer, sem stream para o cliente ainda.
     const result1 = await chat.sendMessageStream(lastMessageTransformed.parts)
     const aggregatedResponse = await result1.response
