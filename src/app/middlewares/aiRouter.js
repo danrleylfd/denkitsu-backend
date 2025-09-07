@@ -11,10 +11,10 @@ const aiRouter = (req, res, next) => {
     case "groq":
     case "openrouter":
     case "custom":
-      path = `/ai/chat/${provider}/${streamType}`
+      path = `/chat/${provider}/${streamType}`
       break
     case "gemini":
-      path = `/ai/chat/gemini/${streamType}`
+      path = `/chat/gemini/${streamType}`
       break
     default:
       return next(createAppError("O provedor de IA especificado é inválido.", 400, "INVALID_AI_PROVIDER"))
