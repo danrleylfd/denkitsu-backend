@@ -212,23 +212,65 @@ const processToolCalls = async (toolCalls, user) => {
 
 const transformToGemini = (messages) => {
   const geminiContents = []
-  const operationalMessages = messages.filter(m => m.role !== "system")
+  const operationalMessages = messages.filter(msg => msg.role !== "system")
 
-  operationalMessages.forEach((msg) => {
-    const role = msg.role === "assistant" ? "model" : "user"
+  operationalMessages.forEach(msg => {
     const parts = []
-    const content = msg.content
+    let role = msg.role === "assistant" ? "model" : "user"
 
-    if (Array.isArray(content)) {
-      content.forEach(part => {
-        if (part.type === "text") {
-          parts.push({ text: part.content })
-        }
-      })
-    } else if (typeof content === "string") {
-      parts.push({ text: content })
+    // 1. Converte conteúdo de texto (string ou array multimodal)
+    if (msg.content) {
+      if (typeof msg.content === "string") {
+        if (msg.content.trim()) parts.push({ text: msg.content })
+      } else if (Array.isArray(msg.content)) {
+        // Lógica para imagens (ainda não implementada, mas evita erros)
+        msg.content.forEach(part => {
+          if (part.type === "text" && part.content.trim()) {
+            parts.push({ text: part.content })
+          }
+        })
+      }
     }
 
+    // 2. Converte 'tool_calls' do assistente para 'functionCall' do Gemini
+    if (msg.role === "assistant" && msg.tool_calls) {
+      msg.tool_calls.forEach(toolCall => {
+        try {
+          parts.push({
+            functionCall: {
+              name: toolCall.function.name,
+              args: JSON.parse(toolCall.function.arguments)
+            }
+          })
+        } catch (e) {
+          console.error("Erro no parse de argumentos do tool_call para Gemini:", e)
+        }
+      })
+    }
+
+    // 3. Converte respostas de ferramenta ('role: tool') para 'functionResponse' do Gemini
+    if (msg.role === "tool") {
+      role = "user" // No Gemini, a resposta da ferramenta vem do usuário.
+      try {
+        parts.push({
+          functionResponse: {
+            name: msg.name,
+            response: JSON.parse(msg.content)
+          }
+        })
+      } catch (e) {
+        console.error("Erro no parse do conteúdo da tool response para Gemini:", e)
+        parts.push({
+          functionResponse: {
+            name: msg.name,
+            response: { error: "Conteúdo da ferramenta em formato JSON inválido.", details: msg.content }
+          }
+        })
+      }
+    }
+
+    // 4. Adiciona a mensagem transformada apenas se tiver partes válidas.
+    // Isso previne o erro de 'data must have one initialized field'.
     if (parts.length > 0) {
       geminiContents.push({ role, parts })
     }
@@ -236,6 +278,7 @@ const transformToGemini = (messages) => {
 
   return geminiContents
 }
+
 
 const transformFromGemini = (geminiResponse) => {
   const candidate = geminiResponse?.candidates?.[0]
