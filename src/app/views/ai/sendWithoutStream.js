@@ -20,6 +20,15 @@ const handleGeminiNonStream = async (req, res) => {
   let responseMessage = data.choices[0].message
 
   if (responseMessage.tool_calls) {
+    const routerToolCall = responseMessage.tool_calls.find(tc => tc.function.name === "selectAgentTool")
+    if (routerToolCall) {
+      const args = JSON.parse(routerToolCall.function.arguments)
+      return res.status(200).json({
+        next_action: { type: "SWITCH_AGENT", agent: args.agentName },
+        original_message: responseMessage
+      })
+    }
+
     const toolResultMessages = await processToolCalls(responseMessage.tool_calls, user)
     messages.push(responseMessage)
     messages.push(...toolResultMessages)

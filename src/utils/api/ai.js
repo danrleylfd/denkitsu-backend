@@ -16,7 +16,7 @@ const providerConfig = {
   },
   gemini: {
     apiKey: process.env.GEMINI_API_KEY,
-    defaultModel: "gemini-1.5-flash"
+    defaultModel: "gemini-2.5-pro"
   }
 }
 
@@ -142,8 +142,10 @@ const getModels = async (aiProvider, apiUrl, apiKey) => {
   if (aiProvider === "custom") models.push({ id: "auto", supports_tools: true, supports_images: true, supports_files: true, aiProvider: "custom" })
 
   const geminiHardcodedModels = [
+    { id: "gemini-1.5-flash", supports_tools: true, supports_images: true, supports_files: true, aiProvider: "gemini" },
     { id: "gemini-1.5-pro", supports_tools: true, supports_images: true, supports_files: true, aiProvider: "gemini" },
-    { id: "gemini-1.5-flash", supports_tools: true, supports_images: true, supports_files: true, aiProvider: "gemini" }
+    { id: "gemini-2.5-flash", supports_tools: true, supports_images: true, supports_files: true, aiProvider: "gemini" },
+    { id: "gemini-2.5-pro", supports_tools: true, supports_images: true, supports_files: true, aiProvider: "gemini" },
   ]
   if (aiProvider === "gemini") models.push(...geminiHardcodedModels)
 

@@ -43,7 +43,22 @@ const handleGeminiStream = async (req, res, next) => {
 
   messages.push({ role: "assistant", tool_calls: aggregatedToolCalls })
   const toolResultMessages = await processToolCalls(aggregatedToolCalls, user)
-  messages.push(...toolResultMessages)
+
+  const routerToolCallResult = toolResultMessages.find(r => r.name === "selectAgentTool")
+  if (routerToolCallResult) {
+    const resultData = JSON.parse(routerToolCallResult.content)
+    if (resultData.action === "SWITCH_AGENT" && resultData.agent) {
+      const newAgentName = resultData.agent
+      const newSystemPrompt = await getSystemPrompt(newAgentName, userID)
+      messages = [newSystemPrompt, ...userPrompts] // Reinicia o histórico com o novo agente
+      const switchNotification = {
+        choices: [{ delta: { reasoning: `<think>Roteador selecionou o Agente ${newAgentName}. Trocando contexto e continuando o fluxo.</think>` } }]
+      }
+      res.write(`data: ${JSON.stringify(switchNotification)}\n\n`)
+    }
+  } else {
+    messages.push(...toolResultMessages)
+  }
 
   const secondCallOptions = { ...requestOptions, stream: true }
   const finalStreamResponse = await ask("gemini", aiKey, sanitizeMessages(messages), secondCallOptions)
@@ -158,6 +173,37 @@ const handleOpenAIStream = async (req, res, next) => {
   }
 
   return res.end()
+}
+
+const sendWithStream = async (req, res, next) => {
+  try {
+    const { aiProvider, model, messages: userPrompts, aiKey, use_tools = [], mode, customApiUrl } = req.body
+    const { userID, user } = req
+    res.setHeader("Content-Type", "text/event-stream")
+    res.setHeader("Cache-Control", "no-cache")
+    res.setHeader("Connection", "keep-alive")
+
+    const systemPrompt = await getSystemPrompt(mode, userID)
+    let messages = [systemPrompt, ...userPrompts]
+    const toolOptions = await buildToolOptions(aiProvider, use_tools, userID, mode)
+    const requestOptions = { model, stream: true, customApiUrl, ...toolOptions }
+
+    const handlerArgs = {
+      res, aiProvider, aiKey, messages, requestOptions, user, userPrompts, userID, model, customApiUrl
+    }
+
+    if (aiProvider === "gemini") {
+      await handleGeminiStream(req, res, next)
+    } else {
+      await handleOpenAIStream(req, res, next)
+    }
+  } catch (error) {
+    next(error)
+    if (res.headersSent) {
+      console.error(`[STREAM_ERROR] Erro durante o streaming, encerrando conexão: ${error.message}`)
+      res.end()
+    }
+  }
 }
 
 module.exports = {

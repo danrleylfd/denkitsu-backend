@@ -26,12 +26,16 @@ const sendMessage = (req, res, next) => {
 
   const isGemini = aiProvider === "gemini"
 
-  if (stream) {
-    const handler = isGemini ? handleGeminiStream : handleOpenAIStream
-    return handler(req, res, next).catch(next)
-  } else {
-    const handler = isGemini ? handleGeminiNonStream : handleOpenAINonStream
-    return handler(req, res, next).catch(next)
+  try {
+    if (stream) {
+      const handler = isGemini ? handleGeminiStream : handleOpenAIStream
+      return handler(req, res, next)
+    } else {
+      const handler = isGemini ? handleGeminiNonStream : handleOpenAINonStream
+      return handler(req, res, next)
+    }
+  } catch(error) {
+    next(error)
   }
 }
 
