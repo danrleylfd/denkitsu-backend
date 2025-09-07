@@ -9,7 +9,7 @@ const aiRouter = require("../middlewares/aiRouter")
 const { sendMessageRules } = require("../validators/ai")
 const { prepareInitialAIRequest, makePrimaryAIRequest, handleToolCalls } = require("../middlewares/aiRequestSequence")
 
-const handleStreamingLifecycle = require("../views/ai/handleStreamingLifecycle")
+const handleStreamLifecycle = require("../views/ai/handleStreamLifecycle")
 const finalizeAndSendResponse = require("../views/ai/finalizeAndSendResponse")
 const handleGeminiStream = require("../views/ai/handleGeminiStream")
 const handleGeminiNonStream = require("../views/ai/handleGeminiNonStream")
@@ -22,7 +22,7 @@ routes.use(authMiddleware)
 
 routes.post("/chat/completions", sendMessageRules(), validate, aiMiddleware, aiRouter)
 
-routes.post("/chat/groq/stream", asyncHandler(prepareInitialAIRequest), asyncHandler(handleStreamingLifecycle))
+routes.post("/chat/groq/stream", asyncHandler(prepareInitialAIRequest), asyncHandler(handleStreamLifecycle))
 routes.post(
   "/chat/groq/nonstream",
   asyncHandler(prepareInitialAIRequest),
@@ -31,7 +31,7 @@ routes.post(
   asyncHandler(finalizeAndSendResponse)
 )
 
-routes.post("/chat/openrouter/stream", asyncHandler(prepareInitialAIRequest), asyncHandler(handleStreamingLifecycle))
+routes.post("/chat/openrouter/stream", asyncHandler(prepareInitialAIRequest), asyncHandler(handleStreamLifecycle))
 routes.post(
   "/chat/openrouter/nonstream",
   asyncHandler(prepareInitialAIRequest),
@@ -40,7 +40,7 @@ routes.post(
   asyncHandler(finalizeAndSendResponse)
 )
 
-routes.post("/chat/custom/stream", proOnly, asyncHandler(prepareInitialAIRequest), asyncHandler(handleStreamingLifecycle))
+routes.post("/chat/custom/stream", proOnly, asyncHandler(prepareInitialAIRequest), asyncHandler(handleStreamLifecycle))
 routes.post(
   "/chat/custom/nonstream",
   proOnly,
