@@ -36,12 +36,14 @@ const handleGeminiNonStream = async (req, res, next) => {
       history: transformToGemini(initialHistory)
     })
 
-    const lastMessageTransformed = transformToGemini([lastMessage])[0]
+    const transformedMessages = transformToGemini([lastMessage])
 
-    // FIX: Adicionada validação para previnir crash com prompts vazios ou não-suportados.
-    if (!lastMessageTransformed || !lastMessageTransformed.parts || lastMessageTransformed.parts.length === 0) {
+    // FIX DEFINITIVO: A validação ocorre aqui. Se a transformação não produzir um conteúdo válido, nós barramos a requisição.
+    if (!transformedMessages || transformedMessages.length === 0 || !transformedMessages[0].parts || transformedMessages[0].parts.length === 0) {
       throw createAppError("O prompt está vazio ou contém apenas mídias não suportadas no momento.", 400, "EMPTY_PROMPT")
     }
+    const lastMessageTransformed = transformedMessages[0]
+
 
     const result1 = await chat.sendMessage(lastMessageTransformed.parts)
     let response1 = result1.response
