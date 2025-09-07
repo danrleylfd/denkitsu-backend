@@ -190,4 +190,4 @@ const getModels = async (aiProvider, apiUrl, apiKey) => {
   return prettyModels
 }
 
-module.exports = { ask, getModels }
+module.exports = { ask, getModels, createAIClientFactory }
