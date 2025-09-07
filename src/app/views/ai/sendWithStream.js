@@ -11,19 +11,7 @@ const handleOpenAIStream = async (req, res, next) => {
   const { aiProvider, model, messages: userPrompts, aiKey, use_tools = [], mode, customApiUrl } = req.body
   const { userID, user } = req
   const systemPrompt = await getSystemPrompt(mode, userID)
-
   let messages = [systemPrompt, ...userPrompts]
-  if (mode === "Roteador") {
-    const textOnlyUserPrompts = userPrompts.map((msg) => {
-      if (Array.isArray(msg.content)) {
-        const textContent = msg.content.find((part) => part.type === "text")
-        return { ...msg, content: textContent ? textContent.content : "" }
-      }
-      return msg
-    })
-    messages = [systemPrompt, ...textOnlyUserPrompts]
-  }
-
   const toolOptions = await buildToolOptions(aiProvider, use_tools, userID, mode)
   const requestOptions = { model, stream: true, customApiUrl, ...toolOptions }
 

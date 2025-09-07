@@ -14,22 +14,11 @@ const handleOpenAINonStream = async (req, res, next) => {
   const { userID, user } = req
   try {
     const systemPrompt = await getSystemPrompt(mode, userID)
+    let messages = [systemPrompt, ...userPrompts]
     const toolOptions = await buildToolOptions(aiProvider, use_tools, userID, mode)
     const requestOptions = { model, stream: false, customApiUrl, ...toolOptions }
 
-    let messagesForFirstCall = [systemPrompt, ...userPrompts]
-    if (mode === "Roteador") {
-      const textOnlyUserPrompts = userPrompts.map((msg) => {
-        if (Array.isArray(msg.content)) {
-          const textContent = msg.content.find((part) => part.type === "text")
-          return { ...msg, content: textContent ? textContent.content : "" }
-        }
-        return msg
-      })
-      messagesForFirstCall = [systemPrompt, ...textOnlyUserPrompts]
-    }
-
-    const { data } = await ask(aiProvider, aiKey, messagesForFirstCall, requestOptions)
+    const { data } = await ask(aiProvider, aiKey, messages, requestOptions)
     let responseMessage = data.choices[0].message
     responseMessage.content = cleanToolCallSyntax(responseMessage.content)
 
@@ -67,8 +56,9 @@ const handleOpenAINonStream = async (req, res, next) => {
         })
       }
       const initialReasoning = responseMessage.reasoning || ""
-      const messagesWithToolResults = [...messagesForFirstCall, responseMessage, ...toolResultMessages]
-      const finalResponse = await ask(aiProvider, aiKey, sanitizeMessages(messagesWithToolResults), { model, stream: false, customApiUrl })
+      messages.push(responseMessage)
+      messages.push(...toolResultMessages)
+      const finalResponse = await ask(aiProvider, aiKey, sanitizeMessages(messages), { model, stream: false, customApiUrl, ...toolOptions })
       const finalMessage = finalResponse.data.choices[0].message
       finalMessage.content = cleanToolCallSyntax(finalMessage.content)
       const { content, reasoning: finalExtractedReasoning } = extractReasoning(finalMessage.content)
