@@ -1,4 +1,5 @@
 const selectAgent = async ({ agentName }) => {
+  console.log("[SELECT_AGENT_TOOL] Agente Selecionado:", agentName)
   return {
     status: 200,
     data: {
