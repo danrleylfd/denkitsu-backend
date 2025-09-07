@@ -16,7 +16,7 @@ const providerConfig = {
   },
   gemini: {
     apiKey: process.env.GEMINI_API_KEY,
-    defaultModel: "gemini-2.5-flash"
+    defaultModel: "gemini-1.5-flash"
   }
 }
 
@@ -34,42 +34,36 @@ const createAIClientFactory = (provider, apiKey, customApiUrl) => {
   return new OpenAI({ apiKey: finalApiKey, baseURL: finalApiUrl })
 }
 
-const ask = async (aiProvider, aiKey, prompts, options = {}) => {
-  const { customApiUrl, ...restOptions } = options
-  const timestampsMsg = { role: "system", content: `O sistema informa a data atual em formato ISO: ${new Date().toISOString()}, converta para horário de Brasília conforme necessidade do usuário, não mostre se o usuário não solicitar, use como referência temporal quando o usuário mencionar alguma data ou quando alguma tool fornecer uma data.` }
-  const finalPrompts = [timestampsMsg, ...prompts]
+const askGemini = async (aiKey, finalPrompts, restOptions) => {
+  const { model: modelName, stream, ...props } = restOptions
+  const geminiClient = createAIClientFactory("gemini", aiKey)
+  const geminiModel = geminiClient.getGenerativeModel({
+    model: modelName || providerConfig.gemini.defaultModel,
+    tools: props.tools,
+    toolConfig: props.toolConfig
+  })
 
-  if (aiProvider === "gemini") {
-    const { model: modelName, stream, ...props } = restOptions
-    const geminiClient = createAIClientFactory(aiProvider, aiKey)
-    const geminiModel = geminiClient.getGenerativeModel({
-      model: modelName || providerConfig.gemini.defaultModel,
-      tools: props.tools,
-      toolConfig: props.toolConfig
-    })
-    const geminiContents = transformToGemini(finalPrompts)
-    const history = geminiContents.length > 1 ? geminiContents.slice(0, -1) : []
-    const lastMessage = geminiContents.length > 0 ? geminiContents[geminiContents.length - 1] : { role: "user", parts: [{ text: "" }] }
+  const contents = transformToGemini(finalPrompts)
+  const request = { contents }
 
-    try {
-      const chat = geminiModel.startChat({ history })
-      // A lógica de streaming agora é tratada em sendWithStream.js
-      if (stream) {
-        return await chat.sendMessageStream(lastMessage.parts)
-      }
-      const result = await chat.sendMessage(lastMessage.parts)
-      const openAIResponse = transformFromGemini(result.response)
-      return { status: 200, data: { choices: [{ message: openAIResponse }] } }
-    } catch (error) {
-       console.error(`Erro ao chamar a API ${aiProvider}:`, {
-        message: error.message,
-        stack: error.stack
-      })
-      throw new Error("API_REQUEST_FAILED")
+  try {
+    if (stream) {
+      const streamResult = await geminiModel.generateContentStream(request)
+      return streamResult
     }
+    const result = await geminiModel.generateContent(request)
+    const openAIResponse = transformFromGemini(result.response)
+    return { status: 200, data: { choices: [{ message: openAIResponse }] } }
+  } catch (error) {
+    console.error(`Erro ao chamar a API gemini:`, {
+      message: error.message,
+      stack: error.stack
+    })
+    throw new Error("API_REQUEST_FAILED")
   }
+}
 
-  // Lógica existente para OpenAI e compatíveis
+const askOpenAI = async (aiProvider, aiKey, finalPrompts, restOptions, customApiUrl) => {
   const openai = createAIClientFactory(aiProvider, aiKey, customApiUrl)
   const { model, stream, ...props } = restOptions
   const config = providerConfig[aiProvider]
@@ -105,6 +99,18 @@ const ask = async (aiProvider, aiKey, prompts, options = {}) => {
   }
 }
 
+const ask = async (aiProvider, aiKey, prompts, options = {}) => {
+  const { customApiUrl, ...restOptions } = options
+  const timestampsMsg = { role: "system", content: `O sistema informa a data atual em formato ISO: ${new Date().toISOString()}, converta para horário de Brasília conforme necessidade do usuário, não mostre se o usuário não solicitar, use como referência temporal quando o usuário mencionar alguma data ou quando alguma tool fornecer uma data.` }
+  const finalPrompts = [timestampsMsg, ...prompts]
+
+  if (aiProvider === "gemini") {
+    return askGemini(aiKey, finalPrompts, restOptions)
+  } else {
+    return askOpenAI(aiProvider, aiKey, finalPrompts, restOptions, customApiUrl)
+  }
+}
+
 const checkToolCompatibility = (model) => {
   if (model.supported_parameters && Array.isArray(model.supported_parameters)) {
     const params = new Set(model.supported_parameters)
@@ -136,13 +142,10 @@ const getModels = async (aiProvider, apiUrl, apiKey) => {
   if (aiProvider === "custom") models.push({ id: "auto", supports_tools: true, supports_images: true, supports_files: true, aiProvider: "custom" })
 
   const geminiHardcodedModels = [
-    { id: "gemini-1.5-flash", supports_tools: true, supports_images: true, supports_files: true, aiProvider: "gemini" },
     { id: "gemini-1.5-pro", supports_tools: true, supports_images: true, supports_files: true, aiProvider: "gemini" },
-    { id: "gemini-2.5-flash", supports_tools: true, supports_images: true, supports_files: true, aiProvider: "gemini" },
-    { id: "gemini-2.5-pro", supports_tools: true, supports_images: true, supports_files: true, aiProvider: "gemini" },
+    { id: "gemini-1.5-flash", supports_tools: true, supports_images: true, supports_files: true, aiProvider: "gemini" }
   ]
   if (aiProvider === "gemini") models.push(...geminiHardcodedModels)
-
 
   for (const [provider, config] of Object.entries(providerConfig)) {
     if (provider === "gemini") continue
