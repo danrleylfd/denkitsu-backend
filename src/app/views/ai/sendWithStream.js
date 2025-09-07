@@ -4,97 +4,8 @@ const {
   getSystemPrompt,
   buildToolOptions,
   processToolCalls,
-  processStreamAndExtractReasoning,
-  transformToGemini,
-  transformFromGemini
+  processStreamAndExtractReasoning
 } = require("./chatHelpers")
-const { createAIClientFactory } = require("../../../utils/api/ai")
-
-const handleGeminiStream = async (req, res, next) => {
-  const { model: modelName, messages: userPrompts, aiKey, use_tools = [], mode } = req.body
-  const { userID, user } = req
-
-  try {
-    const systemPrompt = await getSystemPrompt(mode, userID)
-    const toolOptions = await buildToolOptions("gemini", use_tools, userID, mode)
-
-    const geminiClient = createAIClientFactory("gemini", aiKey)
-    const geminiModel = geminiClient.getGenerativeModel({
-      model: modelName || "gemini-1.5-flash",
-      systemInstruction: {
-        parts: [{ text: systemPrompt.content }]
-      },
-      ...toolOptions
-    })
-
-    const allMessages = [...userPrompts]
-    const initialHistory = allMessages.slice(0, -1)
-    const lastMessage = allMessages[allMessages.length - 1]
-
-    const chat = geminiModel.startChat({
-      history: transformToGemini(initialHistory)
-    })
-
-    const lastMessageTransformed = transformToGemini([lastMessage])[0]
-
-    // FIX: Adicionada validação para previnir crash com prompts vazios ou não-suportados.
-    if (!lastMessageTransformed || !lastMessageTransformed.parts || lastMessageTransformed.parts.length === 0) {
-      // Para stream, apenas encerramos a conexão.
-      return res.end()
-    }
-
-    // Step 1: Envia a mensagem e aguarda a resposta completa em buffer, sem stream para o cliente ainda.
-    const result1 = await chat.sendMessageStream(lastMessageTransformed.parts)
-    const aggregatedResponse = await result1.response
-    const openAIResponse = transformFromGemini(aggregatedResponse)
-
-    // Step 2: Checa se a resposta bufferizada contém um tool call.
-    if (openAIResponse.tool_calls && openAIResponse.tool_calls.length > 0) {
-      // Informa o cliente que uma ferramenta está sendo usada.
-      const toolStatusUpdate = {
-        choices: [{
-          delta: {
-            reasoning: `<think>Recebi uma solicitação de ferramenta. Executando ${openAIResponse.tool_calls.map(t => t.function.name).join(", ")}...</think>`
-          }
-        }]
-      }
-      res.write(`data: ${JSON.stringify(toolStatusUpdate)}\n\n`)
-
-      // Step 3: Executa as ferramentas.
-      const toolResultMessages = await processToolCalls(openAIResponse.tool_calls, user)
-      const functionResponseParts = toolResultMessages.map(toolMsg => ({
-        functionResponse: {
-          name: toolMsg.name,
-          response: JSON.parse(toolMsg.content)
-        }
-      }))
-
-      // Step 4: Envia o resultado das ferramentas de volta e agora faz o stream da resposta final para o cliente.
-      const result2Stream = await chat.sendMessageStream(functionResponseParts)
-      for await (const chunk of result2Stream.stream) {
-        const text = chunk.text()
-        if (text) {
-          const openAIDelta = { choices: [{ delta: { content: text } }] }
-          res.write(`data: ${JSON.stringify(openAIDelta)}\n\n`)
-        }
-      }
-    } else {
-      // Step 5: Se não houve tool call, simplesmente envia a resposta de texto que já foi bufferizada.
-      const text = aggregatedResponse.text()
-      if (text) {
-        const openAIDelta = { choices: [{ delta: { content: text } }] }
-        res.write(`data: ${JSON.stringify(openAIDelta)}\n\n`)
-      }
-    }
-  } catch (error) {
-    next(error)
-  } finally {
-    if (!res.writableEnded) {
-      res.end()
-    }
-  }
-}
-
 
 const handleOpenAIStream = async (req, res, next) => {
   const { aiProvider, model, messages: userPrompts, aiKey, use_tools = [], mode, customApiUrl } = req.body
@@ -198,6 +109,5 @@ const handleOpenAIStream = async (req, res, next) => {
 }
 
 module.exports = {
-  handleGeminiStream,
   handleOpenAIStream
 }

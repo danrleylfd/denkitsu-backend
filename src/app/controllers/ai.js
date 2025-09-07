@@ -10,8 +10,8 @@ const createAppError = require("../../utils/errors")
 const routes = Router()
 routes.use(authMiddleware)
 
-const { handleGeminiStream, handleOpenAIStream } = require("../views/ai/sendWithStream")
-const { handleGeminiNonStream, handleOpenAINonStream } = require("../views/ai/sendWithoutStream")
+const { handleOpenAIStream } = require("../views/ai/sendWithStream")
+const { handleOpenAINonStream } = require("../views/ai/sendWithoutStream")
 const getModels = require("../views/ai/getModels")
 const listAgents = require("../views/ai/listAgents")
 const listTools = require("../views/ai/listTools")
@@ -24,15 +24,11 @@ const sendMessage = (req, res, next) => {
     return next(createAppError("O provedor de IA personalizado é um recurso exclusivo para membros Plus.", 403, "PLUS_PLAN_REQUIRED"))
   }
 
-  const isGemini = aiProvider === "gemini"
-
   try {
     if (stream) {
-      const handler = isGemini ? handleGeminiStream : handleOpenAIStream
-      return handler(req, res, next)
+      return handleOpenAIStream(req, res, next)
     } else {
-      const handler = isGemini ? handleGeminiNonStream : handleOpenAINonStream
-      return handler(req, res, next)
+      return handleOpenAINonStream(req, res, next)
     }
   } catch(error) {
     next(error)

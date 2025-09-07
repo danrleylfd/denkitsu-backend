@@ -112,13 +112,8 @@ const buildToolOptions = async (aiProvider, use_tools = [], userId, mode) => {
     }))
     const combinedTools = [...(toolOptions.tools || []), ...filteredBuiltInTools, ...customToolSchemas]
     if (combinedTools.length > 0) {
-      if (aiProvider === "gemini") {
-        toolOptions.toolConfig = { function_calling_config: { mode: "AUTO" } }
-        toolOptions.tools = [{ functionDeclarations: combinedTools.map(t => t.function) }]
-      } else {
-        toolOptions.tools = combinedTools
-        toolOptions.tool_choice = "auto"
-      }
+      toolOptions.tools = combinedTools
+      toolOptions.tool_choice = "auto"
     }
   }
   return toolOptions
@@ -210,111 +205,11 @@ const processToolCalls = async (toolCalls, user) => {
   return Promise.all(toolResultPromises)
 }
 
-const transformToGemini = (messages) => {
-  const geminiContents = []
-  const operationalMessages = messages.filter(msg => msg.role !== "system")
-
-  operationalMessages.forEach(msg => {
-    const parts = []
-    let role = msg.role === "assistant" ? "model" : "user"
-
-    // 1. Converte conteúdo de texto (string ou array multimodal)
-    if (msg.content) {
-      if (typeof msg.content === "string") {
-        if (msg.content.trim()) parts.push({ text: msg.content })
-      } else if (Array.isArray(msg.content)) {
-        msg.content.forEach(part => {
-          // FIX: Adicionado check de existência para part.content antes do .trim()
-          if (part.type === "text" && part.content && part.content.trim()) {
-            parts.push({ text: part.content })
-          }
-          // Lógica para imagens (ainda não implementada, mas o stub está aqui para evitar erros)
-          if (part.type === "image_url") {
-            // No futuro: converter URL para base64 e adicionar como inlineData
-            // Por agora, ignoramos para não quebrar.
-          }
-        })
-      }
-    }
-
-    // 2. Converte 'tool_calls' do assistente para 'functionCall' do Gemini
-    if (msg.role === "assistant" && msg.tool_calls) {
-      msg.tool_calls.forEach(toolCall => {
-        try {
-          parts.push({
-            functionCall: {
-              name: toolCall.function.name,
-              args: JSON.parse(toolCall.function.arguments)
-            }
-          })
-        } catch (e) {
-          console.error("Erro no parse de argumentos do tool_call para Gemini:", e)
-        }
-      })
-    }
-
-    // 3. Converte respostas de ferramenta ('role: tool') para 'functionResponse' do Gemini
-    if (msg.role === "tool") {
-      role = "user" // No Gemini, a resposta da ferramenta vem do usuário.
-      try {
-        parts.push({
-          functionResponse: {
-            name: msg.name,
-            response: JSON.parse(msg.content)
-          }
-        })
-      } catch (e) {
-        console.error("Erro no parse do conteúdo da tool response para Gemini:", e)
-        parts.push({
-          functionResponse: {
-            name: msg.name,
-            response: { error: "Conteúdo da ferramenta em formato JSON inválido.", details: msg.content }
-          }
-        })
-      }
-    }
-
-    // 4. Adiciona a mensagem transformada apenas se tiver partes válidas.
-    // Isso previne o erro de 'data must have one initialized field'.
-    if (parts.length > 0) {
-      geminiContents.push({ role, parts })
-    }
-  })
-
-  return geminiContents
-}
-
-
-const transformFromGemini = (geminiResponse) => {
-  const candidate = geminiResponse?.candidates?.[0]
-  if (!candidate) return { role: "assistant", content: "" }
-
-  const content = candidate.content?.parts?.find(p => p.text)?.text || ""
-  const tool_calls = candidate.content?.parts
-    .filter(p => p.functionCall)
-    .map((p, i) => ({
-      id: `call_${i}`,
-      type: "function",
-      function: {
-        name: p.functionCall.name,
-        arguments: JSON.stringify(p.functionCall.args)
-      }
-    }))
-
-  return {
-    role: "assistant",
-    content: content || null,
-    tool_calls: tool_calls?.length > 0 ? tool_calls : undefined
-  }
-}
-
 module.exports = {
   cleanToolCallSyntax,
   extractReasoning,
   getSystemPrompt,
   buildToolOptions,
   processToolCalls,
-  processStreamAndExtractReasoning,
-  transformToGemini,
-  transformFromGemini
+  processStreamAndExtractReasoning
 }

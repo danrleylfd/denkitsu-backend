@@ -1,4 +1,4 @@
-const { ask, createAIClientFactory } = require("../../../utils/api/ai")
+const { ask } = require("../../../utils/api/ai")
 const { sanitizeMessages } = require("../../../utils/helpers/ai")
 const {
   cleanToolCallSyntax,
@@ -6,81 +6,8 @@ const {
   getSystemPrompt,
   buildToolOptions,
   processToolCalls,
-  transformToGemini,
-  transformFromGemini
 } = require("./chatHelpers")
-const createAppError = require("../../../utils/errors")
-
-const handleGeminiNonStream = async (req, res, next) => {
-  const { model: modelName, messages: userPrompts, aiKey, use_tools = [], mode } = req.body
-  const { userID, user } = req
-
-  try {
-    const systemPrompt = await getSystemPrompt(mode, userID)
-
-    const allMessages = [...userPrompts]
-    const initialHistory = allMessages.slice(0, -1)
-    const lastMessage = allMessages[allMessages.length - 1]
-
-    const toolOptions = await buildToolOptions("gemini", use_tools, userID, mode)
-    const geminiClient = createAIClientFactory("gemini", aiKey)
-    const geminiModel = geminiClient.getGenerativeModel({
-      model: modelName || "gemini-1.5-flash",
-      systemInstruction: {
-        parts: [{ text: systemPrompt.content }]
-      },
-      ...toolOptions
-    })
-
-    const chat = geminiModel.startChat({
-      history: transformToGemini(initialHistory)
-    })
-
-    const transformedMessages = transformToGemini([lastMessage])
-
-    // FIX DEFINITIVO: A validação ocorre aqui. Se a transformação não produzir um conteúdo válido, nós barramos a requisição.
-    if (!transformedMessages || transformedMessages.length === 0 || !transformedMessages[0].parts || transformedMessages[0].parts.length === 0) {
-      throw createAppError("O prompt está vazio ou contém apenas mídias não suportadas no momento.", 400, "EMPTY_PROMPT")
-    }
-    const lastMessageTransformed = transformedMessages[0]
-
-
-    const result1 = await chat.sendMessage(lastMessageTransformed.parts)
-    let response1 = result1.response
-
-    const functionCalls = response1.candidates[0].content.parts.filter(p => p.functionCall)
-
-    if (functionCalls.length > 0) {
-      const openAIToolCalls = transformFromGemini(response1).tool_calls
-
-      const routerToolCall = openAIToolCalls.find(tc => tc.function.name === "selectAgentTool")
-      if (routerToolCall) {
-        const args = JSON.parse(routerToolCall.function.arguments)
-        return res.status(200).json({
-          next_action: { type: "SWITCH_AGENT", agent: args.agentName },
-          original_message: transformFromGemini(response1)
-        })
-      }
-
-      const toolResultMessages = await processToolCalls(openAIToolCalls, user)
-      const functionResponseParts = toolResultMessages.map(toolMsg => ({
-        functionResponse: {
-          name: toolMsg.name,
-          response: JSON.parse(toolMsg.content)
-        }
-      }))
-
-      const result2 = await chat.sendMessage(functionResponseParts)
-      const finalResponse = transformFromGemini(result2.response)
-      return res.status(200).json({ choices: [{ message: finalResponse }] })
-    }
-
-    const finalResponse = transformFromGemini(response1)
-    return res.status(200).json({ choices: [{ message: finalResponse }] })
-  } catch (error) {
-    next(error)
-  }
-}
+const { createAIClientFactory } = require("../../../utils/api/ai")
 
 const handleOpenAINonStream = async (req, res, next) => {
   const { aiProvider, model, messages: userPrompts, aiKey, use_tools = [], mode, customApiUrl } = req.body
@@ -150,6 +77,5 @@ const handleOpenAINonStream = async (req, res, next) => {
 }
 
 module.exports = {
-  handleGeminiNonStream,
   handleOpenAINonStream
 }
