@@ -4,43 +4,57 @@ const authMiddleware = require("../middlewares/auth")
 const aiMiddleware = require("../middlewares/ai")
 const asyncHandler = require("../middlewares/asyncHandler")
 const validate = require("../middlewares/validator")
+const proOnly = require("../middlewares/subscription")
+const aiRouter = require("../middlewares/aiRouter")
 const { sendMessageRules } = require("../validators/ai")
-const createAppError = require("../../utils/errors")
+const { prepareInitialAIRequest, makePrimaryAIRequest, handleToolCalls } = require("../middlewares/aiRequestSequence")
 
-const routes = Router()
-routes.use(authMiddleware)
-
-const { handleOpenAIStream } = require("../views/ai/sendWithStream")
-const { handleOpenAINonStream } = require("../views/ai/sendWithoutStream")
+const handleStreamingLifecycle = require("../views/ai/handleStreamingLifecycle")
+const finalizeAndSendResponse = require("../views/ai/finalizeAndSendResponse")
+const handleGeminiStream = require("../views/ai/handleGeminiStream")
+const handleGeminiNonStream = require("../views/ai/handleGeminiNonStream")
 const getModels = require("../views/ai/getModels")
 const listAgents = require("../views/ai/listAgents")
 const listTools = require("../views/ai/listTools")
 
-const sendMessage = (req, res, next) => {
-  const { user } = req
-  const { aiProvider = "groq", stream = false } = req.body
+const routes = Router()
+routes.use(authMiddleware)
 
-  if (aiProvider === "custom" && user.plan === "free") {
-    return next(createAppError("O provedor de IA personalizado é um recurso exclusivo para membros Plus.", 403, "PLUS_PLAN_REQUIRED"))
-  }
+routes.post("/chat/completions", sendMessageRules(), validate, aiMiddleware, aiRouter)
 
-  try {
-    if (stream) {
-      return handleOpenAIStream(req, res, next)
-    } else {
-      return handleOpenAINonStream(req, res, next)
-    }
-  } catch(error) {
-    next(error)
-  }
-}
+routes.post("/chat/groq/stream", asyncHandler(prepareInitialAIRequest), asyncHandler(handleStreamingLifecycle))
+routes.post(
+  "/chat/groq/nonstream",
+  asyncHandler(prepareInitialAIRequest),
+  asyncHandler(makePrimaryAIRequest),
+  asyncHandler(handleToolCalls),
+  asyncHandler(finalizeAndSendResponse)
+)
 
-routes.post("/chat/completions", sendMessageRules(), validate, aiMiddleware, asyncHandler(sendMessage))
+routes.post("/chat/openrouter/stream", asyncHandler(prepareInitialAIRequest), asyncHandler(handleStreamingLifecycle))
+routes.post(
+  "/chat/openrouter/nonstream",
+  asyncHandler(prepareInitialAIRequest),
+  asyncHandler(makePrimaryAIRequest),
+  asyncHandler(handleToolCalls),
+  asyncHandler(finalizeAndSendResponse)
+)
+
+routes.post("/chat/custom/stream", proOnly, asyncHandler(prepareInitialAIRequest), asyncHandler(handleStreamingLifecycle))
+routes.post(
+  "/chat/custom/nonstream",
+  proOnly,
+  asyncHandler(prepareInitialAIRequest),
+  asyncHandler(makePrimaryAIRequest),
+  asyncHandler(handleToolCalls),
+  asyncHandler(finalizeAndSendResponse)
+)
+
+routes.post("/chat/gemini/stream", asyncHandler(handleGeminiStream))
+routes.post("/chat/gemini/nonstream", asyncHandler(handleGeminiNonStream))
 
 routes.get("/models", asyncHandler(getModels))
-
 routes.get("/agents", asyncHandler(listAgents))
-
 routes.get("/tools", asyncHandler(listTools))
 
 const loadAIRoutes = (app) => app.use("/ai", routes)

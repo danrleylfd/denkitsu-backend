@@ -1,0 +1,77 @@
+const { ask } = require("../../../utils/api/ai")
+const { sanitizeMessages } = require("../../../utils/helpers/ai")
+const { processToolCalls, processStreamAndExtractReasoning } = require("./chatHelpers")
+const { getSystemPrompt } = require("./chatHelpers")
+
+const handleStreamingLifecycle = async (req, res) => {
+  const { aiProvider, aiKey, messages: userPrompts } = req.body
+  const { user, userID, aiRequestPayload } = req
+  const { messages: initialMessages, options: requestOptions } = aiRequestPayload
+  const streamResponse = await ask(aiProvider, aiKey, initialMessages, requestOptions)
+  let aggregatedToolCalls = []
+  let hasToolCall = false
+  let initialReasoningSent = false
+  for await (const chunk of streamResponse) {
+    const delta = chunk.choices[0]?.delta
+    if (!delta) continue
+    if (delta.tool_calls) {
+      hasToolCall = true
+      delta.tool_calls.forEach(toolCallChunk => {
+        const existingCall = aggregatedToolCalls[toolCallChunk.index]
+        if (!existingCall) aggregatedToolCalls[toolCallChunk.index] = { ...toolCallChunk.function, id: toolCallChunk.id, index: toolCallChunk.index }
+        else if (toolCallChunk.function?.arguments) existingCall.arguments += toolCallChunk.function.arguments
+      })
+      res.write(`data: ${JSON.stringify(chunk)}\n\n`)
+    }
+    if (delta.content || delta.reasoning) {
+      for await (const processedChunk of processStreamAndExtractReasoning([chunk])) {
+        if (processedChunk.choices[0]?.delta?.reasoning) initialReasoningSent = true
+        res.write(`data: ${JSON.stringify(processedChunk)}\n\n`)
+      }
+    }
+  }
+  if (!hasToolCall) return res.end()
+  const finalToolCalls = aggregatedToolCalls.map(call => ({
+    id: call.id,
+    type: "function",
+    function: { name: call.name, arguments: call.arguments }
+  }))
+  let messagesForNextStep = [...initialMessages, { role: "assistant", tool_calls: finalToolCalls }]
+  for (const toolCall of finalToolCalls) {
+    const statusUpdate = { choices: [{ delta: { tool_calls: [{ index: toolCall.index, function: { name: toolCall.function.name, arguments: "" } }] } }] }
+    res.write(`data: ${JSON.stringify(statusUpdate)}\n\n`)
+  }
+  const toolResultMessages = await processToolCalls(finalToolCalls, user)
+  const ttsCall = finalToolCalls.find(c => c.function.name === "ttsTool")
+  if (ttsCall && finalToolCalls.length === 1) {
+    const ttsResult = toolResultMessages.find(r => r.tool_call_id === ttsCall.id)
+    if (ttsResult) {
+      const audioData = JSON.parse(ttsResult.content)
+      const finalChunk = { choices: [{ delta: { role: "assistant", content: audioData.inputText, audio: { data: audioData.audio, format: audioData.format || "wav" } } }] }
+      res.write(`data: ${JSON.stringify(finalChunk)}\n\n`)
+      return res.end()
+    }
+  }
+  const routerToolCallResult = toolResultMessages.find(r => r.name === "selectAgentTool")
+  if (routerToolCallResult) {
+    const resultData = JSON.parse(routerToolCallResult.content)
+    if (resultData.action === "SWITCH_AGENT" && resultData.agent) {
+      const newAgentName = resultData.agent
+      const newSystemPrompt = await getSystemPrompt(newAgentName, userID)
+      messagesForNextStep = [newSystemPrompt, ...userPrompts]
+      const switchNotification = { choices: [{ delta: { reasoning: `<think>Roteador selecionou o Agente ${newAgentName}. Trocando contexto e continuando o fluxo.</think>` } }] }
+      res.write(`data: ${JSON.stringify(switchNotification)}\n\n`)
+    }
+  } else {
+    messagesForNextStep.push(...toolResultMessages)
+  }
+  if (initialReasoningSent) res.write(`data: ${JSON.stringify({ choices: [{ delta: { reasoning: "\n\n...\n\n" } }] })}\n\n`)
+  const finalResponseStream = await ask(aiProvider, aiKey, sanitizeMessages(messagesForNextStep), requestOptions)
+  const finalProcessedStream = processStreamAndExtractReasoning(finalResponseStream)
+  for await (const finalChunk of finalProcessedStream) {
+    res.write(`data: ${JSON.stringify(finalChunk)}\n\n`)
+  }
+  return res.end()
+}
+
+module.exports = handleStreamingLifecycle
