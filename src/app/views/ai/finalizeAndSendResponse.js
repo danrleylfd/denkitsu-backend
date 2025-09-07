@@ -1,17 +1,41 @@
-const { cleanToolCallSyntax, extractReasoning } = require("./chatHelpers")
-const { processToolCalls } = require("./chatHelpers")
+const { cleanToolCallSyntax, extractReasoning, processToolCalls, getSystemPrompt } = require("./chatHelpers")
+const { ask } = require("../../../utils/api/ai")
+const { sanitizeMessages } = require("../../../utils/helpers/ai")
 
 const finalizeAndSendResponse = async (req, res) => {
-  const data = res.locals.primaryResponse // CORREÇÃO: Atribuição direta sem desestruturação
+  const { aiProvider, aiKey, model, customApiUrl, messages: userPrompts } = req.body
+  const { user, userID } = req
+  let data = res.locals.primaryResponse
+
   if (!data || !data.choices || data.choices.length === 0) {
-    // Adiciona uma guarda para o caso de a resposta da IA vir malformada
     throw new Error("A resposta da API de IA não contém 'choices' válidos.")
   }
 
-  const responseMessage = data.choices[0].message
-  const { user } = req
+  let responseMessage = data.choices[0].message
 
-  // Lógica para TTS Tool
+  // VERIFICA SE O ROTEADOR FOI ATIVADO
+  const routerToolCall = responseMessage.tool_calls?.find(tc => tc.function.name === "selectAgentTool")
+
+  if (routerToolCall) {
+    console.log("[FINALIZE_NON_STREAM] Roteador detectado. Executando a segunda chamada internamente.")
+    const toolResultMessages = await processToolCalls(responseMessage.tool_calls, user)
+    const routerToolCallResult = toolResultMessages.find(r => r.name === "selectAgentTool")
+    const resultData = JSON.parse(routerToolCallResult.content)
+
+    if (resultData.action === "SWITCH_AGENT" && resultData.agent) {
+      const newAgentName = resultData.agent
+      const newSystemPrompt = await getSystemPrompt(newAgentName, userID)
+      const userOnlyMessages = userPrompts.filter(msg => msg.role !== "system")
+      const messagesForNextStep = [newSystemPrompt, ...userOnlyMessages]
+
+      // Executa a segunda chamada para a IA, agora com o agente correto
+      const finalResponse = await ask(aiProvider, aiKey, sanitizeMessages(messagesForNextStep), { model, stream: false, customApiUrl })
+      data = finalResponse.data // Substitui a resposta do roteador pela resposta final
+      responseMessage = data.choices[0].message
+    }
+  }
+
+  // A partir daqui, a lógica processa a RESPOSTA FINAL (seja do roteador ou da primeira chamada)
   if (responseMessage.tool_calls && responseMessage.tool_calls.length === 1 && responseMessage.tool_calls[0].function.name === "ttsTool") {
     const ttsCall = responseMessage.tool_calls[0]
     const toolResultMessages = await processToolCalls(responseMessage.tool_calls, user)
@@ -35,17 +59,6 @@ const finalizeAndSendResponse = async (req, res) => {
     }
   }
 
-  // Lógica para Roteador de Agentes
-  const routerToolCall = responseMessage.tool_calls?.find(tc => tc.function.name === "selectAgentTool")
-  if (routerToolCall) {
-    const args = JSON.parse(routerToolCall.function.arguments)
-    return res.status(200).json({
-      next_action: { type: "SWITCH_AGENT", agent: args.agentName },
-      original_message: responseMessage
-    })
-  }
-
-  // Limpa a sintaxe e extrai o raciocínio da resposta final
   const { content, reasoning } = extractReasoning(cleanToolCallSyntax(responseMessage.content))
   responseMessage.content = content
   responseMessage.reasoning = responseMessage.reasoning || reasoning
