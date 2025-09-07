@@ -8,16 +8,40 @@ const {
   processToolCalls
 } = require("./chatHelpers")
 
-const sendWithoutStream = async (req, res) => {
+const handleGeminiNonStream = async (req, res) => {
+  const { model, messages: userPrompts, aiKey, use_tools = [], mode, customProviderUrl } = req.body
+  const { userID, user } = req
+  const systemPrompt = await getSystemPrompt(mode, userID)
+  let messages = [systemPrompt, ...userPrompts]
+  const toolOptions = await buildToolOptions("gemini", use_tools, userID, mode)
+  const requestOptions = { model, stream: false, customProviderUrl, ...toolOptions }
+
+  const { data } = await ask("gemini", aiKey, messages, requestOptions)
+  let responseMessage = data.choices[0].message
+
+  if (responseMessage.tool_calls) {
+    const toolResultMessages = await processToolCalls(responseMessage.tool_calls, user)
+    messages.push(responseMessage)
+    messages.push(...toolResultMessages)
+    const finalResponse = await ask("gemini", aiKey, sanitizeMessages(messages), { model, stream: false, customProviderUrl, ...toolOptions })
+    return res.status(200).json({ ...finalResponse.data, tool_calls: responseMessage.tool_calls || [] })
+  }
+
+  return res.status(200).json({ ...data, tool_calls: responseMessage.tool_calls || [] })
+}
+
+const handleOpenAINonStream = async (req, res) => {
   const { aiProvider, model, messages: userPrompts, aiKey, use_tools = [], mode, customApiUrl } = req.body
   const { userID, user } = req
   const systemPrompt = await getSystemPrompt(mode, userID)
   let messages = [systemPrompt, ...userPrompts]
   const toolOptions = await buildToolOptions(aiProvider, use_tools, userID, mode)
   const requestOptions = { model, stream: false, customApiUrl, ...toolOptions }
+
   const { data } = await ask(aiProvider, aiKey, messages, requestOptions)
   let responseMessage = data.choices[0].message
   responseMessage.content = cleanToolCallSyntax(responseMessage.content)
+
   if (responseMessage.tool_calls) {
     const ttsCall = responseMessage.tool_calls.find(c => c.function.name === "ttsTool")
     const toolResultMessages = await processToolCalls(responseMessage.tool_calls, user)
@@ -69,4 +93,7 @@ const sendWithoutStream = async (req, res) => {
   return res.status(200).json({ ...data, tool_calls: responseMessage.tool_calls || [] })
 }
 
-module.exports = sendWithoutStream
+module.exports = {
+  handleGeminiNonStream,
+  handleOpenAINonStream
+}

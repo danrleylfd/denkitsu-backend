@@ -10,8 +10,8 @@ const createAppError = require("../../utils/errors")
 const routes = Router()
 routes.use(authMiddleware)
 
-const sendWithStream = require("../views/ai/sendWithStream")
-const sendWithoutStream = require("../views/ai/sendWithoutStream")
+const { handleGeminiStream, handleOpenAIStream } = require("../views/ai/sendWithStream")
+const { handleGeminiNonStream, handleOpenAINonStream } = require("../views/ai/sendWithoutStream")
 const getModels = require("../views/ai/getModels")
 const listAgents = require("../views/ai/listAgents")
 const listTools = require("../views/ai/listTools")
@@ -19,9 +19,20 @@ const listTools = require("../views/ai/listTools")
 const sendMessage = (req, res, next) => {
   const { user } = req
   const { aiProvider = "groq", stream = false } = req.body
-  if (aiProvider === "custom" && user.plan === "free") return next(createAppError("O provedor de IA personalizado é um recurso exclusivo para membros Plus.", 403, "PLUS_PLAN_REQUIRED"))
-  if (stream) return sendWithStream(req, res, next)
-  return sendWithoutStream(req, res, next)
+
+  if (aiProvider === "custom" && user.plan === "free") {
+    return next(createAppError("O provedor de IA personalizado é um recurso exclusivo para membros Plus.", 403, "PLUS_PLAN_REQUIRED"))
+  }
+
+  const isGemini = aiProvider === "gemini"
+
+  if (stream) {
+    const handler = isGemini ? handleGeminiStream : handleOpenAIStream
+    return handler(req, res, next).catch(next)
+  } else {
+    const handler = isGemini ? handleGeminiNonStream : handleOpenAINonStream
+    return handler(req, res, next).catch(next)
+  }
 }
 
 routes.post("/chat/completions", sendMessageRules(), validate, aiMiddleware, asyncHandler(sendMessage))
