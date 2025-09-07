@@ -1,7 +1,6 @@
 const { ask } = require("../../../utils/api/ai")
 const { sanitizeMessages } = require("../../../utils/helpers/ai")
-const { processToolCalls, processStreamAndExtractReasoning } = require("./chatHelpers")
-const { getSystemPrompt } = require("./chatHelpers")
+const { processToolCalls, processStreamAndExtractReasoning, getSystemPrompt } = require("./chatHelpers")
 
 const handleStreamingLifecycle = async (req, res) => {
   const { aiProvider, aiKey, messages: userPrompts } = req.body
