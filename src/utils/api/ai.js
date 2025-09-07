@@ -16,7 +16,7 @@ const providerConfig = {
   },
   gemini: {
     apiKey: process.env.GEMINI_API_KEY,
-    defaultModel: "gemini-1.5-flash"
+    defaultModel: "gemini-2.5-flash"
   }
 }
 
@@ -53,11 +53,9 @@ const ask = async (aiProvider, aiKey, prompts, options = {}) => {
 
     try {
       const chat = geminiModel.startChat({ history })
+      // A lógica de streaming agora é tratada em sendWithStream.js
       if (stream) {
-        const streamResult = await chat.sendMessageStream(lastMessage.parts)
-        // O streaming do Gemini será tratado diretamente no `sendWithStream` para simplicidade agora.
-        // Esta função se concentrará na resposta sem streaming para Gemini.
-        throw new Error("Streaming para Gemini deve ser tratado em uma função dedicada.")
+        return await chat.sendMessageStream(lastMessage.parts)
       }
       const result = await chat.sendMessage(lastMessage.parts)
       const openAIResponse = transformFromGemini(result.response)
@@ -140,7 +138,7 @@ const getModels = async (aiProvider, apiUrl, apiKey) => {
   const geminiHardcodedModels = [
     { id: "gemini-1.5-flash", supports_tools: true, supports_images: true, supports_files: true, aiProvider: "gemini" },
     { id: "gemini-1.5-pro", supports_tools: true, supports_images: true, supports_files: true, aiProvider: "gemini" },
-    { id: "gemini-2.5-pro", supports_tools: true, supports_images: true, supports_files: true, aiProvider: "gemini" },
+    { id: "gemini-2.5-flash", supports_tools: true, supports_images: true, supports_files: true, aiProvider: "gemini" },
   ]
   if (aiProvider === "gemini") models.push(...geminiHardcodedModels)
 
