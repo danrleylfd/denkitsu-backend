@@ -155,7 +155,7 @@ const buildToolOptions = async (aiProvider, use_tools = [], userId, mode) => {
   return toolOptions
 }
 
-const resolveObjectPath = (obj, path) => {
+const getValueFromPath = (obj, path) => {
   if (!path || path === "data") return obj
   return path.split(".").reduce((prev, curr) => {
     const arrMatch = curr.match(/(\w+)\[(\d+)\]/)
@@ -167,6 +167,56 @@ const resolveObjectPath = (obj, path) => {
     return prev ? prev[curr] : undefined
   }, obj)
 }
+
+const applyMapping = (sourceObject, mappingConfig) => {
+  let mapping
+  try {
+    mapping = JSON.parse(mappingConfig)
+  } catch (e) {
+    // Se não for JSON, trata como um caminho de string simples.
+    return getValueFromPath(sourceObject, mappingConfig)
+  }
+
+  if (typeof mapping !== "object" || mapping === null) {
+    return getValueFromPath(sourceObject, mappingConfig)
+  }
+
+  const result = {}
+  for (const key in mapping) {
+    const rule = mapping[key]
+    if (typeof rule === "object" && rule !== null && rule._path && rule._select) {
+      // Lógica de transformação de array
+      const sourceArray = getValueFromPath(sourceObject, rule._path)
+      if (Array.isArray(sourceArray)) {
+        result[key] = sourceArray.map(item => {
+          const newItem = {}
+          if (Array.isArray(rule._select)) { // Ex: _select: ["name", "id"]
+            rule._select.forEach(prop => {
+              if (item.hasOwnProperty(prop)) {
+                newItem[prop] = item[prop]
+              }
+            })
+          } else if (typeof rule._select === "object") { // Ex: _select: { "nome": "name" }
+            for (const newProp in rule._select) {
+              const oldProp = rule._select[newProp]
+              if (item.hasOwnProperty(oldProp)) {
+                newItem[newProp] = item[oldProp]
+              }
+            }
+          }
+          return newItem
+        })
+      } else {
+        result[key] = null // ou um erro, se preferir
+      }
+    } else if (typeof rule === "string") {
+      // Lógica de seleção simples de múltiplos campos
+      result[key] = getValueFromPath(sourceObject, rule)
+    }
+  }
+  return result
+}
+
 
 const executeToolCall = async (toolCall, allUserCustomTools, user) => {
   const functionName = toolCall.function.name
@@ -214,7 +264,7 @@ const executeToolCall = async (toolCall, allUserCustomTools, user) => {
       }
       console.log("httpConfig", httpConfig)
       const functionResponse = await availableTools.httpTool(httpConfig)
-      const mappedResponse = resolveObjectPath(functionResponse.data, customTool.responseMapping || "data")
+      const mappedResponse = applyMapping(functionResponse.data, customTool.responseMapping || "data")
       functionResponseContent = JSON.stringify(mappedResponse)
     } else if (availableTools[functionName]) {
       console.log(`[TOOL CALL] Executing: ${functionName}(${JSON.stringify(functionArgs)})`)
