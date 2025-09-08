@@ -168,55 +168,53 @@ const getValueFromPath = (obj, path) => {
   }, obj)
 }
 
-const applyMapping = (sourceObject, mappingConfig) => {
+const applyMapping = (rootObject, mappingConfig) => {
   let mapping
   try {
     mapping = JSON.parse(mappingConfig)
   } catch (e) {
-    // Se não for JSON, trata como um caminho de string simples.
-    return getValueFromPath(sourceObject, mappingConfig)
+    return getValueFromPath(rootObject, mappingConfig)
   }
 
   if (typeof mapping !== "object" || mapping === null) {
-    return getValueFromPath(sourceObject, mappingConfig)
+    return getValueFromPath(rootObject, mappingConfig)
   }
 
   const result = {}
   for (const key in mapping) {
     const rule = mapping[key]
-    if (typeof rule === "object" && rule !== null && rule._path && rule._select) {
-      // Lógica de transformação de array
-      const sourceArray = getValueFromPath(sourceObject, rule._path)
+
+    // Verifica se é uma regra de transformação de array
+    if (typeof rule === "object" && rule !== null && rule._source && rule._transform) {
+      const sourceData = getValueFromPath(rootObject, rule._source)
+      const sourceArray = Array.isArray(sourceData) ? sourceData : (typeof sourceData === "object" && sourceData !== null ? Object.values(sourceData) : null)
+
       if (Array.isArray(sourceArray)) {
         result[key] = sourceArray.map(item => {
           const newItem = {}
-          if (Array.isArray(rule._select)) { // Ex: _select: ["name", "id"]
-            rule._select.forEach(prop => {
-              if (item.hasOwnProperty(prop)) {
-                newItem[prop] = item[prop]
-              }
-            })
-          } else if (typeof rule._select === "object") { // Ex: _select: { "nome": "name" }
-            for (const newProp in rule._select) {
-              const oldProp = rule._select[newProp]
-              if (item.hasOwnProperty(oldProp)) {
-                newItem[newProp] = item[oldProp]
-              }
+          const transformRules = rule._transform
+          for (const newProp in transformRules) {
+            const oldPropPath = transformRules[newProp]
+            if (typeof oldPropPath === "string" && oldPropPath.startsWith("lookup:")) {
+              const [_, lookupPath, lookupKeySource] = oldPropPath.split(":")
+              const keyFromItem = item[lookupKeySource.replace(/[{}]/g, "")]
+              const lookupTable = getValueFromPath(rootObject, lookupPath)
+              newItem[newProp] = lookupTable && lookupTable[keyFromItem] ? lookupTable[keyFromItem] : keyFromItem
+            } else {
+              newItem[newProp] = getValueFromPath(item, oldPropPath)
             }
           }
           return newItem
         })
       } else {
-        result[key] = null // ou um erro, se preferir
+        result[key] = []
       }
     } else if (typeof rule === "string") {
-      // Lógica de seleção simples de múltiplos campos
-      result[key] = getValueFromPath(sourceObject, rule)
+      result[key] = getValueFromPath(rootObject, rule)
     }
   }
   return result
 }
-
 
 const executeToolCall = async (toolCall, allUserCustomTools, user) => {
   const functionName = toolCall.function.name
