@@ -200,7 +200,7 @@ const executeToolCall = async (toolCall, allUserCustomTools, user) => {
         body: replacePlaceholders(body)
       }
       console.log("httpConfig", httpConfig)
-      const functionResponse = await availableTools.httpTool({ httpConfig })
+      const functionResponse = await availableTools.httpTool(httpConfig)
       functionResponseContent = JSON.stringify(functionResponse.data)
     } else if (availableTools[functionName]) {
       console.log(`[TOOL CALL] Executing: ${functionName}(${JSON.stringify(functionArgs)})`)

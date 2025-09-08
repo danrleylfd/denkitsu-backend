@@ -1,7 +1,7 @@
 const axios = require("axios")
 const createAppError = require("../../errors")
 
-const executeHttpRequest = async ({ config }) => {
+const executeHttpRequest = async (config) => {
   try {
     console.log("httpConfig", config)
     const response = await axios({
