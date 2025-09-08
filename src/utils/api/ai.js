@@ -5,12 +5,12 @@ const providerConfig = {
   groq: {
     apiUrl: process.env.GROQ_API_URL,
     apiKey: process.env.GROQ_API_KEY,
-    defaultModel: "gemma-7b-it"
+    defaultModel: "openai/gpt-oss-120b"
   },
   openrouter: {
     apiUrl: process.env.OPENROUTER_API_URL,
     apiKey: process.env.OPENROUTER_API_KEY,
-    defaultModel: "deepseek/deepseek-chat-v2-beta:free"
+    defaultModel: "deepseek/deepseek-chat-v3.1:free"
   }
 }
 
