@@ -1,3 +1,5 @@
+// Arquivo: Backend/src/app/views/ai/handleNonStreamLifecycle.js
+
 const { ask } = require("../../../utils/api/ai")
 const { sanitizeMessages } = require("../../../utils/helpers/ai")
 const { processToolCalls, getSystemPrompt, cleanToolCallSyntax, extractReasoning } = require("./chatHelpers")
@@ -8,29 +10,31 @@ const handleNonStreamingLifecycle = async (req, res, next) => {
   const { initialMessages, originalUserMessages, options: requestOptions } = aiRequestPayload
 
   try {
-    // 1. Primeira chamada à IA
     const { data: firstResponseData } = await ask(aiProvider, aiKey, initialMessages, { ...requestOptions, stream: false })
-    let responseMessage = firstResponseData.choices[0].message
+    const responseMessage = firstResponseData.choices[0].message
 
-    // 2. Se não houver tool calls, extrai o raciocínio e finaliza.
     if (!responseMessage.tool_calls) {
-      const { content, reasoning } = extractReasoning(cleanToolCallSyntax(responseMessage.content))
-      responseMessage.content = content
-      responseMessage.reasoning = reasoning
-      return res.status(200).json(firstResponseData)
+      // MODIFICADO: Captura o reasoning de ambas as fontes
+      const reasoningFromField = responseMessage.reasoning || ""
+      const { content, reasoning: reasoningFromContent } = extractReasoning(cleanToolCallSyntax(responseMessage.content))
+      const finalReasoning = (reasoningFromField + "\n" + reasoningFromContent).trim()
+
+      const finalMessage = { ...responseMessage, content, reasoning: finalReasoning }
+      const finalData = { ...firstResponseData, choices: [{ ...firstResponseData.choices[0], message: finalMessage }] }
+
+      return res.status(200).json(finalData)
     }
 
-    // ADICIONADO: Extrai e armazena o raciocínio da primeira chamada
-    const { reasoning: initialReasoning } = extractReasoning(cleanToolCallSyntax(responseMessage.content))
-    console.log("initialReasoning", initialReasoning)
+    // MODIFICADO: Captura o reasoning inicial de ambas as fontes
+    const initialReasoningFromField = responseMessage.reasoning || ""
+    const { reasoning: initialReasoningFromContent } = extractReasoning(cleanToolCallSyntax(responseMessage.content))
+    const initialReasoning = (initialReasoningFromField + "\n" + initialReasoningFromContent).trim()
 
-    // 3. Se houver, executa as ferramentas
     const toolResultMessages = await processToolCalls(responseMessage.tool_calls, user)
 
     let messagesForNextStep
     let finalResponseData
 
-    // 4. Lógica especial para o Agente Roteador
     const routerToolCallResult = toolResultMessages.find(r => r.name === "selectAgentTool")
     if (routerToolCallResult) {
       const resultData = JSON.parse(routerToolCallResult.content)
@@ -39,29 +43,36 @@ const handleNonStreamingLifecycle = async (req, res, next) => {
         const newSystemPrompt = await getSystemPrompt(newAgentName, userID)
         messagesForNextStep = [newSystemPrompt, ...originalUserMessages.filter(m => m.role !== "system")]
 
-        // 5. Segunda chamada à IA com o novo agente
         const { data } = await ask(aiProvider, aiKey, sanitizeMessages(messagesForNextStep), { ...requestOptions, stream: false })
         finalResponseData = data
         finalResponseData.routingInfo = { routedTo: newAgentName }
       }
     } else {
-      // 6. Para ferramentas normais, anexa os resultados e faz a segunda chamada
       messagesForNextStep = [...initialMessages, responseMessage, ...toolResultMessages]
       const { data } = await ask(aiProvider, aiKey, sanitizeMessages(messagesForNextStep), { ...requestOptions, stream: false })
       finalResponseData = data
     }
 
-    // 7. Processa a resposta final e envia
-    let finalMessage = finalResponseData.choices[0].message
-    // MODIFICADO: Extrai o raciocínio da segunda chamada
-    const { content, reasoning: finalReasoning } = extractReasoning(cleanToolCallSyntax(finalMessage.content))
-    console.log("finalReasoning", finalReasoning)
-    finalMessage.content = content
-    // MODIFICADO: Concatena o raciocínio inicial com o final
-    finalMessage.reasoning = `${initialReasoning}\n\n${finalReasoning}`.trim()
-    finalResponseData.tool_calls = responseMessage.tool_calls
+    const finalMessageFromAI = finalResponseData.choices[0].message
 
-    return res.status(200).json(finalResponseData)
+    // MODIFICADO: Captura o reasoning final de ambas as fontes
+    const finalReasoningFromField = finalMessageFromAI.reasoning || ""
+    const { content, reasoning: finalReasoningFromContent } = extractReasoning(cleanToolCallSyntax(finalMessageFromAI.content))
+    const finalExtractedReasoning = (finalReasoningFromField + "\n" + finalReasoningFromContent).trim()
+
+    const finalMessageWithReasoning = {
+      ...finalMessageFromAI,
+      content,
+      reasoning: `${initialReasoning}\n...\n${finalExtractedReasoning}`.trim()
+    }
+
+    const finalData = {
+      ...finalResponseData,
+      choices: [{ ...finalResponseData.choices[0], message: finalMessageWithReasoning }],
+      tool_calls: responseMessage.tool_calls
+    }
+
+    return res.status(200).json(finalData)
 
   } catch (error) {
     next(error)

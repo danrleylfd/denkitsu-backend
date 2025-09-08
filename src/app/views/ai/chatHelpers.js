@@ -1,3 +1,5 @@
+// Arquivo: Backend/src/app/views/ai/chatHelpers.js
+
 const prompts = require("../../../utils/prompts")
 const Agent = require("../../models/agent")
 const Tool = require("../../models/tool")
@@ -20,14 +22,19 @@ const extractReasoning = (rawContent = "") => {
   return { content, reasoning }
 }
 
+// MODIFICADO: Agora a função lida com .reasoning e .content
 async function* processStreamAndExtractReasoning(streamResponse) {
   let streamBuffer = ""
   for await (const chunk of streamResponse) {
     const delta = chunk.choices[0]?.delta
     if (!delta) continue
+
+    // ADICIONADO: Verifica primeiro pelo campo dedicado .reasoning
     if (delta.reasoning) {
       yield { choices: [{ delta: { reasoning: delta.reasoning } }] }
     }
+
+    // Mantém a lógica para extrair de .content
     if (delta.content) {
       streamBuffer += delta.content
       const { content, reasoning } = extractReasoning(streamBuffer)
@@ -42,6 +49,7 @@ async function* processStreamAndExtractReasoning(streamResponse) {
   }
 }
 
+// ... resto do arquivo sem alterações ...
 const getRouterPrompt = async (userId) => {
   const routerPromptTemplate = prompts.find(p => p.content.trim().startsWith("Agente Roteador"))
   if (!routerPromptTemplate) return prompts[0]
