@@ -1,60 +1,46 @@
-const { ask } = require("../../utils/api/ai")
-const { sanitizeMessages } = require("../../utils/helpers/ai")
-const { getSystemPrompt, buildToolOptions, processToolCalls, cleanToolCallSyntax, extractReasoning } = require("../views/ai/chatHelpers")
+// Arquivo: Backend/src/app/middlewares/aiRequestSequence.js
 
+const { getSystemPrompt, buildToolOptions } = require("../views/ai/chatHelpers")
+
+// MODIFICADO: Apenas prepara a requisição, não a executa
 const prepareInitialAIRequest = async (req, res, next) => {
   const { model, messages: userPrompts, use_tools = [], mode } = req.body
-  const { userID } = req
+  const { userID, user } = req
 
   const systemPrompt = await getSystemPrompt(mode, userID)
-  // CORREÇÃO: Filtra qualquer system message anterior para evitar duplicidade
+
+  // Filtra qualquer system message anterior para evitar duplicidade
   const userOnlyMessages = userPrompts.filter(msg => msg.role !== "system")
-  const messages = [systemPrompt, ...userOnlyMessages]
+
+  let messagesForFirstCall = [systemPrompt, ...userOnlyMessages]
+
+  // Para o Roteador, removemos conteúdo não-texto para a primeira chamada de decisão
+  if (mode === "Roteador") {
+    const textOnlyUserPrompts = userOnlyMessages.map((msg) => {
+      if (Array.isArray(msg.content)) {
+        const textContent = msg.content.find((part) => part.type === "text")
+        return { ...msg, content: textContent ? textContent.text : "" }
+      }
+      return msg
+    })
+    messagesForFirstCall = [systemPrompt, ...textOnlyUserPrompts]
+  }
 
   const toolOptions = await buildToolOptions(req.body.aiProvider, use_tools, userID, mode)
-  const requestOptions = { model, stream: req.body.stream, customApiUrl: req.body.customApiUrl, ...toolOptions }
 
-  req.aiRequestPayload = { messages, options: requestOptions }
+  // Salva o payload preparado para ser usado pela view
+  req.aiRequestPayload = {
+    initialMessages: messagesForFirstCall,
+    originalUserMessages: [systemPrompt, ...userOnlyMessages], // Mantém as mensagens originais com imagens, etc.
+    options: { model, customApiUrl: req.body.customApiUrl, ...toolOptions }
+  }
+
   next()
 }
 
-const makePrimaryAIRequest = async (req, res, next) => {
-  const { aiProvider, aiKey } = req.body
-  const { messages, options } = req.aiRequestPayload
-  const { data } = await ask(aiProvider, aiKey, messages, { ...options, stream: false })
-  res.locals.primaryResponse = data
-  res.locals.rawMessages = messages
-  next()
-}
-
-const handleToolCalls = async (req, res, next) => {
-  const { aiProvider, aiKey, model, customApiUrl } = req.body
-  const { user } = req
-  const { primaryResponse, rawMessages } = res.locals
-  const responseMessage = primaryResponse.choices[0].message
-
-  if (!responseMessage.tool_calls) return next()
-
-  responseMessage.content = cleanToolCallSyntax(responseMessage.content)
-  const { reasoning: initialReasoning } = extractReasoning(responseMessage.content)
-
-  const toolResultMessages = await processToolCalls(responseMessage.tool_calls, user)
-  const messagesWithToolResults = [...rawMessages, responseMessage, ...toolResultMessages]
-
-  const finalResponse = await ask(aiProvider, aiKey, sanitizeMessages(messagesWithToolResults), { model, stream: false, customApiUrl })
-  const finalMessage = finalResponse.data.choices[0].message
-
-  const { content, reasoning: finalExtractedReasoning } = extractReasoning(cleanToolCallSyntax(finalMessage.content))
-  finalMessage.content = content
-  finalMessage.reasoning = `${initialReasoning || ""}\n\n${finalExtractedReasoning}`.trim()
-
-  finalResponse.data.tool_calls = responseMessage.tool_calls || []
-  res.locals.primaryResponse = finalResponse.data
-  next()
-}
+// REMOVIDO: makePrimaryAIRequest e handleToolCalls
+// A lógica foi movida para as novas views handleStreamLifecycle e handleNonStreamLifecycle
 
 module.exports = {
-  prepareInitialAIRequest,
-  makePrimaryAIRequest,
-  handleToolCalls
+  prepareInitialAIRequest
 }
