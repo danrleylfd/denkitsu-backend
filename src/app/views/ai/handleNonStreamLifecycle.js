@@ -22,6 +22,7 @@ const handleNonStreamingLifecycle = async (req, res, next) => {
 
     // ADICIONADO: Extrai e armazena o raciocínio da primeira chamada
     const { reasoning: initialReasoning } = extractReasoning(cleanToolCallSyntax(responseMessage.content))
+    console.log("initialReasoning", initialReasoning)
 
     // 3. Se houver, executa as ferramentas
     const toolResultMessages = await processToolCalls(responseMessage.tool_calls, user)
@@ -53,10 +54,11 @@ const handleNonStreamingLifecycle = async (req, res, next) => {
     // 7. Processa a resposta final e envia
     let finalMessage = finalResponseData.choices[0].message
     // MODIFICADO: Extrai o raciocínio da segunda chamada
-    const { content, reasoning: finalExtractedReasoning } = extractReasoning(cleanToolCallSyntax(finalMessage.content))
+    const { content, reasoning: finalReasoning } = extractReasoning(cleanToolCallSyntax(finalMessage.content))
+    console.log("finalReasoning", finalReasoning)
     finalMessage.content = content
     // MODIFICADO: Concatena o raciocínio inicial com o final
-    finalMessage.reasoning = `${initialReasoning}\n\n${finalExtractedReasoning}`.trim()
+    finalMessage.reasoning = `${initialReasoning}\n\n${finalReasoning}`.trim()
     finalResponseData.tool_calls = responseMessage.tool_calls
 
     return res.status(200).json(finalResponseData)
