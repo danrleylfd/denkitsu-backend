@@ -47,6 +47,10 @@ const ToolSchema = new mongoose.Schema(
         type: mongoose.Schema.Types.Mixed
       }
     },
+    responseMapping: {
+      type: String,
+      default: "data"
+    },
     author: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

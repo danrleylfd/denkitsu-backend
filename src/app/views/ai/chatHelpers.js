@@ -66,7 +66,7 @@ const getRouterPrompt = async (userId) => {
     }
     return acc
   }, [])
-  const agentListContext = "Agentes Disponíveis:\n" + uniqueAgents.map(a => `    - ${a.name}: ${a.description}`).join("\n")
+  const agentListContext = "Agentes Disponíveis:\n" + uniqueAgents.map(a => `     - ${a.name}: ${a.description}`).join("\n")
   const dynamicRouterPrompt = JSON.parse(JSON.stringify(routerPromptTemplate))
   dynamicRouterPrompt.content = dynamicRouterPrompt.content.replace("{{AGENT_LIST}}", agentListContext)
   return dynamicRouterPrompt
@@ -155,6 +155,19 @@ const buildToolOptions = async (aiProvider, use_tools = [], userId, mode) => {
   return toolOptions
 }
 
+const resolveObjectPath = (obj, path) => {
+  if (!path || path === "data") return obj
+  return path.split(".").reduce((prev, curr) => {
+    const arrMatch = curr.match(/(\w+)\[(\d+)\]/)
+    if (arrMatch) {
+      const key = arrMatch[1]
+      const index = parseInt(arrMatch[2], 10)
+      return prev && prev[key] ? prev[key][index] : undefined
+    }
+    return prev ? prev[curr] : undefined
+  }, obj)
+}
+
 const executeToolCall = async (toolCall, allUserCustomTools, user) => {
   const functionName = toolCall.function.name
   let functionArgs
@@ -201,7 +214,8 @@ const executeToolCall = async (toolCall, allUserCustomTools, user) => {
       }
       console.log("httpConfig", httpConfig)
       const functionResponse = await availableTools.httpTool(httpConfig)
-      functionResponseContent = JSON.stringify(functionResponse.data)
+      const mappedResponse = resolveObjectPath(functionResponse.data, customTool.responseMapping || "data")
+      functionResponseContent = JSON.stringify(mappedResponse)
     } else if (availableTools[functionName]) {
       console.log(`[TOOL CALL] Executing: ${functionName}(${JSON.stringify(functionArgs)})`)
       const functionToCall = availableTools[functionName]

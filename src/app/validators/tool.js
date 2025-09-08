@@ -43,6 +43,11 @@ const createToolRules = () => {
       .withMessage("A URL da API é obrigatória.")
       .isURL()
       .withMessage("A URL fornecida é inválida."),
+    body("responseMapping")
+      .optional()
+      .isString()
+      .withMessage("O mapeamento da resposta deve ser um texto.")
+      .trim(),
     body("parameters")
       .optional()
       .isObject()
