@@ -1,24 +1,23 @@
-// Arquivo: Backend/src/app/views/ai/handleStreamLifecycle.js
-
 const { ask } = require("../../../utils/api/ai")
 const { sanitizeMessages } = require("../../../utils/helpers/ai")
 const { processToolCalls, processStreamAndExtractReasoning, getSystemPrompt } = require("./chatHelpers")
 
 const handleStreamingLifecycle = async (req, res) => {
-  const { aiProvider, aiKey } = req.body
+  const { aiProvider, aiKey, messages: userPrompts } = req.body // ADICIONADO: userPrompts
   const { user, userID, aiRequestPayload } = req
-  const { initialMessages, originalUserMessages, options: requestOptions } = aiRequestPayload
+  const { initialMessages, options: requestOptions } = aiRequestPayload
 
   const writeEvent = (data) => res.write(`data: ${JSON.stringify(data)}\n\n`)
 
   try {
-    // 1. Primeira chamada à IA (sempre com stream)
     const streamResponse = await ask(aiProvider, aiKey, initialMessages, { ...requestOptions, stream: true })
 
     let aggregatedToolCalls = []
     let hasToolCall = false
+    let initialReasoningSent = false
+    // ADICIONADO: Objeto para montar a primeira resposta completa do assistente
+    const firstAssistantMessage = { role: "assistant", content: "", tool_calls: [] }
 
-    // 2. Processa o primeiro stream
     for await (const chunk of streamResponse) {
       const delta = chunk.choices[0]?.delta
       if (!delta) continue
@@ -34,48 +33,57 @@ const handleStreamingLifecycle = async (req, res) => {
           }
         })
       }
-      // Repassa os chunks brutos para o frontend
-      writeEvent(chunk)
+
+      // ADICIONADO: Agrega o conteúdo da primeira resposta
+      if (delta.content) {
+        firstAssistantMessage.content += delta.content
+      }
+
+      for await (const processedChunk of processStreamAndExtractReasoning([chunk])) {
+        if (processedChunk.choices[0]?.delta?.reasoning) initialReasoningSent = true
+        writeEvent(processedChunk)
+      }
     }
 
-    // 3. Se não houve chamada de ferramenta, o trabalho termina aqui
     if (!hasToolCall) return res.end()
 
-    // 4. Se houve, formata as chamadas e executa as ferramentas
     const finalToolCalls = aggregatedToolCalls.map(call => ({
       id: call.id,
       type: "function",
       function: { name: call.name, arguments: call.arguments }
     }))
+    // ADICIONADO: Atribui os tool_calls completos à mensagem do assistente
+    firstAssistantMessage.tool_calls = finalToolCalls
 
-    // Notifica o frontend que as ferramentas estão sendo executadas
     writeEvent({ type: "TOOL_EXECUTION_START", tool_calls: finalToolCalls })
 
     const toolResultMessages = await processToolCalls(finalToolCalls, user)
 
+    // MODIFICADO: A mensagem original do usuário é usada para a próxima etapa
     let messagesForNextStep
+    let nextUserPrompts = userPrompts // Usa o userPrompts original por padrão
 
-    // 5. Lógica especial para o Agente Roteador
     const routerToolCallResult = toolResultMessages.find(r => r.name === "selectAgentTool")
     if (routerToolCallResult) {
       const resultData = JSON.parse(routerToolCallResult.content)
       if (resultData.action === "SWITCH_AGENT" && resultData.agent) {
         const newAgentName = resultData.agent
         const newSystemPrompt = await getSystemPrompt(newAgentName, userID)
-        // Usa as mensagens originais (com imagens) para a próxima etapa
-        messagesForNextStep = [newSystemPrompt, ...originalUserMessages.filter(m => m.role !== "system")]
+        const userOnlyMessages = nextUserPrompts.filter(msg => msg.role !== "system")
+        messagesForNextStep = [newSystemPrompt, ...userOnlyMessages]
         writeEvent({ type: "AGENT_SWITCH", agent: newAgentName })
       }
     } else {
-      // Para ferramentas normais, apenas anexa os resultados
-      messagesForNextStep = [...initialMessages, { role: "assistant", tool_calls: finalToolCalls }, ...toolResultMessages]
+      // MODIFICADO: Passa a primeira resposta completa do assistente como contexto
+      messagesForNextStep = [...initialMessages, firstAssistantMessage, ...toolResultMessages]
     }
 
-    // 6. Segunda chamada à IA com os resultados das ferramentas
-    const finalResponseStream = await ask(aiProvider, aiKey, sanitizeMessages(messagesForNextStep), { ...requestOptions, stream: true })
+    if (initialReasoningSent) writeEvent({ choices: [{ delta: { reasoning: "\n\n...\n\n" } }] })
 
-    // 7. Processa o segundo stream e repassa para o cliente
-    for await (const finalChunk of processStreamAndExtractReasoning(finalResponseStream)) {
+    const finalResponseStream = await ask(aiProvider, aiKey, sanitizeMessages(messagesForNextStep), { ...requestOptions, stream: true })
+    const finalProcessedStream = processStreamAndExtractReasoning(finalResponseStream)
+
+    for await (const finalChunk of finalProcessedStream) {
       writeEvent(finalChunk)
     }
 

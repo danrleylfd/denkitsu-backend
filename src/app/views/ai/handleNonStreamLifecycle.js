@@ -1,5 +1,3 @@
-// Arquivo: Backend/src/app/views/ai/handleNonStreamLifecycle.js
-
 const { ask } = require("../../../utils/api/ai")
 const { sanitizeMessages } = require("../../../utils/helpers/ai")
 const { processToolCalls, getSystemPrompt, cleanToolCallSyntax, extractReasoning } = require("./chatHelpers")
@@ -22,6 +20,9 @@ const handleNonStreamingLifecycle = async (req, res, next) => {
       return res.status(200).json(firstResponseData)
     }
 
+    // ADICIONADO: Extrai e armazena o raciocínio da primeira chamada
+    const { reasoning: initialReasoning } = extractReasoning(cleanToolCallSyntax(responseMessage.content))
+
     // 3. Se houver, executa as ferramentas
     const toolResultMessages = await processToolCalls(responseMessage.tool_calls, user)
 
@@ -40,7 +41,6 @@ const handleNonStreamingLifecycle = async (req, res, next) => {
         // 5. Segunda chamada à IA com o novo agente
         const { data } = await ask(aiProvider, aiKey, sanitizeMessages(messagesForNextStep), { ...requestOptions, stream: false })
         finalResponseData = data
-        // Adiciona a informação de roteamento para o frontend
         finalResponseData.routingInfo = { routedTo: newAgentName }
       }
     } else {
@@ -52,10 +52,12 @@ const handleNonStreamingLifecycle = async (req, res, next) => {
 
     // 7. Processa a resposta final e envia
     let finalMessage = finalResponseData.choices[0].message
-    const { content, reasoning } = extractReasoning(cleanToolCallSyntax(finalMessage.content))
+    // MODIFICADO: Extrai o raciocínio da segunda chamada
+    const { content, reasoning: finalExtractedReasoning } = extractReasoning(cleanToolCallSyntax(finalMessage.content))
     finalMessage.content = content
-    finalMessage.reasoning = reasoning
-    finalResponseData.tool_calls = responseMessage.tool_calls // Mantém os tool_calls originais para referência
+    // MODIFICADO: Concatena o raciocínio inicial com o final
+    finalMessage.reasoning = `${initialReasoning}\n\n${finalExtractedReasoning}`.trim()
+    finalResponseData.tool_calls = responseMessage.tool_calls
 
     return res.status(200).json(finalResponseData)
 
