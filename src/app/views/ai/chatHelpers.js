@@ -1,5 +1,3 @@
-// Arquivo: Backend/src/app/views/ai/chatHelpers.js
-
 const prompts = require("../../../utils/prompts")
 const Agent = require("../../models/agent")
 const Tool = require("../../models/tool")
@@ -22,19 +20,16 @@ const extractReasoning = (rawContent = "") => {
   return { content, reasoning }
 }
 
-// MODIFICADO: Agora a função lida com .reasoning e .content
 async function* processStreamAndExtractReasoning(streamResponse) {
   let streamBuffer = ""
   for await (const chunk of streamResponse) {
     const delta = chunk.choices[0]?.delta
     if (!delta) continue
 
-    // ADICIONADO: Verifica primeiro pelo campo dedicado .reasoning
     if (delta.reasoning) {
       yield { choices: [{ delta: { reasoning: delta.reasoning } }] }
     }
 
-    // Mantém a lógica para extrair de .content
     if (delta.content) {
       streamBuffer += delta.content
       const { content, reasoning } = extractReasoning(streamBuffer)
@@ -49,7 +44,6 @@ async function* processStreamAndExtractReasoning(streamResponse) {
   }
 }
 
-// ... resto do arquivo sem alterações ...
 const getRouterPrompt = async (userId) => {
   const routerPromptTemplate = prompts.find(p => p.content.trim().startsWith("Agente Roteador"))
   if (!routerPromptTemplate) return prompts[0]
@@ -82,7 +76,18 @@ const getSystemPrompt = async (mode, userID) => {
   if (mode === "Roteador") return getRouterPrompt(userID)
   let systemPrompt = prompts.find(p => p.role === "system" && p.content.trim().startsWith(`Agente ${mode}`))
   if (systemPrompt) return systemPrompt
-  const customAgent = await Agent.findOne({ user: userID, name: mode })
+
+  const userAcquisitions = await Acquisition.find({ user: userID, itemType: "Agent" }).select("item").lean()
+  const acquiredAgentIds = userAcquisitions.map(acq => acq.item)
+
+  const customAgent = await Agent.findOne({
+    name: mode,
+    $or: [
+      { author: userID },
+      { _id: { $in: acquiredAgentIds } }
+    ]
+  })
+
   if (customAgent?.prompt) {
     const { goal, returnFormat, warning, contextDump } = customAgent.prompt
     return { role: "system", content: `Agente ${customAgent.name}\nGoal\n${goal}\nReturn Format\n${returnFormat}\nWarning\n${warning}\nContext Dump\n${contextDump}` }
@@ -93,11 +98,12 @@ const getSystemPrompt = async (mode, userID) => {
 const buildToolOptions = async (aiProvider, use_tools = [], userId, mode) => {
   let finalUseTools = [...use_tools]
   if (mode === "Suporte") {
-    console.log("[AI_HELPER] Agente de Suporte ativado. Forçando o uso de ferramentas de administração.")
     finalUseTools = ["cancelSubscriptionTool", "refundSubscriptionTool", "reactivateSubscriptionTool", "syncSubscriptionTool"]
   }
   if (mode === "Roteador") finalUseTools.push("selectAgentTool")
+
   let toolOptions = {}
+
   if (aiProvider === "groq") {
     if (finalUseTools.includes("web")) finalUseTools = finalUseTools.filter(t => t !== "web")
     const nativeTools = []
@@ -111,17 +117,39 @@ const buildToolOptions = async (aiProvider, use_tools = [], userId, mode) => {
     }
     if (nativeTools.length > 0) toolOptions.tools = nativeTools
   }
+
   if (Array.isArray(finalUseTools) && finalUseTools.length > 0) {
     const filteredBuiltInTools = builtInTools.filter(tool => tool && tool.function && finalUseTools.includes(tool.function.name))
-    const userCustomTools = await Tool.find({ user: userId, name: { $in: finalUseTools } })
-    const customToolSchemas = userCustomTools.map(tool => ({
-      type: "function",
-      function: { name: tool.name, description: tool.description, parameters: tool.parameters }
-    }))
-    const combinedTools = [...(toolOptions.tools || []), ...filteredBuiltInTools, ...customToolSchemas]
-    if (combinedTools.length > 0) {
-      toolOptions.tools = combinedTools
-      toolOptions.tool_choice = "auto"
+
+    const userAcquisitions = await Acquisition.find({ user: userId, itemType: "Tool" }).select("item").lean()
+    const acquiredToolIds = userAcquisitions.map(acq => acq.item)
+
+    const customToolNames = finalUseTools.filter(name => !builtInTools.some(bt => bt.function.name === name))
+
+    if (customToolNames.length > 0) {
+      const userCustomTools = await Tool.find({
+        name: { $in: customToolNames },
+        $or: [
+          { author: userId },
+          { _id: { $in: acquiredToolIds } }
+        ]
+      })
+
+      const customToolSchemas = userCustomTools.map(tool => ({
+        type: "function",
+        function: { name: tool.name, description: tool.description, parameters: tool.parameters }
+      }))
+
+      const combinedTools = [...(toolOptions.tools || []), ...filteredBuiltInTools, ...customToolSchemas]
+      if (combinedTools.length > 0) {
+        toolOptions.tools = combinedTools
+        toolOptions.tool_choice = "auto"
+      }
+    } else {
+      if (filteredBuiltInTools.length > 0) {
+        toolOptions.tools = [...(toolOptions.tools || []), ...filteredBuiltInTools]
+        toolOptions.tool_choice = "auto"
+      }
     }
   }
   return toolOptions
@@ -208,7 +236,15 @@ const executeToolCall = async (toolCall, allUserCustomTools, user) => {
 }
 
 const processToolCalls = async (toolCalls, user) => {
-  const allUserCustomTools = await Tool.find({ user: user._id })
+  const userAcquisitions = await Acquisition.find({ user: user._id, itemType: "Tool" }).select("item").lean()
+  const acquiredToolIds = userAcquisitions.map(acq => acq.item)
+  const allUserCustomTools = await Tool.find({
+    $or: [
+      { author: user._id },
+      { _id: { $in: acquiredToolIds } }
+    ]
+  })
+
   const toolResultPromises = toolCalls.map(toolCall => executeToolCall(toolCall, allUserCustomTools, user))
   return Promise.all(toolResultPromises)
 }
