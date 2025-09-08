@@ -3,6 +3,7 @@ const createAppError = require("../../errors")
 
 const executeHttpRequest = async ({ config }) => {
   try {
+    console.log("httpConfig", config)
     const response = await axios({
       url: config.url,
       method: config.method || "GET",
