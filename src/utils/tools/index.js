@@ -4,7 +4,8 @@ const agentService = require("../api/agent")
 const ttsService = require("./audio/tts")
 
 const albionService = require("./games/albion")
-const genshinService = require("./games/genshinAnalysis")
+const genshinCharAnalysisService = require("./games/genshinCharAnalysis")
+const genshinCharDetailsService = require("./games/genshinCharDetails")
 const hoyoCodesService = require("./games/hoyoCodes")
 const pokedexService = require("./games/pokedex")
 const gamesService = require("./games/rawg")
@@ -27,6 +28,8 @@ const tmdbService = require("./search/tmdb")
 const weatherService = require("./search/weather")
 const wikipediaService = require("./search/wikipedia")
 
+const genshinService = { ...genshinCharAnalysisService, ...genshinCharDetailsService }
+
 const availableTools = {
   cancelSubscriptionTool: adminService.cancelSubscription,
   refundSubscriptionTool: adminService.refundSubscription,
@@ -37,7 +40,8 @@ const availableTools = {
   ttsTool: ttsService.textToSpeech,
 
   albionTool: albionService.getGoldPrice,
-  genshinTool: genshinService.genshinAnalysis,
+  genshinCharAnalysisTool: genshinService.analyzeCharacter,
+  genshinCharDetailsTool: genshinService.getCharacterDetails,
   hoyoCodesTool: hoyoCodesService.getHoyoCodes,
   pokedexTool: pokedexService.getPokemonDetails,
   gamesTool: gamesService.searchGames,
@@ -71,7 +75,8 @@ const tools = [
   ttsService.ttsTool,
 
   albionService.albionTool,
-  genshinService.genshinTool,
+  genshinService.genshinCharAnalysisTool,
+  genshinService.genshinCharDetailsTool,
   hoyoCodesService.hoyoCodesTool,
   pokedexService.pokedexTool,
   gamesService.gamesTool,

@@ -1,94 +1,10 @@
 const axios = require("axios")
 const createAppError = require("../../errors")
 
-const filterReferenceData = (data) => {
-  if (!data) return null
-  const mapIdToName = (id) => data.items[id]?.name || `Unknown Item (ID: ${id})`
-  const calculateUpgradeMaterials = () => {
-    const totals = {}
-    const talentMaterialIds = new Set()
-    const firstTalent = Object.values(data.talent)[0]
-    if (firstTalent?.promote) {
-      for (const level in firstTalent.promote) {
-        const costItems = firstTalent.promote[level]?.costItems
-        if (costItems) {
-          Object.keys(costItems).forEach(id => talentMaterialIds.add(id))
-        }
-      }
-    }
-    Object.entries(data.ascension || {}).forEach(([id, amount]) => {
-      if (!talentMaterialIds.has(id)) {
-        totals[id] = (totals[id] || 0) + amount
-      }
-    })
-    return Object.entries(totals).map(([id, amount]) => ({
-      name: mapIdToName(id),
-      amount
-    }))
-  }
-  const calculateTotalTalentMaterials = () => {
-    const materialsTotal = {}
-    const talent = Object.values(data.talent)[0]
-    if (talent?.promote) {
-      for (let level = 2;level <= 10; level++) {
-        const costItems = talent.promote[level]?.costItems
-        if (costItems) {
-          Object.entries(costItems).forEach(([id, amount]) => {
-            materialsTotal[id] = (materialsTotal[id] || 0) + amount
-          })
-        }
-      }
-    }
-    return Object.entries(materialsTotal).map(([id, amount]) => ({
-      name: mapIdToName(id),
-      amount
-    }))
-  }
-  const calculateTotalMora = () => {
-    let total = 0
-    Object.values(data.upgrade?.promote || []).forEach(level => {
-      if (level.coinCost) total += level.coinCost
-    })
-    const talent = Object.values(data.talent)[0]
-    if (talent?.promote) {
-      for (let level = 2; level <= 10; level++) {
-        const promoteData = talent.promote[level]
-        if (promoteData?.coinCost) total += promoteData.coinCost
-      }
-    }
-    return total
-  }
-  const result = {
-    name: data.name,
-    birthday: data.birthday,
-    birthdayFormat: ["MM/DD"],
-    rank: data.rank,
-    element: data.element,
-    weaponType: data.weaponType,
-    nationality: data.region,
-    region: data.fetter.native,
-    title: data.fetter.title,
-    detail: data.fetter.detail,
-    constellationName: data.fetter.constellation,
-    specialProp: data.specialProp,
-    upgradeNeedMaterial: {
-      xpBooks: 419,
-      moraCoin: calculateTotalMora(),
-      ascensionMaterials: calculateUpgradeMaterials(),
-      talentMaterials: calculateTotalTalentMaterials(),
-    },
-    talents: Object.values(data.talent).map(t => ({
-      name: t.name,
-      description: t.description.replace(/<[^>]+>/g, ""),
-    }))
-  }
-  return result
-}
+const AMBR_API_BASE_URL = "https://gi.yatta.moe/api/v2/pt"
 
 const filterPlayerData = (playerData) => {
-  if (!playerData) {
-    return null
-  }
+  if (!playerData) return null
   const propMap = {
     "1": "HP Base",
     "4": "ATQ Base",
@@ -179,44 +95,27 @@ const filterPlayerData = (playerData) => {
   return result
 }
 
-const AMBR_API_BASE_URL = "https://gi.yatta.moe/api/v2/pt"
-
-const genshinAnalysis = async ({ characterName, uid }) => {
+const analyzeCharacter = async ({ characterName, uid }) => {
   try {
-    console.log(`[TOOL_CALL] Iniciando análise para ${characterName} (UID: ${uid})`)
-    console.log("[TOOL_HELPER] Buscando mapa de IDs de personagens...")
+    console.log(`[TOOL_CALL] Iniciando análise de build para ${characterName} (UID: ${uid})`)
     const listResponse = await axios.get(`${AMBR_API_BASE_URL}/avatar`)
     const characterItems = listResponse.data?.data?.items
-    if (!characterItems) {
-      throw createAppError("A estrutura de dados da API de referência (Ambr) mudou. A ferramenta precisa de manutenção.", 500, "GENSHIN_API_STRUCTURE_CHANGED")
-    }
+    if (!characterItems) throw createAppError("A estrutura de dados da API de referência (Ambr) mudou. A ferramenta precisa de manutenção.", 500, "GENSHIN_API_STRUCTURE_CHANGED")
     const characterEntry = Object.entries(characterItems).find(
       ([id, char]) => char.name.toLowerCase() === characterName.toLowerCase()
     )
-    if (!characterEntry) {
-      throw createAppError(`Não foi possível encontrar o personagem '${characterName}'. Verifique se o nome está correto e completo.`, 404, "GENSHIN_CHARACTER_NOT_FOUND")
-    }
+    if (!characterEntry) throw createAppError(`Não foi possível encontrar o personagem '${characterName}'. Verifique se o nome está correto e completo.`, 404, "GENSHIN_CHARACTER_NOT_FOUND")
     const characterId = characterEntry[0]
-    console.log(`[TOOL_HELPER] ID de ${characterName} encontrado: ${characterId}`)
-    console.log(`[TOOL_HELPER] Buscando dados de referência para o ID ${characterId}...`)
-    const referenceBuildPromise = axios.get(`${AMBR_API_BASE_URL}/avatar/${characterId}`)
-    console.log(`[TOOL_HELPER] Buscando dados do jogador no Enka.network para o UID ${uid}...`)
-    const playerBuildPromise = axios.get(`https://enka.network/api/uid/${uid}`, {
+    const playerResponse = await axios.get(`https://enka.network/api/uid/${uid}`, {
       headers: { "User-Agent": "Denkitsu/1.0" }
     })
-    const [referenceResponse, playerResponse] = await Promise.all([referenceBuildPromise, playerBuildPromise])
-    if (!playerResponse.data.avatarInfoList) {
-      throw createAppError(`Não foi possível acessar os dados do UID ${uid}. O perfil pode ser privado ou não ter personagens na Vitrine.`, 403, "GENSHIN_PROFILE_PRIVATE_OR_EMPTY")
-    }
+    if (!playerResponse.data.avatarInfoList) throw createAppError(`Não foi possível acessar os dados do UID ${uid}. O perfil pode ser privado ou não ter personagens na Vitrine.`, 403, "GENSHIN_PROFILE_PRIVATE_OR_EMPTY")
     const playerData = playerResponse.data.avatarInfoList.find((char) => char.avatarId.toString() === characterId)
-    if (!playerData) {
-      throw createAppError(`Personagem '${characterName}' não encontrado na Vitrine de Personagens do UID ${uid}.`, 404, "GENSHIN_CHARACTER_NOT_IN_SHOWCASE")
-    }
+    if (!playerData) throw createAppError(`Personagem '${characterName}' não encontrado na Vitrine de Personagens do UID ${uid}.`, 404, "GENSHIN_CHARACTER_NOT_IN_SHOWCASE")
     const responseData = {
-      characterGameInfo: filterReferenceData(referenceResponse.data.data),
       characterPlayerBuild: filterPlayerData(playerData)
     }
-    console.log(`[TOOL_CALL] Análise concluída. Retornando dados combinados.`)
+    console.log(`[TOOL_CALL] Análise de build concluída. Retornando dados.`)
     return { status: 200, data: responseData }
   } catch (error) {
     if (error.isOperational) throw error
@@ -225,11 +124,11 @@ const genshinAnalysis = async ({ characterName, uid }) => {
   }
 }
 
-const genshinTool = {
+const genshinCharAnalysisTool = {
   type: "function",
   function: {
-    name: "genshinTool",
-    description: "Use essa tool para buscar os dados atuais (arma, artefatos, status, etc.) do personagem que um jogador de Genshin Impact exibe em seu perfil no jogo, usando o UID fornecido. O assistente deve retornar em 2 sessões, a primeira mostra o necessário para upar o personagem e outra com os dados da build do personagem do jogador.",
+    name: "genshinCharAnalysisTool",
+    description: "Use esta ferramenta para buscar a build específica de um jogador para um determinado personagem, incluindo arma, artefatos, status, constelações e níveis de talento. Requer o nome do personagem e o UID do jogador.",
     parameters: {
       type: "object",
       properties: {
@@ -239,7 +138,7 @@ const genshinTool = {
         },
         characterName: {
           type: "string",
-          description: "O nome do personagem de interesse para focar a resposta. Exemplo: 'Nahida'."
+          description: "O nome do personagem de interesse para focar a análise da build. Exemplo: 'Nahida'."
         }
       },
       required: ["uid", "characterName"]
@@ -247,4 +146,4 @@ const genshinTool = {
   }
 }
 
-module.exports = { genshinAnalysis, genshinTool }
+module.exports = { analyzeCharacter, genshinCharAnalysisTool }
