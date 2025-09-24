@@ -1,13 +1,13 @@
 const AGENTS_DEFINITIONS = [
   { name: "Roteador", Icon: "Route", description: "Analisa a pergunta e seleciona automaticamente o melhor agente para a tarefa.", isCustom: false },
   { name: "Padrão", Icon: "Bot", description: "Assistente geral para uma ampla gama de tarefas e conversas.", isCustom: false },
-  // { name: "Analista", Icon: "BarChart2", description: "Focado em interpretar dados, encontrar padrões e gerar insights.", isCustom: false },
-  // { name: "Blogueiro", Icon: "Rss", description: "Ideal para criar textos longos, artigos e posts de blog com estilo.", isCustom: false },
+  { name: "Analista", Icon: "BarChart2", description: "Focado em interpretar dados, encontrar padrões e gerar insights.", isCustom: false },
+  { name: "Blogueiro", Icon: "Rss", description: "Ideal para criar textos longos, artigos e posts de blog com estilo.", isCustom: false },
   { name: "Desenvolvedor", Icon: "Code", description: "Especializado em gerar, explicar e depurar código em várias linguagens.", isCustom: false },
   { name: "Lousa", Icon: "Presentation", description: "Otimizado para criar visualizações interativas com código HTML.", isCustom: false },
-  // { name: "Prompter", Icon: "Sparkle", description: "Ajuda a refinar e melhorar as suas próprias perguntas para obter melhores respostas.", isCustom: false },
-  // { name: "Redator", Icon: "Newspaper", description: "Perfeito para escrever textos concisos, anúncios e notícias.", isCustom: false },
-  // { name: "Secretário", Icon: "ListTree", description: "Transforme seus objetivos em um passo-a-passo.", isCustom: false },
+  { name: "Prompter", Icon: "Sparkle", description: "Ajuda a refinar e melhorar as suas próprias perguntas para obter melhores respostas.", isCustom: false },
+  { name: "Redator", Icon: "Newspaper", description: "Perfeito para escrever textos concisos, anúncios e notícias.", isCustom: false },
+  { name: "Secretário", Icon: "ListTree", description: "Transforme seus objetivos em um passo-a-passo.", isCustom: false },
   { name: "Transcritor", Icon: "Speech", description: "Especialista em transcrever áudio para texto com alta precisão.", isCustom: false },
   { name: "Suporte", Icon: "HeartHandshake", description: "Agente especializado em ajudar com questões da conta, como assinaturas.", isCustom: false, disabled: false },
 ]
