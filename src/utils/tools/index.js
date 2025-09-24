@@ -20,7 +20,7 @@ const spaceWeatherService = require("./nasa/spaceWeather")
 
 // const bibleService = require("./search/bible")
 const browserService = require("./search/browser")
-const criptoService = require("./search/cripto")
+// const criptoService = require("./search/cripto")
 const duckduckgoService = require("./search/duckduckgo")
 const httpService = require("./search/http")
 const newsService = require("./search/news")
@@ -56,7 +56,7 @@ const availableTools = {
 
   // bibleTool: bibleService.searchBible,
   browserTool: browserService.browseUrl,
-  criptoTool: criptoService.getCoinQuote,
+  // criptoTool: criptoService.getCoinQuote,
   duckduckgoTool: duckduckgoService.searchDuckDuckGo,
   httpTool: httpService.executeHttpRequest,
   newsTool: newsService.searchNews,
@@ -91,7 +91,7 @@ const tools = [
 
   // bibleService.bibleTool,
   browserService.browserTool,
-  criptoService.criptoTool,
+  // criptoService.criptoTool,
   duckduckgoService.duckduckgoTool,
   httpService.httpTool,
   newsService.newsTool,
