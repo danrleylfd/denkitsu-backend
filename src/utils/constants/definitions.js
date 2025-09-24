@@ -6,7 +6,7 @@ const AGENTS_DEFINITIONS = [
   { name: "Desenvolvedor", Icon: "Code", description: "Especializado em gerar, explicar e depurar código em várias linguagens.", isCustom: false },
   { name: "Lousa", Icon: "Presentation", description: "Otimizado para criar visualizações interativas com código HTML.", isCustom: false },
   // { name: "Prompter", Icon: "Sparkle", description: "Ajuda a refinar e melhorar as suas próprias perguntas para obter melhores respostas.", isCustom: false },
-  { name: "Redator", Icon: "Newspaper", description: "Perfeito para escrever textos concisos, anúncios e notícias.", isCustom: false },
+  // { name: "Redator", Icon: "Newspaper", description: "Perfeito para escrever textos concisos, anúncios e notícias.", isCustom: false },
   // { name: "Secretário", Icon: "ListTree", description: "Transforme seus objetivos em um passo-a-passo.", isCustom: false },
   { name: "Transcritor", Icon: "Speech", description: "Especialista em transcrever áudio para texto com alta precisão.", isCustom: false },
   { name: "Suporte", Icon: "HeartHandshake", description: "Agente especializado em ajudar com questões da conta, como assinaturas.", isCustom: false, disabled: false },
