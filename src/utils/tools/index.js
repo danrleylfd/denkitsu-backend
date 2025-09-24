@@ -7,7 +7,7 @@ const albionService = require("./games/albion")
 const genshinCharAnalysisService = require("./games/genshinCharAnalysis")
 const genshinCharDetailsService = require("./games/genshinCharDetails")
 const hoyoCodesService = require("./games/hoyoCodes")
-const pokedexService = require("./games/pokedex")
+// const pokedexService = require("./games/pokedex")
 const gamesService = require("./games/rawg")
 
 const asteroidsService = require("./nasa/asteroids")
@@ -43,7 +43,7 @@ const availableTools = {
   genshinCharAnalysisTool: genshinService.analyzeCharacter,
   genshinCharDetailsTool: genshinService.getCharacterDetails,
   hoyoCodesTool: hoyoCodesService.getHoyoCodes,
-  pokedexTool: pokedexService.getPokemonDetails,
+  // pokedexTool: pokedexService.getPokemonDetails,
   gamesTool: gamesService.searchGames,
 
   asteroidsTool: asteroidsService.getNearEarthObjects,
@@ -78,7 +78,7 @@ const tools = [
   genshinService.genshinCharAnalysisTool,
   genshinService.genshinCharDetailsTool,
   hoyoCodesService.hoyoCodesTool,
-  pokedexService.pokedexTool,
+  // pokedexService.pokedexTool,
   gamesService.gamesTool,
 
   asteroidsService.asteroidsTool,
