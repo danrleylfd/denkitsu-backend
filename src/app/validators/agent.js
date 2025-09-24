@@ -13,8 +13,8 @@ const createOrUpdateAgentRules = () => {
       .trim()
       .notEmpty()
       .withMessage("A descrição do agente é obrigatória.")
-      .isLength({ max: 256 })
-      .withMessage("A descrição não pode ter mais de 256 caracteres.")
+      .isLength({ max: 512 })
+      .withMessage("A descrição não pode ter mais de 512 caracteres.")
       .escape(),
     body("Icon")
       .trim()
@@ -32,26 +32,26 @@ const createOrUpdateAgentRules = () => {
       .trim()
       .notEmpty()
       .withMessage("O campo 'Goal' do prompt é obrigatório.")
-      .isLength({ max: 512 })
-      .withMessage("O campo 'Goal' não pode ter mais de 512 caracteres."),
+      .isLength({ max: 1024 })
+      .withMessage("O campo 'Goal' não pode ter mais de 1024 caracteres."),
     body("prompt.returnFormat")
       .trim()
       .notEmpty()
       .withMessage("O campo 'Return Format' do prompt é obrigatório.")
-      .isLength({ max: 512 })
-      .withMessage("O campo 'Return Format' não pode ter mais de 512 caracteres."),
+      .isLength({ max: 1024 })
+      .withMessage("O campo 'Return Format' não pode ter mais de 1024 caracteres."),
     body("prompt.warning")
       .trim()
       .notEmpty()
       .withMessage("O campo 'Warning' do prompt é obrigatório.")
-      .isLength({ max: 512 })
-      .withMessage("O campo 'Warning' não pode ter mais de 512 caracteres."),
+      .isLength({ max: 1024 })
+      .withMessage("O campo 'Warning' não pode ter mais de 1024 caracteres."),
     body("prompt.contextDump")
       .trim()
       .notEmpty()
       .withMessage("O campo 'Context Dump' do prompt é obrigatório.")
-      .isLength({ max: 512 })
-      .withMessage("O campo 'Context Dump' não pode ter mais de 512 caracteres."),
+      .isLength({ max: 1024 })
+      .withMessage("O campo 'Context Dump' não pode ter mais de 1024 caracteres."),
   ]
 }
 
