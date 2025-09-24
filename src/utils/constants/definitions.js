@@ -32,7 +32,7 @@ const TOOLS_DEFINITIONS = [
   { name: "genshinCharAnalysisTool", title: "Genshin | Análise de Personagem", Icon: "FlagTriangleLeft", description: "Análise de builds de personagens de Genshin Impact a partir de um UID." },
   { name: "genshinCharDetailsTool", title: "Genshin | Detalhes de Personagem", Icon: "FlagTriangleRight", description: "Detalhes de personagens de Genshin Impact a partir de um UID." },
   // { name: "criptoTool", title: "Cotação: Cripto (Beta)", Icon: "Bitcoin", description: "Verifica a cotação atual de diversas criptomoedas em tempo real." },
-  { name: "albionTool", title: "Cotação: Albion Online Ouro (Beta)", Icon: "Coins", description: "Consulta o preço atual do ouro no jogo Albion Online." },
+  // { name: "albionTool", title: "Cotação: Albion Online Ouro (Beta)", Icon: "Coins", description: "Consulta o preço atual do ouro no jogo Albion Online." },
   { name: "weatherTool", title: "Clima na Terra", Icon: "Cloud", description: "Fornece a previsão do tempo para qualquer cidade do mundo." },
   { name: "spaceWeatherTool", title: "NASA: Clima Espacial", Icon: "SunMoon", description: "Busca relatórios da NASA sobre as condições climáticas no espaço." },
   { name: "marsWeatherTool", title: "NASA: Clima em Marte", Icon: "Thermometer", description: "Obtém os últimos dados meteorológicos diretamente dos rovers da NASA em Marte." },
