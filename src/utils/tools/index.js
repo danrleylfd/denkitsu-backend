@@ -18,7 +18,7 @@ const marsRoverService = require("./nasa/marsRover")
 const marsWeatherService = require("./nasa/marsWeather")
 const spaceWeatherService = require("./nasa/spaceWeather")
 
-const bibleService = require("./search/bible")
+// const bibleService = require("./search/bible")
 const browserService = require("./search/browser")
 const criptoService = require("./search/cripto")
 const duckduckgoService = require("./search/duckduckgo")
@@ -54,7 +54,7 @@ const availableTools = {
   marsWeatherTool: marsWeatherService.getMarsWeather,
   spaceWeatherTool: spaceWeatherService.getSpaceWeatherEvents,
 
-  bibleTool: bibleService.searchBible,
+  // bibleTool: bibleService.searchBible,
   browserTool: browserService.browseUrl,
   criptoTool: criptoService.getCoinQuote,
   duckduckgoTool: duckduckgoService.searchDuckDuckGo,
@@ -89,7 +89,7 @@ const tools = [
   marsWeatherService.marsWeatherTool,
   spaceWeatherService.spaceWeatherTool,
 
-  bibleService.bibleTool,
+  // bibleService.bibleTool,
   browserService.browserTool,
   criptoService.criptoTool,
   duckduckgoService.duckduckgoTool,
