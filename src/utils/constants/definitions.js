@@ -1,7 +1,7 @@
 const AGENTS_DEFINITIONS = [
   { name: "Roteador", Icon: "Route", description: "Analisa a pergunta e seleciona automaticamente o melhor agente para a tarefa.", isCustom: false },
   { name: "Padrão", Icon: "Bot", description: "Assistente geral para uma ampla gama de tarefas e conversas.", isCustom: false },
-  { name: "Analista", Icon: "BarChart2", description: "Focado em interpretar dados, encontrar padrões e gerar insights.", isCustom: false },
+  // { name: "Analista", Icon: "BarChart2", description: "Focado em interpretar dados, encontrar padrões e gerar insights.", isCustom: false },
   { name: "Blogueiro", Icon: "Rss", description: "Ideal para criar textos longos, artigos e posts de blog com estilo.", isCustom: false },
   { name: "Desenvolvedor", Icon: "Code", description: "Especializado em gerar, explicar e depurar código em várias linguagens.", isCustom: false },
   { name: "Lousa", Icon: "Presentation", description: "Otimizado para criar visualizações interativas com código HTML.", isCustom: false },
