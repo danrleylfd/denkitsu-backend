@@ -3,7 +3,7 @@ const agentService = require("../api/agent")
 
 const ttsService = require("./audio/tts")
 
-const albionService = require("./games/albion")
+// const albionService = require("./games/albion")
 const genshinCharAnalysisService = require("./games/genshinCharAnalysis")
 const genshinCharDetailsService = require("./games/genshinCharDetails")
 const hoyoCodesService = require("./games/hoyoCodes")
@@ -39,7 +39,7 @@ const availableTools = {
 
   ttsTool: ttsService.textToSpeech,
 
-  albionTool: albionService.getGoldPrice,
+  // albionTool: albionService.getGoldPrice,
   genshinCharAnalysisTool: genshinService.analyzeCharacter,
   genshinCharDetailsTool: genshinService.getCharacterDetails,
   hoyoCodesTool: hoyoCodesService.getHoyoCodes,
@@ -74,7 +74,7 @@ const tools = [
 
   ttsService.ttsTool,
 
-  albionService.albionTool,
+  // albionService.albionTool,
   genshinService.genshinCharAnalysisTool,
   genshinService.genshinCharDetailsTool,
   hoyoCodesService.hoyoCodesTool,
