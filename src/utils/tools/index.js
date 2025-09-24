@@ -26,7 +26,7 @@ const httpService = require("./search/http")
 const newsService = require("./search/news")
 const tmdbService = require("./search/tmdb")
 const weatherService = require("./search/weather")
-const wikipediaService = require("./search/wikipedia")
+// const wikipediaService = require("./search/wikipedia")
 
 const genshinService = { ...genshinCharAnalysisService, ...genshinCharDetailsService }
 
@@ -62,7 +62,7 @@ const availableTools = {
   newsTool: newsService.searchNews,
   tmdbTool: tmdbService.searchMedia,
   weatherTool: weatherService.getWeatherByLocation,
-  wikiTool: wikipediaService.searchWikipedia,
+  // wikiTool: wikipediaService.searchWikipedia,
 }
 
 const tools = [
@@ -97,7 +97,7 @@ const tools = [
   newsService.newsTool,
   tmdbService.tmdbTool,
   weatherService.weatherTool,
-  wikipediaService.wikiTool,
+  // wikipediaService.wikiTool,
 ]
 
 module.exports = { availableTools, tools }

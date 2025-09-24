@@ -23,7 +23,7 @@ const TOOLS_DEFINITIONS = [
   { name: "httpTool", title: "Requisição HTTP", Icon: "Server", description: "Faz uma requisição GET para uma URL, útil para acessar APIs ou dados brutos de uma página." },
   { name: "duckduckgoTool", title: "Pesquisar no DuckDuckGo", Icon: "Search", description: "Executa uma pesquisa rápida e direta no DuckDuckGo para obter resultados imediatos." },
   { name: "bibleTool", title: "Pesquisar na Bíblia", Icon: "BookOpenText", description: "Busca por versículos, passagens ou termos específicos diretamente no texto bíblico." },
-  { name: "wikiTool", title: "Pesquisar na Wikipédia", Icon: "BookOpen", description: "Consulta a Wikipédia para obter resumos e informações enciclopédicas sobre um tópico." },
+  // { name: "wikiTool", title: "Pesquisar na Wikipédia", Icon: "BookOpen", description: "Consulta a Wikipédia para obter resumos e informações enciclopédicas sobre um tópico." },
   { name: "newsTool", title: "Buscar Notícias", Icon: "Newspaper", description: "Pesquisa as notícias mais recentes de fontes globais sobre um determinado assunto." },
   { name: "cinemaTool", title: "Pesquisa Cinematográfica", Icon: "Clapperboard", description: "Busca informações sobre filmes e séries, incluindo sinopses, elenco e avaliações." },
   { name: "gamesTool", title: "Pesquisar Jogos", Icon: "Gamepad", description: "Encontra detalhes sobre videojogos, como data de lançamento, plataformas e gênero." },
