@@ -3,7 +3,7 @@ const agentService = require("../api/agent")
 
 const ttsService = require("./audio/tts")
 
-// const albionService = require("./games/albion")
+const albionService = require("./games/albion")
 const genshinCharAnalysisService = require("./games/genshinCharAnalysis")
 const genshinCharDetailsService = require("./games/genshinCharDetails")
 const hoyoCodesService = require("./games/hoyoCodes")
@@ -18,7 +18,7 @@ const marsRoverService = require("./nasa/marsRover")
 const marsWeatherService = require("./nasa/marsWeather")
 const spaceWeatherService = require("./nasa/spaceWeather")
 
-// const bibleService = require("./search/bible")
+const bibleService = require("./search/bible")
 const browserService = require("./search/browser")
 // const criptoService = require("./search/cripto")
 const duckduckgoService = require("./search/duckduckgo")
@@ -39,7 +39,7 @@ const availableTools = {
 
   ttsTool: ttsService.textToSpeech,
 
-  // albionTool: albionService.getGoldPrice,
+  albionTool: albionService.getGoldPrice,
   genshinCharAnalysisTool: genshinService.analyzeCharacter,
   genshinCharDetailsTool: genshinService.getCharacterDetails,
   hoyoCodesTool: hoyoCodesService.getHoyoCodes,
@@ -54,7 +54,7 @@ const availableTools = {
   marsWeatherTool: marsWeatherService.getMarsWeather,
   spaceWeatherTool: spaceWeatherService.getSpaceWeatherEvents,
 
-  // bibleTool: bibleService.searchBible,
+  bibleTool: bibleService.searchBible,
   browserTool: browserService.browseUrl,
   // criptoTool: criptoService.getCoinQuote,
   duckduckgoTool: duckduckgoService.searchDuckDuckGo,
@@ -74,7 +74,7 @@ const tools = [
 
   ttsService.ttsTool,
 
-  // albionService.albionTool,
+  albionService.albionTool,
   genshinService.genshinCharAnalysisTool,
   genshinService.genshinCharDetailsTool,
   hoyoCodesService.hoyoCodesTool,
@@ -89,7 +89,7 @@ const tools = [
   marsWeatherService.marsWeatherTool,
   spaceWeatherService.spaceWeatherTool,
 
-  // bibleService.bibleTool,
+  bibleService.bibleTool,
   browserService.browserTool,
   // criptoService.criptoTool,
   duckduckgoService.duckduckgoTool,
