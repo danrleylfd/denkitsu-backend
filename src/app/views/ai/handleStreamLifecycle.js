@@ -3,7 +3,7 @@ const { sanitizeMessages } = require("../../../utils/helpers/ai")
 const { processToolCalls, processStreamAndExtractReasoning, getSystemPrompt } = require("./chatHelpers")
 
 const handleStreamingLifecycle = async (req, res) => {
-  const { aiProvider, aiKey, messages: userPrompts } = req.body // ADICIONADO: userPrompts
+  const { aiProvider, aiKey, messages: userPrompts } = req.body
   const { user, userID, aiRequestPayload } = req
   const { initialMessages, options: requestOptions } = aiRequestPayload
 
@@ -15,7 +15,6 @@ const handleStreamingLifecycle = async (req, res) => {
     let aggregatedToolCalls = []
     let hasToolCall = false
     let initialReasoningSent = false
-    // ADICIONADO: Objeto para montar a primeira resposta completa do assistente
     const firstAssistantMessage = { role: "assistant", content: "", tool_calls: [] }
 
     for await (const chunk of streamResponse) {
@@ -34,7 +33,6 @@ const handleStreamingLifecycle = async (req, res) => {
         })
       }
 
-      // ADICIONADO: Agrega o conteúdo da primeira resposta
       if (delta.content) {
         firstAssistantMessage.content += delta.content
       }
@@ -52,16 +50,34 @@ const handleStreamingLifecycle = async (req, res) => {
       type: "function",
       function: { name: call.name, arguments: call.arguments }
     }))
-    // ADICIONADO: Atribui os tool_calls completos à mensagem do assistente
     firstAssistantMessage.tool_calls = finalToolCalls
 
     writeEvent({ type: "TOOL_EXECUTION_START", tool_calls: finalToolCalls })
 
     const toolResultMessages = await processToolCalls(finalToolCalls, user)
 
-    // MODIFICADO: A mensagem original do usuário é usada para a próxima etapa
+    // ADICIONADO: Lógica para interceptar a ttsTool, enviar o áudio e encerrar o stream
+    const ttsCall = finalToolCalls.find(c => c.function.name === "ttsTool")
+    if (ttsCall && finalToolCalls.length === 1) {
+      const ttsResult = toolResultMessages.find(r => r.tool_call_id === ttsCall.id)
+      if (ttsResult) {
+        const audioData = JSON.parse(ttsResult.content)
+        const finalChunk = {
+          choices: [{
+            delta: {
+              role: "assistant",
+              content: audioData.inputText,
+              audio: { data: audioData.audio, format: audioData.format || "wav" }
+            }
+          }]
+        }
+        writeEvent(finalChunk)
+        return res.end()
+      }
+    }
+
     let messagesForNextStep
-    let nextUserPrompts = userPrompts // Usa o userPrompts original por padrão
+    let nextUserPrompts = userPrompts
 
     const routerToolCallResult = toolResultMessages.find(r => r.name === "selectAgentTool")
     if (routerToolCallResult) {
@@ -74,7 +90,6 @@ const handleStreamingLifecycle = async (req, res) => {
         writeEvent({ type: "AGENT_SWITCH", agent: newAgentName })
       }
     } else {
-      // MODIFICADO: Passa a primeira resposta completa do assistente como contexto
       messagesForNextStep = [...initialMessages, firstAssistantMessage, ...toolResultMessages]
     }
 
@@ -86,7 +101,6 @@ const handleStreamingLifecycle = async (req, res) => {
     for await (const finalChunk of finalProcessedStream) {
       writeEvent(finalChunk)
     }
-
   } catch (error) {
     console.error(`[STREAM_LIFECYCLE_ERROR] ${new Date().toISOString()} - `, { error: error.message, stack: error.stack })
     writeEvent({ type: "ERROR", error: { message: error.message, code: error.errorCode || "STREAM_ERROR" } })

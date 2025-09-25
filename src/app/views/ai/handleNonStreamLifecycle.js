@@ -1,5 +1,3 @@
-// Arquivo: Backend/src/app/views/ai/handleNonStreamLifecycle.js
-
 const { ask } = require("../../../utils/api/ai")
 const { sanitizeMessages } = require("../../../utils/helpers/ai")
 const { processToolCalls, getSystemPrompt, cleanToolCallSyntax, extractReasoning } = require("./chatHelpers")
@@ -14,23 +12,41 @@ const handleNonStreamingLifecycle = async (req, res, next) => {
     const responseMessage = firstResponseData.choices[0].message
 
     if (!responseMessage.tool_calls) {
-      // MODIFICADO: Captura o reasoning de ambas as fontes
       const reasoningFromField = responseMessage.reasoning || ""
       const { content, reasoning: reasoningFromContent } = extractReasoning(cleanToolCallSyntax(responseMessage.content))
       const finalReasoning = (reasoningFromField + "\n" + reasoningFromContent).trim()
-
       const finalMessage = { ...responseMessage, content, reasoning: finalReasoning }
       const finalData = { ...firstResponseData, choices: [{ ...firstResponseData.choices[0], message: finalMessage }] }
-
       return res.status(200).json(finalData)
     }
 
-    // MODIFICADO: Captura o reasoning inicial de ambas as fontes
     const initialReasoningFromField = responseMessage.reasoning || ""
     const { reasoning: initialReasoningFromContent } = extractReasoning(cleanToolCallSyntax(responseMessage.content))
     const initialReasoning = (initialReasoningFromField + "\n" + initialReasoningFromContent).trim()
 
     const toolResultMessages = await processToolCalls(responseMessage.tool_calls, user)
+
+    // ADICIONADO: Lógica para interceptar a ttsTool e retornar o áudio diretamente
+    const ttsCall = responseMessage.tool_calls.find(c => c.function.name === "ttsTool")
+    if (ttsCall && responseMessage.tool_calls.length === 1) {
+      const ttsResult = toolResultMessages.find(r => r.tool_call_id === ttsCall.id)
+      if (ttsResult) {
+        const audioData = JSON.parse(ttsResult.content)
+        const finalMessage = {
+          role: "assistant",
+          content: audioData.inputText,
+          audio: { data: audioData.audio, format: audioData.format || "wav" }
+        }
+        return res.status(200).json({
+          id: firstResponseData.id,
+          object: "chat.completion",
+          created: Math.floor(Date.now() / 1000),
+          model: requestOptions.model,
+          choices: [{ index: 0, message: finalMessage, finish_reason: "stop" }],
+          tool_calls: responseMessage.tool_calls
+        })
+      }
+    }
 
     let messagesForNextStep
     let finalResponseData
@@ -42,7 +58,6 @@ const handleNonStreamingLifecycle = async (req, res, next) => {
         const newAgentName = resultData.agent
         const newSystemPrompt = await getSystemPrompt(newAgentName, userID)
         messagesForNextStep = [newSystemPrompt, ...originalUserMessages.filter(m => m.role !== "system")]
-
         const { data } = await ask(aiProvider, aiKey, sanitizeMessages(messagesForNextStep), { ...requestOptions, stream: false })
         finalResponseData = data
         finalResponseData.routingInfo = { routedTo: newAgentName }
@@ -54,26 +69,20 @@ const handleNonStreamingLifecycle = async (req, res, next) => {
     }
 
     const finalMessageFromAI = finalResponseData.choices[0].message
-
-    // MODIFICADO: Captura o reasoning final de ambas as fontes
     const finalReasoningFromField = finalMessageFromAI.reasoning || ""
     const { content, reasoning: finalReasoningFromContent } = extractReasoning(cleanToolCallSyntax(finalMessageFromAI.content))
     const finalExtractedReasoning = (finalReasoningFromField + "\n" + finalReasoningFromContent).trim()
-
     const finalMessageWithReasoning = {
       ...finalMessageFromAI,
       content,
       reasoning: `${initialReasoning}\n...\n${finalExtractedReasoning}`.trim()
     }
-
     const finalData = {
       ...finalResponseData,
       choices: [{ ...finalResponseData.choices[0], message: finalMessageWithReasoning }],
       tool_calls: responseMessage.tool_calls
     }
-
     return res.status(200).json(finalData)
-
   } catch (error) {
     next(error)
   }
